@@ -22,8 +22,11 @@ import {setDoc, doc, collection} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import DropDownSkill from './DropDownSkill';
 import {addEmployee} from '../../../Redux/slices/dataSlice';
-
+import {uuidv4} from '@firebase/util';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
+import {resetSkill} from '../../../Redux/English_Level';
+import {Picker} from '@react-native-picker/picker';
+
 const AddEmployee = () => {
   const dispatch = useDispatch();
   const [picture, setPicture] = useState(
@@ -85,13 +88,14 @@ const AddEmployee = () => {
     setOnOptionC_L(!onOptionC_L);
   };
   const AddNewEmployee = async () => {
+    const Id = uuidv4();
     const Data = {
       Address: address,
       Age: age,
       Birthday: dateBirth,
       Date_Join: firstdayworking,
       Email: email,
-      Employee_Id: (dataEmployee.length + 1).toString(),
+      Employee_Id: Id,
       Employee_Image: picture,
       Employee_Name: name,
       Gender: gender,
@@ -106,7 +110,7 @@ const AddEmployee = () => {
       Position: position,
       Salary: salary,
     };
-    await setDoc(doc(collection(db, 'Employee_Information')), Data);
+    await setDoc(doc(collection(db, 'Employee_Information'), Id), Data);
     dispatch(
       addEmployee({
         Address: address,
@@ -114,7 +118,7 @@ const AddEmployee = () => {
         Birthday: dateBirth,
         Date_Join: firstdayworking,
         Email: email,
-        Employee_Id: (dataEmployee.length + 1).toString(),
+        Employee_Id: Id,
         Employee_Image: picture,
         Employee_Name: name,
         Gender: gender,
@@ -130,7 +134,7 @@ const AddEmployee = () => {
         Salary: salary,
       }),
     );
-    ToastAndroid.show('New Employee have been added', ToastAndroid.SHORT);
+
     const auth = getAuth();
     const password =
       'abcdef' + (Math.floor(Math.random() * 10000) + 1000).toString();
@@ -139,6 +143,18 @@ const AddEmployee = () => {
       'New Account has been added',
       `Email: ${email}\t Password:${password}`,
     );
+    setName('');
+    setIdentification('');
+    setPhoneNumber('');
+    setDateBirth('');
+    setAge('');
+    setGender('');
+    setEmail('');
+    setAddress('');
+    setNationality('');
+    setPosition('');
+    setSalary('');
+    dispatch(resetSkill());
   };
 
   return (
@@ -503,20 +519,22 @@ const AddEmployee = () => {
               }}>
               Gender:
             </Text>
-            <TextInput
-              value={gender}
-              onChangeText={setGender}
+            <View
               style={{
                 borderRadius: 10,
-                paddingHorizontal: 20,
                 fontWeight: '600',
                 backgroundColor: 'hsl(222,56%,96%)',
                 height: 55,
                 color: 'black',
-              }}
-              placeholder="Gender"
-              placeholderTextColor="hsl(0,0%,60%)"
-            />
+              }}>
+              <Picker
+                selectedValue={gender}
+                onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+                mode="dropdown">
+                <Picker.Item label="Female" value="Female" />
+                <Picker.Item label="Male" value="Male" />
+              </Picker>
+            </View>
           </View>
 
           {/*Email */}
@@ -652,7 +670,7 @@ const AddEmployee = () => {
                 marginBottom: 5,
                 color: 'black',
               }}>
-              Salary:
+              Basic salary:
             </Text>
             <TextInput
               value={salary}
@@ -665,7 +683,7 @@ const AddEmployee = () => {
                 height: 55,
                 color: 'black',
               }}
-              placeholder="Position"
+              placeholder="Basic salary"
               placeholderTextColor="hsl(0,0%,60%)"
             />
           </View>

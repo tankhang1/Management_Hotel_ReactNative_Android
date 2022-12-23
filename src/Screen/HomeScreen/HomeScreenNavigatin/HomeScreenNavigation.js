@@ -11,7 +11,7 @@ import Bill from '../Bill/Bill';
 import Setting from '../Setting/Setting';
 import TabNavigationCustomer from '../CustomersScreen/TabNavigationCustomer';
 import EmployeeNavigation from '../Employees/EmployeeNavigation';
-import DashBoard from '../../HomeScreen/Dashboard/Index';
+import DashBoard from '../../HomeScreen/Dashboard/Dashboard';
 import {fetchData} from '../../../Redux/thunk/fetchData';
 import {useDispatch, useSelector} from 'react-redux';
 

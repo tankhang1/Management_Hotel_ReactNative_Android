@@ -11,16 +11,19 @@ import Template_Bill from './Template_Bill';
 const CustomersProfile = () => {
   const Id = useSelector(state => state.collect_Id_Customer);
   const dataCustomer = useSelector(state => state.data_infor).data.customers;
+  console.log(dataCustomer);
   const Data_Id = dataCustomer.filter(value => {
     return value.Customer_Id === Id;
   });
+
   const list_bill = useSelector(state => state.data_infor).data.bills.filter(
     value => {
       return value.Customer_Id === Id;
     },
   );
+  console.log(list_bill);
   const [showBill, setShowBill] = useState(false);
-  const [Bill_Id, setBill_Id] = useState('1');
+  const [Bill_Id, setBill_Id] = useState('LQBG6hQs3N7TjCe42DRt');
   const [onShowHistory, setOnshowHistory] = useState(false);
   return (
     <View
@@ -62,11 +65,13 @@ const CustomersProfile = () => {
           </Text>
           <Text
             style={{
-              color: 'hsl(0,0%,73%)',
-              fontSize: 24,
+              color: 'hsl(221,100%,64%)',
+              fontSize: 20,
               letterSpacing: 2,
               paddingVertical: 15,
-            }}>
+              flexWrap: 'wrap',
+            }}
+            numberOfLines={1}>
             Id: #{Data_Id[0].Customer_Id}
           </Text>
           <Text

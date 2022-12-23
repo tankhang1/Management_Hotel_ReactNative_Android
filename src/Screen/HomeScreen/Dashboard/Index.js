@@ -98,10 +98,7 @@ const Index = ({navigation}) => {
     const second = moment().isSameOrBefore(
       moment(year_first + '-' + month_first + '-' + day_first),
     );
-    // const first = moment(
-    //   year_first + '-' + month_first + '-' + day_first,
-    // ).toDate();
-    // console.log(first);
+
     console.log(second);
     return second;
   };
@@ -424,11 +421,6 @@ const Index = ({navigation}) => {
                 style={{
                   labels: {fill: 'black'},
                 }}
-                animate={{
-                  duration: 1000,
-                  onLoad: {duration: 1000},
-                  useNativeDriver: true,
-                }}
                 labelComponent={<VictoryLabel dy={-10} />}
                 data={[
                   {x: '2019', y: 125, label: '125'},
@@ -446,11 +438,6 @@ const Index = ({navigation}) => {
                 ]}
                 style={{
                   data: {stroke: 'red'},
-                }}
-                animate={{
-                  duration: 1000,
-                  onLoad: {duration: 1000},
-                  useNativeDriver: true,
                 }}
               />
               <VictoryScatter
@@ -485,11 +472,6 @@ const Index = ({navigation}) => {
                 interpolation={'catmullRom'}
                 style={{
                   labels: {fill: 'black'},
-                }}
-                animate={{
-                  duration: 1000,
-                  onLoad: {duration: 1000},
-                  useNativeDriver: true,
                 }}
                 labels={({datum}) => datum.y}
                 labelComponent={<VictoryLabel dy={-10} />}

@@ -23,13 +23,13 @@ const DropDownSkill = () => {
   const [openDropDown, setOpenDropDown] = useState(false);
   const convertColor = level => {
     switch (level) {
-      case '1':
+      case 1:
         return 'hsl(360,99%,49%)';
-      case '2':
+      case 2:
         return 'hsl(46,99%,50%)';
-      case '3':
+      case 3:
         return 'hsl(90,57%,62%)';
-      case '4':
+      case 4:
         return 'hsl(120,100%,29%)';
     }
   };
@@ -113,6 +113,8 @@ const DropDownSkill = () => {
                 width={'100%'}
                 height={55}
                 skill={item}
+                setOpenDropDown={setOpenDropDown}
+                openDropDown={openDropDown}
               />
             );
           })

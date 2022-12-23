@@ -72,47 +72,25 @@ const SearchCustomer = ({navigation}) => {
                       position: 'absolute',
                       right: 30,
                       top: 20,
+                      width: '50%',
                     }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          color: 'black',
-                          fontWeight: '600',
-                          paddingBottom: 20,
-                        }}>
-                        {item.Customer_Name}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          color: 'white',
-                          fontWeight: '500',
-                        }}>
-                        #{item.Customer_Id}
-                      </Text>
-                    </View>
                     <Text
                       style={{
                         fontSize: 18,
-                        letterSpacing: 3,
-                        color: 'hsl(0,99%,49%)',
-                        fontWeight: '900',
+                        color: 'hsl(220,61%,30%)',
+                        fontWeight: '600',
+                        paddingBottom: 20,
                       }}>
-                      {item.Identification}
+                      {item.Customer_Name}
                     </Text>
                     <Text
                       style={{
-                        fontSize: 14,
-                        letterSpacing: 2,
+                        fontSize: 16,
                         color: 'black',
-                      }}>
-                      {item.Phone}
+                        fontWeight: '500',
+                      }}
+                      numberOfLines={1}>
+                      #{item.Customer_Id}
                     </Text>
                   </View>
                 </ImageBackground>

@@ -9,6 +9,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Alert,
+  LogBox,
 } from 'react-native';
 import React, {useState} from 'react';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -18,7 +19,12 @@ import {useDispatch} from 'react-redux';
 import {addInfor} from '../../../Redux/InforBooking';
 import Lottie from 'lottie-react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+
 const Room = ({navigation}) => {
+  LogBox.ignoreLogs([
+    'Warning: Failed prop type: Invalid props.style key `resizeMode` supplied to `Text`.',
+  ]);
   const dispatch = useDispatch();
   const [modalVisibleCheckIn, setModalVisibleCheckIn] = useState(false);
   const [modalVisibleCheckOut, setModalVisibleCheckOut] = useState(false);
@@ -65,21 +71,16 @@ const Room = ({navigation}) => {
   };
 
   return (
-    <ScrollView
-      style={{
-        flex: 1,
-        backgroundColor: 'white',
-        paddingHorizontal: 10,
-
-        // height:height
-      }}
-      showsVerticalScrollIndicator={false}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'position'}
+    <KeyboardAwareScrollView>
+      <ScrollView
         style={{
           flex: 1,
-          //    height:height
-        }}>
+          backgroundColor: 'white',
+          paddingHorizontal: 10,
+
+          // height:height
+        }}
+        showsVerticalScrollIndicator={false}>
         <View
           style={{
             justifyContent: 'space-between',
@@ -100,12 +101,13 @@ const Room = ({navigation}) => {
             source={{
               uri: 'https://assets9.lottiefiles.com/private_files/lf30_ttgwkuhd.json',
             }}
-            autoPlay
-            loop
             style={{
               width: 50,
               height: 50,
             }}
+            resizeMode="contain"
+            autoPlay
+            loop
           />
         </View>
         <View
@@ -405,8 +407,8 @@ const Room = ({navigation}) => {
             </Text>
           </View>
         </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

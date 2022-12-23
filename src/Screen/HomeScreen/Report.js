@@ -8,8 +8,9 @@ import {
   ScrollView,
   Pressable,
   TouchableOpacity,
+  LogBox,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Lottie from 'lottie-react-native';
@@ -23,52 +24,108 @@ import {
 import {Divider} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {ProgressCircle} from 'react-native-svg-charts';
+import {
+  query,
+  collection,
+  onSnapshot,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+import {db} from '../../Firebase/firebase';
+import moment from 'moment';
+import {useNavigation} from '@react-navigation/native';
+const Report = ({navigation}) => {
+  useEffect(() => {
+    LogBox.ignoreLogs([
+      'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
+    ]);
+    const subscribe = navigation.addListener('focus', () => {
+      const q = query(
+        collection(db, 'History_Revenue'),
+        orderBy('Date', 'desc'),
+        limit(5),
+      );
+      onSnapshot(q, snapShot => {
+        const tmp = [];
+        snapShot.forEach(doc => {
+          tmp.push(doc.data());
+        });
+        const income = [];
+        let sumIncome = 0;
+        const outcome = [];
+        let sumOutcome = 0;
+        tmp.reverse().map((item, index) => {
+          const m = Number(moment(item.Date.toDate()).format('M'));
+          const month = convertMonth(m);
+          sumIncome += item.Income;
+          sumOutcome += item.Outcome;
+          income.push({x: month, y: item.Income});
+          outcome.push({x: month, y: item.Outcome});
+        });
+        setIncome([...income]);
+        setOutcome([...outcome]);
+        setSumIncome(sumIncome);
+        setSumOutcome(sumOutcome);
+      });
+      const queryDaily = query(
+        collection(db, 'History_Daily_Revenue'),
+        orderBy('Date', 'desc'),
+        limit(4),
+      );
+      onSnapshot(queryDaily, snaps => {
+        const tmp = [];
+        snaps.forEach(doc => {
+          const data = {
+            title: 'Default Bank Account',
+            bankNumber: doc.data().Bank_Number,
+            lastUpdate: moment(doc.data().Date.toDate()).format('DD/MM/YYYY'),
+            money: doc.data().Revenue,
+          };
+          tmp.push(data);
+        });
+        setDataBanking([...tmp]);
+      });
+    });
+    return subscribe;
+  }, [navigation]);
 
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-const Report = () => {
-  const dataBanking = [
-    {
-      title: 'Default Bank Account',
-      bankNumber: '55555666',
-      lastUpdate: '15/9/2022',
-      money: '16,504.64',
-    },
-    {
-      title: 'Default Bank Account',
-      bankNumber: '55555666',
-      lastUpdate: '17/8/2019',
-      money: '16,504.64',
-    },
-    {
-      title: 'Default Bank Account',
-      bankNumber: '55555666',
-      lastUpdate: '20/8/2019',
-      money: '16,504.64',
-    },
-  ];
+  const [Income, setIncome] = useState([]);
+  const [Outcome, setOutcome] = useState([]);
+  const [sumIncome, setSumIncome] = useState(0);
+  const [sumOutcome, setSumOutcome] = useState(0);
 
-  const dataIncome = [
-    {x: 'Aug', y: 2},
-    {x: 'Sep', y: 4},
-    {x: 'Oct', y: 1},
-    {x: 'Now', y: 8},
-    {x: 'Dec', y: 6},
-    {x: 'Jan', y: 7},
-  ];
+  const convertMonth = month => {
+    switch (month) {
+      case 1:
+        return 'Jan';
+      case 2:
+        return 'Feb';
+      case 3:
+        return 'Mar';
+      case 4:
+        return 'Apr';
+      case 5:
+        return 'May';
+      case 6:
+        return 'Jun';
+      case 7:
+        return 'Jul';
+      case 8:
+        return 'Aug';
+      case 9:
+        return 'Sep';
+      case 10:
+        return 'Oct';
+      case 11:
+        return 'Nov';
+      case 12:
+        return 'Dec';
+      default:
+        break;
+    }
+  };
+  const [dataBanking, setDataBanking] = useState([]);
 
-  const dataExpenses = [
-    {x: 'Aug', y: 2},
-    {x: 'Sep', y: 4},
-    {x: 'Oct', y: 1},
-    {x: 'Now', y: 8},
-    {x: 'Dec', y: 6},
-    {x: 'Jan', y: 7},
-  ];
   const ConvertBankNumber = number => {
     for (let i = 0; i < number.length - 4; i++) {
       number = number.replace(number[i], '*');
@@ -126,12 +183,7 @@ const Report = () => {
         />
       </View>
       {/*Body */}
-      <ScrollView
-        style={{}}
-        showsVerticalScrollIndicator={false}
-        onScroll={() =>
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.spring)
-        }>
+      <ScrollView style={{}} showsVerticalScrollIndicator={false}>
         {/*Profit and Loss */}
         <View
           style={{
@@ -172,7 +224,7 @@ const Report = () => {
                 letterSpacing: 1,
                 textAlign: 'center',
               }}>
-              $ 15151
+              $ {sumIncome - sumOutcome}
             </Text>
             <Text
               style={{
@@ -183,46 +235,46 @@ const Report = () => {
               Net Profit
             </Text>
           </View>
-          <VictoryChart
-            theme={VictoryTheme.grayscale}
-            animate={{
-              duration: 1000,
-              onLoad: {duration: 1000},
+          <View
+            style={{
+              flex: 1,
             }}>
-            <VictoryAxis
-              style={{
-                axis: {stroke: 'none'},
-              }}
-            />
-            <VictoryAxis
-              style={{
-                axis: {stroke: 'none'},
-              }}
-              dependentAxis
-            />
-            <VictoryGroup offset={12}>
-              <VictoryBar
-                data={dataIncome}
+            <VictoryChart theme={VictoryTheme.material}>
+              <VictoryAxis
                 style={{
-                  data: {
-                    fill: 'hsl(171,62%,48%)',
-                    width: 10,
-                  },
+                  axis: {stroke: 'none'},
                 }}
-                cornerRadius={{top: 5, bottom: 5}}
               />
-              <VictoryBar
-                data={dataExpenses}
+              <VictoryAxis
                 style={{
-                  data: {
-                    fill: 'hsl(215,62%,60%)',
-                    width: 10,
-                  },
+                  axis: {stroke: 'none'},
                 }}
-                cornerRadius={{top: 5, bottom: 5}}
+                dependentAxis
               />
-            </VictoryGroup>
-          </VictoryChart>
+              <VictoryGroup offset={12}>
+                <VictoryBar
+                  data={Income}
+                  style={{
+                    data: {
+                      fill: 'hsl(171,62%,48%)',
+                      width: 10,
+                    },
+                  }}
+                  cornerRadius={{top: 5, bottom: 5}}
+                />
+                <VictoryBar
+                  data={Outcome}
+                  style={{
+                    data: {
+                      fill: 'hsl(215,62%,60%)',
+                      width: 10,
+                    },
+                  }}
+                  cornerRadius={{top: 5, bottom: 5}}
+                />
+              </VictoryGroup>
+            </VictoryChart>
+          </View>
           {/*Legend */}
           <View
             style={{
@@ -263,7 +315,7 @@ const Report = () => {
                   lineHeight: 30,
                   fontWeight: '600',
                 }}>
-                $ 3,5555.4
+                $ {sumIncome}
               </Text>
             </View>
             <View>
@@ -299,7 +351,7 @@ const Report = () => {
                   lineHeight: 30,
                   fontWeight: '600',
                 }}>
-                $ 3,5555.4
+                $ {sumOutcome}
               </Text>
             </View>
           </View>
@@ -332,7 +384,7 @@ const Report = () => {
                     paddingLeft: 10,
                     letterSpacing: 0.8,
                   }}>
-                  Banking
+                  Average daily revenue
                 </Text>
               </View>
               <AntDesign name="right" size={16} />

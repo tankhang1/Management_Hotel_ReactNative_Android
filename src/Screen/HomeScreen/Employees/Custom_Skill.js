@@ -16,21 +16,33 @@ import {
 } from 'react-native-gesture-handler';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {addSkill} from '../../../Redux/English_Level';
 
-const Custom_Skill = ({width, height, skill}) => {
+const Custom_Skill = ({
+  width,
+  height,
+  skill,
+  setOpenDropDown,
+  openDropDown,
+}) => {
   const [name, setName] = useState('');
+  const english_level = useSelector(state => state.english_level);
   const dispatch = useDispatch();
   renderRightAction = (text, color, x, progress) => {
     const pressHandler = () => {
       this.close();
-      dispatch(
-        addSkill({
-          name: name,
-          level: x,
-        }),
-      );
+      if (english_level.map(e => e.x).indexOf(name) === -1) {
+        dispatch(
+          addSkill({
+            name: name,
+            level: x,
+          }),
+        );
+      }
+      if (english_level.length === 3) {
+        setOpenDropDown(!openDropDown);
+      }
     };
     return (
       <Animated.View style={{flex: 1, transform: [{translateX: 0}]}}>
@@ -51,10 +63,10 @@ const Custom_Skill = ({width, height, skill}) => {
         width: 300,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
       }}>
-      {this.renderRightAction('Poor', 'hsl(360,99%,49%)', '1', progress)}
-      {this.renderRightAction('Fair', 'hsl(46,99%,50%)', '2', progress)}
-      {this.renderRightAction('Good', 'hsl(90,57%,62%)', '3', progress)}
-      {this.renderRightAction('Excellent', 'hsl(120,100%,29%)', '4', progress)}
+      {this.renderRightAction('Poor', 'hsl(360,99%,49%)', 1, progress)}
+      {this.renderRightAction('Fair', 'hsl(46,99%,50%)', 2, progress)}
+      {this.renderRightAction('Good', 'hsl(90,57%,62%)', 3, progress)}
+      {this.renderRightAction('Excellent', 'hsl(120,100%,29%)', 4, progress)}
     </View>
   );
   updateRef = ref => {

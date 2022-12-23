@@ -178,12 +178,14 @@ const Booking = ({navigation}) => {
 
   const ApplyFilter = () => {
     setShowFilter(!showFilter);
+
     setData(Rooms);
     let tmp = [];
     Data.map(item => {
-      if (item.money < value || item.rating >= starPerNight) tmp.push(item);
+      if (item.money < value[0] || item.rating >= starPerNight) tmp.push(item);
     });
-    setData(tmp);
+    console.log(tmp.length);
+    setData([...tmp]);
   };
   return (
     <View

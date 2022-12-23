@@ -24,8 +24,12 @@ const English_Level = createSlice({
         }
       });
     },
+    resetSkill: (state, action) => {
+      return [];
+    },
   },
 });
 
-export const {addSkill, deleteSkill, updateSkill} = English_Level.actions;
+export const {addSkill, deleteSkill, updateSkill, resetSkill} =
+  English_Level.actions;
 export default English_Level.reducer;

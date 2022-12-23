@@ -20,7 +20,6 @@ const CustomizeDrawer = ({props, navigation}) => {
       style={{
         flex: 1,
       }}>
-      <StatusBar translucent backgroundColor={'transparent'} />
       <DrawerContentScrollView {...props}>
         <View>
           <Pressable

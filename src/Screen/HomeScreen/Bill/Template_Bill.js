@@ -9,6 +9,7 @@ import {
   Dimensions,
   Animated,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,7 +19,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {addBill, addCustomer} from '../../../Redux/slices/dataSlice';
 import {collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
-
+import {uuidv4} from '@firebase/util';
 const Template_Bill = ({
   visible,
   setVisible,
@@ -28,8 +29,7 @@ const Template_Bill = ({
   Birthday,
   Gender,
 }) => {
-  const No_Bill =
-    '#B' + (Math.floor(Math.random() * (1000 - 100 + 1)) + 100).toString();
+  const bill_Id = uuidv4();
   const dataCustomer = useSelector(state => state.data_infor).data.customers;
   const dataEmployee = useSelector(state => state.data_infor).data.employees;
   const currentEmployee = useSelector(state => state.data_infor).data
@@ -135,8 +135,10 @@ const Template_Bill = ({
   };
   const dispatch = useDispatch();
   const AddNewCustomer = async () => {
+    const cusomter_Id = uuidv4();
+
     const DataCustomer = {
-      Customer_Id: (dataCustomer.length + 1).toString(),
+      Customer_Id: cusomter_Id,
       Customer_Name: Infor_Customer.name,
       Birthday: Birthday,
       Gender: Gender,
@@ -144,27 +146,32 @@ const Template_Bill = ({
       Phone: Infor_Customer.phone,
       Status: 'New Customer',
       Date: moment(new Date()).format('DD/MM/YYYY'),
+      Phone_Number: Infor_Customer.phone,
     };
     const Data = {
-      Bill_Id: No_Bill,
-      Customer_Id: (dataCustomer.length + 1).toString(),
+      Bill_Id: bill_Id,
+      Customer_Id: cusomter_Id,
       Date_Check_In: Infor_Customer.date_check_in,
       Date_Check_Out: Infor_Customer.date_check_out,
       Employee_Id: currentEmployee.Employee_Id,
       List_Room_Id: List_Room_Id(),
       Total_Money: SumMoney(),
       Date: moment(new Date()).format('DD/MM/YYYY'),
+      Phone_Number: Infor_Customer.phone,
     };
     dispatch(addCustomer(DataCustomer));
     dispatch(addBill(Data));
 
-    await setDoc(doc(collection(db, 'Customer_Information')), DataCustomer);
-    await setDoc(doc(collection(db, 'Bill_List')), Data);
-    ToastAndroid.show('New Customer have been added', ToastAndroid.SHORT);
+    await setDoc(
+      doc(collection(db, 'Customer_Information'), cusomter_Id),
+      DataCustomer,
+    );
+    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
+    Alert.alert('Noticable', 'You has book success');
   };
   const NoAddCustomer = async () => {
     const Data = {
-      Bill_Id: No_Bill,
+      Bill_Id: bill_Id,
       Customer_Id: '',
       Date_Check_In: Infor_Customer.date_check_in,
       Date_Check_Out: Infor_Customer.date_check_out,
@@ -172,10 +179,11 @@ const Template_Bill = ({
       List_Room_Id: List_Room_Id(),
       Total_Money: SumMoney(),
       Date: moment(new Date()).format('DD/MM/YYYY'),
+      Phone_Number: Infor_Customer.phone,
     };
     dispatch(addBill(Data));
-    await setDoc(doc(collection(db, 'Bill_List')), Data);
-    ToastAndroid.show('Your booking have been added', ToastAndroid.SHORT);
+    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
+    Alert.alert('Noticable', 'You has book success');
   };
   const AddNewBill = () => {
     if (checkCustomer === true) {
@@ -471,7 +479,7 @@ const Template_Bill = ({
                   style={{
                     color: 'hsl(0,0%,60%)',
                   }}>
-                  {No_Bill}
+                  {bill_Id}
                 </Text>
               </View>
               <View

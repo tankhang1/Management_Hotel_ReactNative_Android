@@ -83,7 +83,7 @@ const CustomersList = () => {
     setCheckSort(null);
     setData([...data]);
   };
-  const numberOfItemsPerPageList = [2, 3, 4];
+  const numberOfItemsPerPageList = [6, 8, 10];
 
   const [page, setPage] = React.useState(0);
   const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(

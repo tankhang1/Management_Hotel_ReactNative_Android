@@ -24,6 +24,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id}) => {
   const bill = dataBills.filter(value => value.Bill_Id == Bill_Id);
   const dataRooms = useSelector(state => state.data_infor).data.rooms;
   const dataCustomers = useSelector(state => state.data_infor).data.customers;
+
   const customer = dataCustomers.filter(
     value => value.Customer_Id == bill[0].Customer_Id,
   );
@@ -153,7 +154,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id}) => {
             width: '95%',
             backgroundColor: 'white',
             alignSelf: 'center',
-            borderRadius: 30,
+            borderRadius: 10,
             paddingBottom: 30,
             marginTop: StatusBar.currentHeight,
           }}>

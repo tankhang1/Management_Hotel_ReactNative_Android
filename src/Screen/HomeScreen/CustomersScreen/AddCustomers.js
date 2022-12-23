@@ -20,6 +20,7 @@ import {addDoc, collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {useDispatch, useSelector} from 'react-redux';
 import {addCustomer} from '../../../Redux/slices/dataSlice';
+import {uuidv4} from '@firebase/util';
 const AddCustomers = () => {
   const Data = [
     {
@@ -63,11 +64,11 @@ const AddCustomers = () => {
   const [gender, setGender] = useState('');
   const [identification, setIdentification] = useState('');
   const [visibleCalendar, setVisibleCalendar] = useState(false);
-
   const AddNewCustomer = async () => {
-    const length = dataCustomer.length;
+    const Id = uuidv4();
+
     const Data = {
-      Customer_Id: (length + 1).toString(),
+      Customer_Id: Id,
       Customer_Name: name,
       Birthday: date_of_birth,
       Gender: gender,
@@ -75,11 +76,11 @@ const AddCustomers = () => {
       Phone: phone_number,
       Status: 'New Customer',
     };
-    await setDoc(doc(collection(db, 'Customer_Information')), Data);
+    await setDoc(doc(collection(db, 'Customer_Information'), Id), Data);
 
     dispatch(
       addCustomer({
-        Customer_Id: (length + 1).toString(),
+        Customer_Id: Id,
         Customer_Name: name,
         Birthday: date_of_birth,
         Gender: gender,
@@ -92,6 +93,7 @@ const AddCustomers = () => {
     setDate_of_birth('');
     setGender('');
     setPhone_number('');
+    setIdentification('');
     Alert.alert('Notice', 'Information customer has been added');
   };
 
@@ -101,6 +103,7 @@ const AddCustomers = () => {
       style={{
         flex: 1,
         backgroundColor: 'white',
+        paddingTop: 10,
       }}>
       <ScrollView
         style={{
@@ -161,7 +164,7 @@ const AddCustomers = () => {
             const animatedWidth = useRef(new Animated.Value(0)).current;
             let transitiontoWidth = animatedWidth.interpolate({
               inputRange: [0, 1],
-              outputRange: ['50%', '65%'],
+              outputRange: [1, 1.2],
               extrapolate: 'clamp',
             });
 
@@ -170,7 +173,7 @@ const AddCustomers = () => {
                 toValue: 1,
                 duration: 500,
                 easing: Easing.linear,
-                useNativeDriver: false,
+                useNativeDriver: true,
               }).start();
             };
 
@@ -179,7 +182,7 @@ const AddCustomers = () => {
                 toValue: 0,
                 duration: 500,
                 easing: Easing.linear,
-                useNativeDriver: false,
+                useNativeDriver: true,
               }).start();
             };
             return (
@@ -190,6 +193,7 @@ const AddCustomers = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   marginBottom: 10,
+                  marginRight: 10,
                 }}>
                 <Text
                   style={{
@@ -201,8 +205,8 @@ const AddCustomers = () => {
                 <Animated.View
                   style={{
                     backgroundColor: 'hsl(0,0%,95%)',
-                    width: transitiontoWidth,
-                    marginLeft: 10,
+                    width: '50%',
+                    transform: [{scaleX: transitiontoWidth}],
                     borderWidth: 1,
                     borderRadius: 10,
                     flexDirection: 'row',
