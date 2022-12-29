@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 const Collect_ID_Employee = createSlice({
   name: 'Collect_ID_Employee',
-  initialState: '4RFSxmAWxtIn1iiLlBYz',
+  initialState: 'E000001',
   reducers: {
     addId: (state, action) => {
       state = action.payload;

@@ -60,8 +60,10 @@ const ListComponent = props => {
             fontSize: 16,
             paddingBottom: 5,
             color: 'hsl(0,0%,60%)',
-          }}>
-          {item.Employee_Id}
+            width: 100,
+          }}
+          numberOfLines={1}>
+          #{item.Employee_Id}
         </Text>
       </View>
     );

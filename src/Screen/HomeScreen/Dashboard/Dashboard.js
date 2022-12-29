@@ -116,9 +116,7 @@ const Dashboard = ({navigation}) => {
             CHKM Hotel Management
           </Text>
           <Pressable
-            onPress={() => {
-              navigation.navigate('Setting');
-            }}
+            onPress={() => {}}
             style={{
               width: 35,
               height: 35,

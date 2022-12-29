@@ -24,9 +24,11 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 const EmployeesProfile = () => {
   const id = useSelector(state => state.collect_Id_Employee);
+  console.log(id);
   const dataEmployee = useSelector(
     state => state.data_infor,
   ).data.employees.filter(value => value.Employee_Id === id);
+  console.log(dataEmployee);
   useEffect(() => {
     const AddNew = () => {
       let tmp = [];

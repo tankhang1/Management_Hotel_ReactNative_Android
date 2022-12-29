@@ -26,7 +26,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {addRoom} from '../../../Redux/slices/dataSlice';
-
+import {uuidv4} from '@firebase/util';
 const AddNewRoom = () => {
   //Animation Kind Room lef
 
@@ -103,8 +103,9 @@ const AddNewRoom = () => {
   };
   const dispatch = useDispatch();
   const AddRoom = async () => {
+    const Id = uuidv4();
     const Room = {
-      id: Rooms.length + 1,
+      id: Id,
       image: picture,
       kind: kindRoom,
       money: roomCharge,

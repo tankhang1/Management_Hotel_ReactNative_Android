@@ -64,8 +64,12 @@ const AddCustomers = () => {
   const [gender, setGender] = useState('');
   const [identification, setIdentification] = useState('');
   const [visibleCalendar, setVisibleCalendar] = useState(false);
+  const createId = number => {
+    if (number < 10) return `C00000${number + 1}`;
+    else if (number < 100) return `C0000${number + 1}`;
+  };
   const AddNewCustomer = async () => {
-    const Id = uuidv4();
+    const Id = createId(dataCustomer.length);
 
     const Data = {
       Customer_Id: Id,

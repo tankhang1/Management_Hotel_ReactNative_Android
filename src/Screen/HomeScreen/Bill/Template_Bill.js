@@ -30,8 +30,6 @@ const Template_Bill = ({
   Gender,
 }) => {
   const bill_Id = uuidv4();
-  const dataCustomer = useSelector(state => state.data_infor).data.customers;
-  const dataEmployee = useSelector(state => state.data_infor).data.employees;
   const currentEmployee = useSelector(state => state.data_infor).data
     .currentEmployee;
   const {width, height} = Dimensions.get('screen');
@@ -214,7 +212,7 @@ const Template_Bill = ({
             width: '95%',
             backgroundColor: 'white',
             alignSelf: 'center',
-            borderRadius: 30,
+            borderRadius: 10,
             paddingBottom: 30,
             marginTop: StatusBar.currentHeight,
           }}>

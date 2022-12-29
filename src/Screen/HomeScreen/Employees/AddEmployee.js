@@ -87,8 +87,12 @@ const AddEmployee = () => {
     });
     setOnOptionC_L(!onOptionC_L);
   };
+  const createId = number => {
+    if (number < 10) return `E00000${number + 1}`;
+    else if (number < 100) return `E0000${number + 1}`;
+  };
   const AddNewEmployee = async () => {
-    const Id = uuidv4();
+    const Id = createId(dataEmployee.length);
     const Data = {
       Address: address,
       Age: age,
