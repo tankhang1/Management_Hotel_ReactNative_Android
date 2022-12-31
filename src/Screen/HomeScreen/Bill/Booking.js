@@ -161,7 +161,13 @@ const Booking = ({navigation}) => {
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const SortResult = ['Highest Popularity', 'Highest Price', 'Lowest Price'];
+  const SortResult = [
+    'Single Room',
+    'Twin Room',
+    'Double Room',
+    'Deluxe',
+    'President',
+  ];
 
   //Range
 
@@ -179,13 +185,34 @@ const Booking = ({navigation}) => {
   const ApplyFilter = () => {
     setShowFilter(!showFilter);
 
-    setData(Rooms);
     let tmp = [];
-    Data.map(item => {
-      if (item.money < value[0] || item.rating >= starPerNight) tmp.push(item);
-    });
-    console.log(tmp.length);
-    setData([...tmp]);
+    console.log(sortResult);
+    if (sortResult !== null || starPerNight !== null || value !== 0) {
+      Rooms.map(item => {
+        if (sortResult !== null) {
+          if (item.kind === SortResult[sortResult]) {
+            if (value > 0) {
+              if (item.money < value) {
+                if (starPerNight !== null) {
+                  if (item.rating > starPerNight) tmp.push(item);
+                } else tmp.push(item);
+              }
+            } else tmp.push(item);
+          }
+        } else {
+          if (value > 0) {
+            if (item.money < value) {
+              if (starPerNight !== null) {
+                if (item.rating > starPerNight) tmp.push(item);
+              } else tmp.push(item);
+            }
+          }
+        }
+      });
+      setData([...tmp]);
+    } else {
+      setData([...Rooms]);
+    }
   };
   return (
     <View
@@ -332,7 +359,7 @@ const Booking = ({navigation}) => {
               minimumTrackTintColor="hsl(145,67%,47%)"
               maximumTrackTintColor="hsl(0,0%,80%)"
               animateTransitions={true}
-              maximumValue={400}
+              maximumValue={3000}
               minimumValue={0}
               step={1}
             />
@@ -451,27 +478,58 @@ const Booking = ({navigation}) => {
               })}
             </ScrollView>
           </View>
-          <Pressable
-            onPress={ApplyFilter}
+          <View
             style={{
-              width: 200,
-              height: 50,
-              justifyContent: 'center',
+              flexDirection: 'row',
               alignItems: 'center',
-              borderRadius: 30,
-              alignSelf: 'center',
-              marginTop: 20,
-              backgroundColor: 'hsl(145,67%,47%)',
+              justifyContent: 'space-between',
+              paddingHorizontal: 20,
             }}>
-            <Text
+            <Pressable
+              onPress={() => {
+                setSortResult(null), setStarPerNight(null), setValue(0);
+              }}
               style={{
-                color: 'white',
-                fontWeight: '600',
-                fontSize: 20,
+                width: '40%',
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                alignSelf: 'center',
+                marginTop: 20,
+                backgroundColor: 'hsl(145,67%,60%)',
               }}>
-              Apply Filter
-            </Text>
-          </Pressable>
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: 20,
+                }}>
+                Reset
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={ApplyFilter}
+              style={{
+                width: '40%',
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                alignSelf: 'center',
+                marginTop: 20,
+                backgroundColor: 'hsl(145,67%,60%)',
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: 20,
+                }}>
+                Apply Filter
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </Modal>
       <View

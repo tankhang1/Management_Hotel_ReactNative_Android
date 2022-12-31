@@ -46,16 +46,10 @@ const AddNewRoom = () => {
   ];
   const [value_facility, setValue_facility] = useState('');
   const [dataChip, setDataChip] = useState([]);
-  const [indexD, setIndexD] = useState();
   //Value Kind Room
   const [kindRoom, setKindRoom] = useState('one-bed');
   const [roomCharge, setRoomCharge] = useState('');
   const [decribe, setDecribe] = useState('');
-  const [isService, setIsService] = useState(false);
-  const [isWifi, setIsWifi] = useState(false);
-  const [isReceptionist, setIsReceptionist] = useState(false);
-  const [isAirconditioning, setIsAirconditioning] = useState(false);
-  const [isBreakfast, setIsBreakfast] = useState(false);
 
   //Picture room
   const [picture, setPicture] = useState('');
@@ -151,12 +145,10 @@ const AddNewRoom = () => {
           <View
             style={{
               width: '80%',
-
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor: 'white',
               alignSelf: 'center',
-
               borderRadius: 5,
               elevation: 5,
               position: 'absolute',

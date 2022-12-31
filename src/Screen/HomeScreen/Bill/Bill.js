@@ -11,7 +11,7 @@ import {
   UIManager,
   LayoutAnimation,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -25,6 +25,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
+import Feather from 'react-native-vector-icons/Feather';
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -32,174 +33,85 @@ if (Platform.OS === 'android') {
 }
 const Bill = ({navigation, route}) => {
   const [data, setData] = React.useState(route.params.bill);
+  const rooms = useSelector(state => state.data_infor).data.rooms;
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', () => {
+      let x = [];
+      data.map((item, index) => {
+        let position = x.map(e => e.key).indexOf(item.kind);
+        if (position === -1) {
+          x.push({key: item.kind, value: [item], quantity: 1});
+        } else {
+          x[position].value.push(item), x[position].quantity++;
+        }
+      });
+      setGroupByData([...x]);
+
+      let y = [];
+      rooms.map((item, index) => {
+        let position = y.map(e => e.key).indexOf(item.kind);
+        if (position === -1) {
+          y.push({key: item.kind, quantity: 1});
+        } else {
+          y[position].quantity++;
+        }
+      });
+      setGroupByMaxRoom([...y]);
+    });
+    return subscribe;
+  }, [navigation]);
+
+  const [groupByData, setGroupByData] = useState([]);
+
+  const [groupByMaxRoom, setGroupByMaxRoom] = useState([]);
+  console.log(groupByMaxRoom);
   const dispatch = useDispatch();
   const InforBooking = useSelector(state => state.booking);
   const [name, setName] = useState(InforBooking.name);
   const [phone, setPhone] = useState(InforBooking.phone);
   const [passport, setPassport] = useState(InforBooking.passport);
-  const onDelete = (index, Id) => {
-    const tmp = [...data];
-    tmp.splice(index, 1);
-    setData(tmp);
-    dispatch(
-      deleteLike({
-        id: Id,
-      }),
-    );
-  };
 
-  const [showDeleteJiggle, setShowDeleteJiggle] = React.useState(false);
   const [checkCustomer, setCheckCustomer] = useState(false);
   const [modalVisibleBirthday, setModalVisibleBirthday] = useState(false);
   const [gender, setGender] = useState('Male');
-  const renderItem = ({item, index}) => {
-    return (
-      <Pressable
-        onLongPress={() => {
-          setShowDeleteJiggle(!showDeleteJiggle);
-        }}
-        key={item.id}
-        style={{
-          width: '90%',
-          alignSelf: 'center',
-        }}>
-        <JiggleDeleteView
-          showDeleteJiggle={showDeleteJiggle}
-          onDelete={() => {
-            onDelete(index, item.id);
-          }}>
-          <View
-            style={{
-              marginVertical: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              alignSelf: 'center',
-            }}>
-            <Image
-              source={{uri: item.image}}
-              style={{
-                width: 200,
-                height: 200,
-                resizeMode: 'cover',
-                borderRadius: 20,
-              }}
-            />
-            <View
-              style={{
-                width: 130,
-                height: 150,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                borderTopWidth: 0.5,
-                borderBottomWidth: 0.5,
-                borderRightWidth: 0.5,
-                borderTopRightRadius: 20,
-                borderBottomRightRadius: 20,
-              }}>
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: '700',
-                  color: 'black',
-                }}>
-                {item.no_room}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginVertical: 10,
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  width: '100%',
-                  marginLeft: 2,
-                }}>
-                {[0, 0, 0, 0, 0].map((Item, index) => {
-                  if (index <= item.rating - 1)
-                    return (
-                      <Fontisto
-                        key={index}
-                        name="star"
-                        size={10}
-                        color="hsl(44,99%,50%)"
-                        style={{
-                          marginRight: 2,
-                        }}
-                      />
-                    );
-                  else if (index - item.rating + 1 <= 0.5)
-                    return (
-                      <Fontisto
-                        key={index}
-                        name="star-half"
-                        size={10}
-                        color="hsl(44,99%,50%)"
-                        style={{
-                          marginRight: 2,
-                        }}
-                      />
-                    );
-                  else return;
-                })}
-                <Text
-                  style={{
-                    fontSize: 18,
-                    marginLeft: 2,
-                    color: 'hsl(0,0%,60%)',
-                  }}>
-                  {item.rating}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  width: '100%',
-                }}>
-                <Text
-                  style={{
-                    color: 'black',
-                    fontSize: 15,
-                  }}>
-                  Rent cost :{' '}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: 'hsl(35,97%,55%)',
-                  }}>
-                  {item.money}$
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: '100%',
-                  height: 50,
-                  position: 'absolute',
-                  bottom: 0,
-                  borderBottomRightRadius: 20,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: 'hsl(221,100%,64%)',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '700',
-                  }}>
-                  View Detail
-                </Text>
-              </View>
-            </View>
-          </View>
-        </JiggleDeleteView>
-      </Pressable>
-    );
-  };
+
   const [visibleModal, setVisibleModal] = React.useState(false);
   const [changeModal, setChangeModal] = useState(false);
   const [Birthday, setBirthday] = useState('');
-  console.log(Birthday, gender);
+  const onPlus = index => {
+    if (groupByData[index].quantity < groupByMaxRoom[index].quantity) {
+      let tmp = [...groupByData];
+      tmp[index].quantity++;
+      setGroupByData([...tmp]);
+    }
+  };
+  const onMinus = index => {
+    if (groupByData[index].quantity > 1) {
+      let tmp = [...groupByData];
+      tmp[index].quantity--;
+      setGroupByData([...tmp]);
+    }
+  };
+  const onDeleteRoom = index => {
+    groupByData[index].value.map((item, index) => {
+      dispatch(
+        deleteLike({
+          id: item.id,
+        }),
+      );
+    });
+    let tmp = [...groupByData];
+    tmp.splice(index, 1);
+    setGroupByData([...tmp]);
+  };
+  useEffect(() => {
+    let sum = 0;
+    groupByData.map((item, index) => {
+      sum += item.quantity;
+    });
+    setSumRoom(sum);
+  }, [groupByData]);
+  const [sumRoom, setSumRoom] = useState(0);
   return (
     <View
       style={{
@@ -429,10 +341,65 @@ const Bill = ({navigation, route}) => {
               }}>
               List room have choosed
             </Text>
-            <Text>({data.length} Room)</Text>
+            <Text>({sumRoom} Room)</Text>
           </View>
-          {data.map((item, index) => {
-            return renderItem({item});
+
+          {groupByData.map((item, index) => {
+            return (
+              <View
+                style={{
+                  width: '100%',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginVertical: 10,
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 10,
+                  height: 30,
+                }}>
+                <Text
+                  style={{
+                    color: 'hsl(0,0%,60%)',
+                    fontSize: 16,
+                  }}>
+                  {item.key} x {item.quantity}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    paddingHorizontal: 10,
+                    borderColor: 'hsl(0,0%,73%)',
+                  }}>
+                  <Pressable
+                    onPress={() => {
+                      onMinus(index);
+                    }}>
+                    <Entypo name="minus" size={16} color="hsl(0,0%,50%)" />
+                  </Pressable>
+                  <Text
+                    style={{
+                      color: 'hsl(0,0%,50%)',
+                      fontSize: 14,
+                      marginHorizontal: 10,
+                    }}>
+                    {item.quantity}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      onPlus(index);
+                    }}>
+                    <Entypo name="plus" size={16} color="hsl(0,0%,50%)" />
+                  </Pressable>
+                </View>
+                <Pressable onPress={() => onDeleteRoom(index)}>
+                  <Feather name="trash" size={16} color="black" />
+                </Pressable>
+                <Feather name="chevrons-left" size={24} color="black" />
+              </View>
+            );
           })}
         </Pressable>
 

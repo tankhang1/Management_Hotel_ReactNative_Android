@@ -20,10 +20,11 @@ const DropDownKind = ({width, open, setOpen, dataKind, value, setValue}) => {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          width: '85%',
         }}>
         <TextInput
           style={{
-            width: '85%',
+            width: '100%',
             color: 'black',
           }}
           placeholder="Kind Room"

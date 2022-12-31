@@ -20,7 +20,6 @@ import {addDoc, collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {useDispatch, useSelector} from 'react-redux';
 import {addCustomer} from '../../../Redux/slices/dataSlice';
-import {uuidv4} from '@firebase/util';
 const AddCustomers = () => {
   const Data = [
     {
@@ -103,7 +102,6 @@ const AddCustomers = () => {
 
   return (
     <KeyboardAvoidingView
-      //behavior="padding"
       style={{
         flex: 1,
         backgroundColor: 'white',

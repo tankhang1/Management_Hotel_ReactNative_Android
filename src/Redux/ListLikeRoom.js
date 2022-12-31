@@ -12,6 +12,9 @@ const ListLikeRoom = createSlice({
       if (index !== -1) list.splice(index, 1);
       return list;
     },
+    setLike: (state, action) => {
+      return [];
+    },
   },
 });
 

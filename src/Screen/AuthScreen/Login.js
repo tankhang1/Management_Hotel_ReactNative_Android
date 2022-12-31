@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   KeyboardAvoidingView,
+  Modal,
 } from 'react-native';
 import React, {useState} from 'react';
 import Lottie from 'lottie-react-native';
@@ -14,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import {auth} from '../../Firebase/firebase';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const Login = ({navigation}) => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -24,17 +26,81 @@ const Login = ({navigation}) => {
         navigation.navigate('IntroScreen'),
       );
     } catch (error) {
-      console.log(JSON.stringify(error));
+      setErrorText(JSON.parse(JSON.stringify(error)).code);
+      setShowError(!showError);
     }
   };
   const [isPressN, setIsPressN] = useState(false);
   const [isPressP, setIsPressP] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorText, setErrorText] = useState('');
   return (
     <ScrollView
       style={{
         flex: 1,
         backgroundColor: 'white',
       }}>
+      <Modal
+        visible={showError}
+        onRequestClose={() => {
+          setShowError(!showError);
+        }}
+        transparent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(186,186,186,0.8)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: '80%',
+              backgroundColor: 'white',
+              paddingVertical: 20,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 10,
+            }}>
+            {/*Header Text */}
+            <MaterialIcons name="error" size={100} color="hsl(0,99%,60%)" />
+            {/*Sub header */}
+            <Text
+              style={{
+                fontSize: 24,
+                color: 'hsl(0,99%,60%)',
+                letterSpacing: 1.5,
+                fontWeight: '600',
+              }}>
+              Error!
+            </Text>
+            <Text
+              style={{
+                fontSize: 18,
+                color: '#bababa',
+                marginVertical: 15,
+              }}>
+              {errorText}
+            </Text>
+
+            <Pressable
+              onPress={() => setShowError(!showError)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: 150,
+                height: 35,
+                backgroundColor: 'hsl(0,99%,60%)',
+                justifyContent: 'center',
+                borderRadius: 10,
+              }}>
+              <Text style={{color: 'white', fontSize: 16, fontWeight: '500'}}>
+                Try again
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <KeyboardAvoidingView behavior={'position'}>
         <Lottie
           source={require('./assets/management.json')}

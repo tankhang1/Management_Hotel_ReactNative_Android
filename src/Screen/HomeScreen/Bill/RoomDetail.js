@@ -43,19 +43,17 @@ const RoomDetail = ({navigation, route}) => {
     bookMark1.current = !bookMark1.current;
     bookMark1.current === true
       ? listlikeroom1.indexOf(Id) === -1
-        ? (dispatch(
+        ? dispatch(
             addLike({
               id: Id,
             }),
-          ),
-          console.log('Add'))
+          )
         : null
-      : (dispatch(
+      : dispatch(
           deleteLike({
             id: Id,
           }),
-        ),
-        console.log('delete'));
+        );
   };
   const onBook = () => {
     if (bookMark1.current === false) {

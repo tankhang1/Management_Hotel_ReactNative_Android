@@ -69,7 +69,49 @@ const Room = ({navigation}) => {
       navigation.navigate('Booking');
     }
   };
-
+  const [checkName, setCheckName] = useState(false);
+  const [checkNumber, setCheckNumber] = useState(false);
+  const [checkIden, setCheckIden] = useState(false);
+  const validateInput = (text, kind) => {
+    switch (kind) {
+      case 1: {
+        for (let i = 0; i < text.length; i++) {
+          if (
+            (text.charCodeAt(i) < 65 && text.charCodeAt(i) > 32) ||
+            (text.charCodeAt(i) > 90 && text.charCodeAt(i) < 97) ||
+            text.charCodeAt(i) > 122
+          ) {
+            setCheckName(true);
+            return;
+          }
+        }
+        setCheckName(false);
+        return;
+      }
+      case 2: {
+        for (let i = 0; i < text.length; i++) {
+          if (text.charCodeAt(i) < 48 || text.charCodeAt(i) > 57) {
+            setCheckNumber(true);
+            return;
+          }
+        }
+        setCheckNumber(false);
+        return;
+      }
+      case 3: {
+        for (let i = 0; i < text.length; i++) {
+          if (text.charCodeAt(i) < 48 || text.charCodeAt(i) > 57) {
+            setCheckIden(true);
+            return;
+          }
+        }
+        setCheckIden(false);
+        return;
+      }
+      default:
+        break;
+    }
+  };
   return (
     <KeyboardAwareScrollView>
       <ScrollView
@@ -77,8 +119,6 @@ const Room = ({navigation}) => {
           flex: 1,
           backgroundColor: 'white',
           paddingHorizontal: 10,
-
-          // height:height
         }}
         showsVerticalScrollIndicator={false}>
         <View
@@ -136,7 +176,7 @@ const Room = ({navigation}) => {
             fontWeight: '700',
             color: 'black',
           }}>
-          Name
+          Name {checkName ? <Text style={{color: 'red'}}>*</Text> : null}
         </Text>
         <View
           style={{
@@ -161,6 +201,10 @@ const Room = ({navigation}) => {
               color: 'black',
             }}
             placeholderTextColor="hsl(0,0%,60%)"
+            onBlur={() => {
+              console.log(checkName);
+              validateInput(name, 1);
+            }}
           />
         </View>
         <Text
@@ -169,7 +213,8 @@ const Room = ({navigation}) => {
             fontWeight: '700',
             color: 'black',
           }}>
-          Phone Number
+          Phone Number{' '}
+          {checkNumber ? <Text style={{color: 'red'}}>*</Text> : null}
         </Text>
         <View
           style={{
@@ -194,6 +239,10 @@ const Room = ({navigation}) => {
               color: 'black',
             }}
             placeholderTextColor="hsl(0,0%,60%)"
+            onBlur={() => {
+              console.log(phone);
+              validateInput(phone, 2);
+            }}
           />
         </View>
         <Text
@@ -259,6 +308,7 @@ const Room = ({navigation}) => {
                 selectedDayColor="#7300e6"
                 selectedDayTextColor="#FFFFFF"
                 onDateChange={CheckIn}
+                minDate={new Date()}
               />
             </View>
           </Pressable>
@@ -337,6 +387,7 @@ const Room = ({navigation}) => {
                 selectedDayColor="#7300e6"
                 selectedDayTextColor="#FFFFFF"
                 onDateChange={CheckOut}
+                minDate={new Date()}
               />
             </View>
           </Pressable>

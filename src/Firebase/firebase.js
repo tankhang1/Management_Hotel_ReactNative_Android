@@ -3,7 +3,7 @@ import {getAuth, initializeAuth} from 'firebase/auth';
 import {initializeFirestore} from 'firebase/firestore';
 import {getReactNativePersistence} from 'firebase/auth/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {getStorage} from 'firebase/storage';
 const firebaseConfig = {
   apiKey: 'AIzaSyDHj8DJkeBuXKD355jqCXzEFEtuaLnmz5s',
   authDomain: 'hotelmanagement-dd856.firebaseapp.com',
@@ -24,5 +24,4 @@ const auth = initializeAuth(app, {
 const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 });
-
 export {auth, db};
