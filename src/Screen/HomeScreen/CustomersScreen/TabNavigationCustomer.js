@@ -1,4 +1,4 @@
-import {View, Text} from 'react-native';
+import {View, Text, Pressable} from 'react-native';
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import DataBottomNavigation from './DataBottomNavigation';
@@ -29,9 +29,7 @@ const TabNavigationCustomer = () => {
             component={item.route_component}
             options={{
               tabBarShowLabel: false,
-              tabBarIcon: props => (
-                <TabButton {...props} item={item} initialValue={0} />
-              ),
+              tabBarButton: props => <TabButton {...props} item={item} />,
             }}
           />
         );

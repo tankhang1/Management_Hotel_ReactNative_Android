@@ -202,7 +202,6 @@ const Room = ({navigation}) => {
             }}
             placeholderTextColor="hsl(0,0%,60%)"
             onBlur={() => {
-              console.log(checkName);
               validateInput(name, 1);
             }}
           />
@@ -240,7 +239,6 @@ const Room = ({navigation}) => {
             }}
             placeholderTextColor="hsl(0,0%,60%)"
             onBlur={() => {
-              console.log(phone);
               validateInput(phone, 2);
             }}
           />

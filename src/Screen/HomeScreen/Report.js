@@ -2,9 +2,6 @@ import {
   View,
   Text,
   Image,
-  LayoutAnimation,
-  Platform,
-  UIManager,
   ScrollView,
   Pressable,
   TouchableOpacity,
@@ -23,7 +20,6 @@ import {
 } from 'victory-native';
 import {Divider} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {ProgressCircle} from 'react-native-svg-charts';
 import {
   query,
   collection,
@@ -33,7 +29,6 @@ import {
 } from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import moment from 'moment';
-import {useNavigation} from '@react-navigation/native';
 const Report = ({navigation}) => {
   useEffect(() => {
     LogBox.ignoreLogs([
@@ -546,7 +541,7 @@ const Report = ({navigation}) => {
               }}>
               {Math.round(rate * 10)}
             </Text>
-            <ProgressCircle
+            {/* <ProgressCircle
               style={{
                 height: 175,
                 width: 200,
@@ -558,7 +553,7 @@ const Report = ({navigation}) => {
               endAngle={Math.PI}
               strokeWidth={10}
               cornerRadius={10}
-            />
+            /> */}
             <Text
               style={{
                 width: 25,

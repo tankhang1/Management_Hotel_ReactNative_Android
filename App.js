@@ -3,6 +3,7 @@ import React from 'react';
 import AllScreenNavigation from './src/AllScreenNavigation/Navigation';
 import {Provider} from 'react-redux';
 import Store from './src/Redux/Store';
+import Search from './src/Screen/HomeScreen/Bill/Search';
 
 const App = () => {
   return (

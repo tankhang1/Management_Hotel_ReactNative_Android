@@ -246,7 +246,7 @@ const CustomizeDrawer = ({props, navigation}) => {
           {/* room */}
           <TouchableHighlight
             onPress={() => {
-              navigation.navigate('Room');
+              navigation.navigate('BillNavigation');
             }}
             underlayColor={'hsl(241,65%,90%)'}
             style={{

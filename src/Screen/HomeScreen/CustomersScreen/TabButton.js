@@ -1,56 +1,64 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import * as Animatable from 'react-native-animatable';
-const animate1 = {
-  0: {scale: 0.5, translateY: 7},
-  0.92: {translateY: -34},
-  1: {scale: 1.2, translateY: -24},
-};
-const animate2 = {
-  0: {scale: 1.2, translateY: -24},
-  1: {scale: 1, translateY: 7},
-};
+import {View, StyleSheet, Pressable} from 'react-native';
+import React, {useEffect} from 'react';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import {useNavigation} from '@react-navigation/native';
 
-const circle1 = {
-  0: {scale: 0},
-  0.3: {scale: 0.9},
-  0.5: {scale: 0.2},
-  0.8: {scale: 0.7},
-  1: {scale: 1},
-};
-const circle2 = {0: {scale: 1}, 1: {scale: 0}};
 const TabButton = props => {
-  const {item, focused, initialValue} = props;
-
-  const viewRef = useRef(initialValue);
-  const circleRef = useRef(initialValue);
-  const textRef = useRef(initialValue);
-
+  const {item, focused} = props;
+  const navigation = useNavigation();
+  const tranY = useSharedValue(0);
+  const scaleView = useSharedValue(0.8);
+  const hideText = useSharedValue(1);
   useEffect(() => {
-    if (focused) {
-      viewRef.current.animate(animate1);
-      circleRef.current.animate(circle1);
-      textRef.current.transitionTo({scale: 1});
-    } else {
-      viewRef.current.animate(animate2);
-      circleRef.current.animate(circle2);
-      textRef.current.transitionTo({scale: 0});
-    }
-  }, [focused]);
+    tranY.value = withTiming(0, {duration: 1000});
+    scaleView.value = withTiming(0.8, {duration: 1000});
+    hideText.value = withTiming(0);
+    const subscribe = navigation.addListener('focus', () => {
+      tranY.value = withTiming(-30, {duration: 1000});
+      scaleView.value = withTiming(1.2, {duration: 1000});
+      hideText.value = withTiming(1);
+    });
+    return subscribe;
+  }, [navigation]);
+  useEffect(() => {
+    const subscribe = navigation.addListener('blur', () => {
+      tranY.value = withTiming(0, {duration: 1000});
+      scaleView.value = withTiming(0.8, {duration: 1000});
+      hideText.value = withTiming(0);
+    });
+    return subscribe;
+  }, [navigation]);
+  const animatedTranY = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: tranY.value}, {scale: scaleView.value}],
+    };
+  });
+  const animatedText = useAnimatedStyle(() => {
+    return {
+      opacity: hideText.value,
+    };
+  });
+  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
   return (
-    <Animatable.View ref={viewRef} duration={1000} style={styles.container}>
+    <AnimatedPressable
+      style={[styles.container, animatedTranY]}
+      onPress={() => navigation.navigate(item.route)}>
       <View style={styles.btn}>
-        <Animatable.View ref={circleRef} style={styles.circle} />
+        <Animated.View style={styles.circle} />
         <item.Icon_type
           name={item.icon_name}
           size={20}
           color={focused ? 'white' : 'hsl(0,0%,60%)'}
         />
       </View>
-      <Animatable.Text ref={textRef} style={styles.text}>
+      <Animated.Text style={[styles.text, animatedText]}>
         {item.title}
-      </Animatable.Text>
-    </Animatable.View>
+      </Animated.Text>
+    </AnimatedPressable>
   );
 };
 
