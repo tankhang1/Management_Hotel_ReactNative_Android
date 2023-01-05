@@ -25,20 +25,19 @@ import {async} from '@firebase/util';
 
 const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const dataBills = useSelector(state => state.list_bill);
-  const bill = dataBills.filter(value => value.Bill_Id === Bill_Id);
   const dataRooms = useSelector(state => state.data_infor).data.rooms;
   const dataCustomers = useSelector(state => state.data_infor).data.customers;
-  console.log(bill);
+  const bill = dataBills.filter(value => value.Bill_Id === Bill_Id);
   const customer = dataCustomers.filter(
-    value => value.Customer_Id == bill[0].Customer_Id,
+    value => value.Customer_Id === bill[0]?.Customer_Id,
   );
 
   const [data_Image, setData_Image] = useState([]);
   useEffect(() => {
     let tmp = [];
-    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
+    for (let i = 0; i < bill[0]?.List_Room_Id.length; i++) {
       for (let j = 0; j < dataRooms.length; j++) {
-        if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
+        if (bill[0]?.List_Room_Id[i] === dataRooms[j].id) {
           tmp.push(dataRooms[j]);
           break;
         }
@@ -374,8 +373,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                     style={{
                       color: 'hsl(0,0%,60%)',
                     }}>
-                    {' '}
-                    {bill[0].Phone_Number}
+                    {bill[0]?.Phone_Number}
                   </Text>
                 </View>
 
@@ -397,7 +395,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                     style={{
                       color: 'hsl(0,0%,60%)',
                     }}>
-                    {bill[0].Date_Check_In}
+                    {bill[0]?.Date_Check_In}
                   </Text>
                 </View>
                 <Divider />
@@ -418,7 +416,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                     style={{
                       color: 'hsl(0,0%,60%)',
                     }}>
-                    {bill[0].Date_Check_In}
+                    {bill[0]?.Date_Check_Out}
                   </Text>
                 </View>
               </View>
@@ -445,7 +443,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                   style={{
                     color: 'hsl(0,0%,60%)',
                   }}>
-                  {bill[0].Bill_Id}
+                  {bill[0]?.Bill_Id}
                 </Text>
               </View>
               <View
@@ -571,27 +569,57 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
             </View>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => setVisible(!visible)}
+
+        <View
           style={{
-            width: '45%',
-            height: 50,
-            backgroundColor: 'black',
-            justifyContent: 'center',
+            flexDirection: 'row',
             alignItems: 'center',
-            borderRadius: 20,
-            alignSelf: 'center',
-            marginVertical: 10,
+            justifyContent: 'space-between',
+            paddingHorizontal: 10,
           }}>
-          <Text
+          <TouchableOpacity
+            onPress={() => setVisible(!visible)}
             style={{
-              color: 'white',
-              fontWeight: '700',
-              letterSpacing: 1,
+              width: '45%',
+              height: 50,
+              backgroundColor: 'black',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 20,
+              alignSelf: 'center',
+              marginVertical: 10,
             }}>
-            Cancel
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '700',
+                letterSpacing: 1,
+              }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onCheck}
+            style={{
+              width: '45%',
+              height: 50,
+              backgroundColor: 'black',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 20,
+              alignSelf: 'center',
+              marginVertical: 10,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '700',
+                letterSpacing: 1,
+              }}>
+              {CheckOut === true ? 'Check out' : 'Check in'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </Modal>
   );

@@ -22,8 +22,7 @@ const ItemComponent = ({
   index,
 }) => {
   const translationX = useSharedValue(0);
-  const hide = useSharedValue(-1);
-
+  const hide = useSharedValue(0);
   const PanHandler = useAnimatedGestureHandler({
     onActive: (e, ctx) => {
       translationX.value = e.translationX;
@@ -31,10 +30,10 @@ const ItemComponent = ({
     onEnd: (e, ctx) => {
       if (e.translationX < 0) {
         translationX.value = withTiming(-100);
-        hide.value = 3;
+        hide.value = 40;
       } else {
         translationX.value = withTiming(0);
-        hide.value = -1;
+        hide.value = 0;
       }
     },
   });
@@ -54,21 +53,28 @@ const ItemComponent = ({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
+        height: 50,
       }}>
-      <GestureHandlerRootView>
+      {/*Dang loi */}
+      <GestureHandlerRootView
+        style={{
+          width: width * 0.95,
+          height: 30,
+          marginVertical: 10,
+          position: 'absolute',
+          zIndex: 33,
+        }}>
         <PanGestureHandler onGestureEvent={PanHandler}>
           <Animated.View
             style={[
               {
-                width: width * 0.95,
+                width: '100%',
                 alignSelf: 'center',
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginVertical: 10,
                 justifyContent: 'space-between',
-                height: 30,
-                position: 'relative',
-                zIndex: 2,
+                height: '100%',
+
                 backgroundColor: 'white',
               },
               animatedStyle,
@@ -121,7 +127,7 @@ const ItemComponent = ({
       <TouchAnimated
         onPress={() => {
           translationX.value = withTiming(0);
-          hide.value = -1;
+          hide.value = 40;
           navigation.navigate('SearchRoom', {item});
         }}
         style={[

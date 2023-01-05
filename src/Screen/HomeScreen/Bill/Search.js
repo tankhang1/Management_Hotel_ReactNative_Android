@@ -8,18 +8,37 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {FlatList} from 'react-native-gesture-handler';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
 const Search = ({navigation, route}) => {
   const Rooms = useSelector(state => state.data_infor).data.rooms;
   const {width} = useWindowDimensions();
+  const dispatch = useDispatch();
   const GroupRoom = route.params.item;
+  const listlikeroom = useSelector(state => state.listlikeroom);
+  const onChoose = id => {
+    if (listlikeroom.indexOf(id) === -1) {
+      dispatch(
+        addLike({
+          id: id,
+        }),
+      );
+    } else {
+      dispatch(
+        deleteLike({
+          id: id,
+        }),
+      );
+    }
+  };
+  console.log(listlikeroom);
   const renderRoom = ({item, index}) => {
     if (item.kind === GroupRoom.key) {
-      let check = GroupRoom.value.indexOf(item);
+      let check = listlikeroom.indexOf(item.id);
       return (
         <View
           key={index}
@@ -226,9 +245,8 @@ const Search = ({navigation, route}) => {
             </Pressable>
             <Pressable
               onPress={() => {
-                console.log('ok');
+                onChoose(item.id);
               }}
-              disabled={check > -1 ? true : false}
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',

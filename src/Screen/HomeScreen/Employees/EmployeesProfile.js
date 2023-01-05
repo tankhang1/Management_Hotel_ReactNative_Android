@@ -28,7 +28,6 @@ const EmployeesProfile = () => {
   const dataEmployee = useSelector(
     state => state.data_infor,
   ).data.employees.filter(value => value.Employee_Id === id);
-  console.log(dataEmployee);
   useEffect(() => {
     const AddNew = () => {
       let tmp = [];

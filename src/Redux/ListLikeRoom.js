@@ -18,5 +18,5 @@ const ListLikeRoom = createSlice({
   },
 });
 
-export const {addLike, deleteLike} = ListLikeRoom.actions;
+export const {addLike, deleteLike, setLike} = ListLikeRoom.actions;
 export default ListLikeRoom.reducer;

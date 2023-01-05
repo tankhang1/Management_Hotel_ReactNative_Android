@@ -18,7 +18,6 @@ import {deleteSkill} from '../../../Redux/English_Level';
 const DropDownSkill = () => {
   const Data_Skill = ['Reading', 'Writting', 'Listening', 'Speaking'];
   const english_level = useSelector(state => state.english_level);
-  console.log(english_level);
   const dispatch = useDispatch();
   const [openDropDown, setOpenDropDown] = useState(false);
   const convertColor = level => {

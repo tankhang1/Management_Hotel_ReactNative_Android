@@ -30,15 +30,15 @@ const Room = ({navigation}) => {
   const [modalVisibleCheckOut, setModalVisibleCheckOut] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [dateCheckIn, setDateCheckIn] = useState('');
-  const [dateCheckOut, setDateCheckOut] = useState('');
+  const [dateCheckIn, setDateCheckIn] = useState(new Date());
+  const [dateCheckOut, setDateCheckOut] = useState(new Date());
   const [passport, setPassport] = useState('');
   const CheckIn = date => {
-    setDateCheckIn(moment(date).format('DD/MM/YYYY'));
+    setDateCheckIn(date);
     setModalVisibleCheckIn(!modalVisibleCheckIn);
   };
   const CheckOut = date => {
-    setDateCheckOut(moment(date).format('DD/MM/YYYY'));
+    setDateCheckOut(date);
     setModalVisibleCheckOut(!modalVisibleCheckOut);
   };
   const onConfirm = () => {
@@ -113,7 +113,7 @@ const Room = ({navigation}) => {
     }
   };
   return (
-    <KeyboardAwareScrollView>
+    <KeyboardAwareScrollView style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollView
         style={{
           flex: 1,
@@ -331,7 +331,7 @@ const Room = ({navigation}) => {
             marginVertical: 10,
           }}>
           <TextInput
-            value={dateCheckIn}
+            value={moment(dateCheckIn).format('DD/MM/YYYY')}
             onChangeText={setDateCheckIn}
             placeholder="Date Check In"
             style={{
@@ -410,7 +410,7 @@ const Room = ({navigation}) => {
             marginVertical: 10,
           }}>
           <TextInput
-            value={dateCheckOut}
+            value={moment(dateCheckOut).format('DD/MM/YYYY')}
             onChangeText={setDateCheckOut}
             placeholder="Date Check Out"
             style={{

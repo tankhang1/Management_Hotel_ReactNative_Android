@@ -56,21 +56,21 @@ const RoomDetail = ({navigation, route}) => {
         );
   };
   const onBook = () => {
-    if (bookMark1.current === false) {
-      dispatch(
-        addLike({
-          id: Id,
-        }),
-      );
-      bookMark1.current = !bookMark1.current;
-    }
-    let tmp = [];
-    listlikeroom1.map((item, index) => {
-      Data_Room.map((Item, Index) => {
-        if (Item.id === item && tmp.indexOf(Item) === -1) tmp.push(Item);
-      });
+    let promise = new Promise(function (Result, Error) {
+      if (bookMark1.current === false) {
+        dispatch(
+          addLike({
+            id: Id,
+          }),
+        );
+        bookMark1.current = !bookMark1.current;
+      }
+      Result();
+      Error();
     });
-    navigation.navigate('Bill', {bill: tmp});
+    promise.then(function () {
+      navigation.navigate('Bill');
+    });
   };
 
   return (

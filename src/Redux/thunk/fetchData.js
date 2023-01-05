@@ -8,7 +8,6 @@ const fetchData = createAsyncThunk('datas/fetch', async () => {
   let tmp = {
     employees: [],
     customers: [],
-    bills: [],
     rooms: [],
     currentEmployee: null,
   };
@@ -23,10 +22,7 @@ const fetchData = createAsyncThunk('datas/fetch', async () => {
   customers.forEach(doc => {
     tmp.customers.push(doc.data());
   });
-  const bills = await getDocs(collection(db, 'Bill_List'));
-  bills.forEach(doc => {
-    tmp.bills.push(doc.data());
-  });
+
   const rooms = await getDocs(collection(db, 'DataRoom'));
   rooms.forEach(doc => {
     tmp.rooms.push(doc.data());

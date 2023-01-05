@@ -1,6 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {fetchData} from '../thunk/fetchData';
-import {fetchEmployees} from '../thunk/fetchEmployee';
 
 const datas = createSlice({
   name: 'datas',
@@ -8,7 +7,6 @@ const datas = createSlice({
     data: {
       employees: [],
       customers: [],
-      bills: [],
       rooms: [],
       currentEmployee: null,
     },
@@ -24,10 +22,7 @@ const datas = createSlice({
       state.data.customers.push(action.payload);
       return state;
     },
-    addBill: (state, action) => {
-      state.data.bills.push(action.payload);
-      return state;
-    },
+
     addRoom: (state, action) => {
       state.data.rooms.push(action.payload);
       return state;

@@ -11,15 +11,18 @@ import {
   ToastAndroid,
   Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Divider} from 'react-native-paper';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
-import {addBill, addCustomer} from '../../../Redux/slices/dataSlice';
-import {collection, doc, setDoc} from 'firebase/firestore';
+import {addCustomer} from '../../../Redux/slices/dataSlice';
+import {collection, doc, setDoc, Timestamp} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {uuidv4} from '@firebase/util';
+import {setLike} from '../../../Redux/ListLikeRoom';
+import {useNavigation} from '@react-navigation/native';
+import {addBill} from '../../../Redux/slices/dataBills';
 const Template_Bill = ({
   visible,
   setVisible,
@@ -29,9 +32,20 @@ const Template_Bill = ({
   Birthday,
   Gender,
 }) => {
+  useEffect(() => {
+    let tmp = [];
+    Data_Image.map((item, index) => {
+      item.value.map((Item, Index) => {
+        tmp.push(Item);
+      });
+    });
+    setData([...tmp]);
+  }, [Data_Image]);
   const bill_Id = uuidv4();
   const currentEmployee = useSelector(state => state.data_infor).data
     .currentEmployee;
+  const [data, setData] = useState([]);
+  const navigation = useNavigation();
   const {width, height} = Dimensions.get('screen');
   const Dot_Line = () => {
     return (
@@ -119,22 +133,27 @@ const Template_Bill = ({
 
   const SumMoney = () => {
     let sum = 0;
-    Data_Image.forEach(element => {
+    data.forEach(element => {
       sum += Number(element.money);
     });
     return sum;
   };
   const List_Room_Id = () => {
     let tmp = [];
-    Data_Image.map((item, index) => {
+    data.map((item, index) => {
       tmp.push(item.id.toString());
     });
     return tmp;
   };
+  const createId = number => {
+    if (number < 10) return `C00000${number + 1}`;
+    else if (number < 100) return `C0000${number + 1}`;
+  };
+  const dataCustomer = useSelector(state => state.data_infor).data.customers;
+
   const dispatch = useDispatch();
   const AddNewCustomer = async () => {
-    const cusomter_Id = uuidv4();
-
+    const cusomter_Id = createId(dataCustomer.length);
     const DataCustomer = {
       Customer_Id: cusomter_Id,
       Customer_Name: Infor_Customer.name,
@@ -143,23 +162,27 @@ const Template_Bill = ({
       Identification: Infor_Customer.passport,
       Phone: Infor_Customer.phone,
       Status: 'New Customer',
-      Date: moment(new Date()).format('DD/MM/YYYY'),
+      Date: new Timestamp.fromDate(new Date()),
       Phone_Number: Infor_Customer.phone,
     };
     const Data = {
       Bill_Id: bill_Id,
       Customer_Id: cusomter_Id,
-      Date_Check_In: Infor_Customer.date_check_in,
-      Date_Check_Out: Infor_Customer.date_check_out,
+      Date_Check_In: new Timestamp.fromDate(
+        new Date(Infor_Customer.date_check_in),
+      ),
+      Date_Check_Out: new Timestamp.fromDate(
+        new Date(Infor_Customer.date_check_out),
+      ),
       Employee_Id: currentEmployee.Employee_Id,
       List_Room_Id: List_Room_Id(),
       Total_Money: SumMoney(),
-      Date: moment(new Date()).format('DD/MM/YYYY'),
+      Date: new Timestamp.fromDate(new Date()),
       Phone_Number: Infor_Customer.phone,
+      Status: 0,
+      CheckIn: 0,
     };
     dispatch(addCustomer(DataCustomer));
-    dispatch(addBill(Data));
-
     await setDoc(
       doc(collection(db, 'Customer_Information'), cusomter_Id),
       DataCustomer,
@@ -167,19 +190,25 @@ const Template_Bill = ({
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
     Alert.alert('Noticable', 'You has book success');
   };
+
   const NoAddCustomer = async () => {
     const Data = {
       Bill_Id: bill_Id,
-      Customer_Id: '',
-      Date_Check_In: Infor_Customer.date_check_in,
-      Date_Check_Out: Infor_Customer.date_check_out,
+      Customer_Id: cusomter_Id,
+      Date_Check_In: new Timestamp.fromDate(
+        new Date(Infor_Customer.date_check_in),
+      ),
+      Date_Check_Out: new Timestamp.fromDate(
+        new Date(Infor_Customer.date_check_out),
+      ),
       Employee_Id: currentEmployee.Employee_Id,
       List_Room_Id: List_Room_Id(),
       Total_Money: SumMoney(),
-      Date: moment(new Date()).format('DD/MM/YYYY'),
+      Date: new Timestamp.fromDate(new Date()),
       Phone_Number: Infor_Customer.phone,
+      Status: 0,
+      CheckIn: 0,
     };
-    dispatch(addBill(Data));
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
     Alert.alert('Noticable', 'You has book success');
   };
@@ -189,6 +218,8 @@ const Template_Bill = ({
     } else {
       NoAddCustomer();
     }
+    //dispatch(setLike());
+    //navigation.navigate('Room');
   };
 
   const scrollX = new Animated.Value(0);
@@ -280,7 +311,7 @@ const Template_Bill = ({
                 [{nativeEvent: {contentOffset: {x: scrollX}}}],
                 {useNativeDriver: false},
               )}>
-              {Data_Image.map((item, index) => {
+              {data.map((item, index) => {
                 return (
                   <Image
                     key={index}
@@ -302,7 +333,7 @@ const Template_Bill = ({
               alignSelf: 'center',
               marginTop: -30,
             }}>
-            {Data_Image.map((item, index) => {
+            {data.map((item, index) => {
               let opacity = position.interpolate({
                 inputRange: [index - 1, index, index + 1],
                 outputRange: [0.2, 1, 0.2],
@@ -429,7 +460,7 @@ const Template_Bill = ({
                     style={{
                       color: 'hsl(0,0%,60%)',
                     }}>
-                    {Infor_Customer.date_check_in}
+                    {moment(Infor_Customer.date_check_in).format('DD/MM/YYYY')}
                   </Text>
                 </View>
                 <Divider />
@@ -450,7 +481,7 @@ const Template_Bill = ({
                     style={{
                       color: 'hsl(0,0%,60%)',
                     }}>
-                    {Infor_Customer.date_check_out}
+                    {moment(Infor_Customer.date_check_out).format('DD/MM/YYYY')}
                   </Text>
                 </View>
               </View>
@@ -526,7 +557,7 @@ const Template_Bill = ({
               style={{
                 paddingHorizontal: 20,
               }}>
-              {Data_Image.map((item, index) => {
+              {data.map((item, index) => {
                 return (
                   <View
                     key={index}

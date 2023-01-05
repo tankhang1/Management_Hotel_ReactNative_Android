@@ -19,6 +19,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {Slider} from '@miblanchard/react-native-slider';
 import {useState} from 'react';
 import {Checkbox} from 'react-native-paper';
+import moment from 'moment';
 const Booking = ({navigation}) => {
   const Rooms = useSelector(state => state.data_infor).data.rooms;
   const [Data, setData] = useState(Rooms);
@@ -44,21 +45,15 @@ const Booking = ({navigation}) => {
   ).current;
 
   const onBook = () => {
-    let tmp = [];
-    listlikeroom1.map((item, index) => {
-      Data.map((Item, Index) => {
-        if (Item.id === item && tmp.indexOf(Item) === -1) tmp.push(Item);
-      });
-    });
-    navigation.navigate('Bill', {bill: tmp});
+    navigation.navigate('Bill');
   };
 
   const dispatch = useDispatch();
   const dataBooking = useSelector(state => state.booking);
   let name = dataBooking.name;
   let phone = dataBooking.phone;
-  let Checkin = dataBooking.date_check_in;
-  let Checkout = dataBooking.date_check_out;
+  let Checkin = moment(dataBooking.date_check_in).format('DD/MM/YYYY');
+  let Checkout = moment(dataBooking.date_check_out).format('DD/MM/YYYY');
   let passport = dataBooking.passport;
 
   const DataChip = [

@@ -15,11 +15,9 @@ const CustomersProfile = () => {
     return value.Customer_Id === Id;
   });
 
-  const list_bill = useSelector(state => state.data_infor).data.bills.filter(
-    value => {
-      return value.Customer_Id === Id;
-    },
-  );
+  const list_bill = useSelector(state => state.list_bill).filter(value => {
+    return value.Customer_Id === Id;
+  });
   const [showBill, setShowBill] = useState(false);
   const [Bill_Id, setBill_Id] = useState('LQBG6hQs3N7TjCe42DRt');
   const [onShowHistory, setOnshowHistory] = useState(false);

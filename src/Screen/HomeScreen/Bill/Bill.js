@@ -16,7 +16,7 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {Checkbox, Divider} from 'react-native-paper';
-import {deleteLike} from '../../../Redux/ListLikeRoom';
+import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
 import {useState} from 'react';
 import Template_Bill from './Template_Bill';
 import {addInfor} from '../../../Redux/InforBooking';
@@ -31,12 +31,20 @@ if (Platform.OS === 'android') {
   }
 }
 const Bill = ({navigation, route}) => {
-  const [data, setData] = React.useState(route.params.bill);
+  const ListLikeRoom = useSelector(state => state.listlikeroom);
+
   const rooms = useSelector(state => state.data_infor).data.rooms;
   const {width, height} = useWindowDimensions();
 
   useEffect(() => {
     const subscribe = navigation.addListener('focus', () => {
+      let tmp = [];
+      ListLikeRoom.map((item, index) => {
+        rooms.map((Item, Index) => {
+          if (Item.id === item && tmp.indexOf(Item) === -1) tmp.push(Item);
+        });
+      });
+
       let y = [];
       rooms.map((item, index) => {
         let position = y.map(e => e.key).indexOf(item.kind);
@@ -49,7 +57,7 @@ const Bill = ({navigation, route}) => {
       });
       setGroupByMaxRoom([...y]);
       let x = [];
-      data.map((item, index) => {
+      tmp.map((item, index) => {
         let position = x.map(e => e.key).indexOf(item.kind);
         if (position === -1) {
           x.push({key: item.kind, value: [item], quantity: 1});
@@ -60,7 +68,7 @@ const Bill = ({navigation, route}) => {
       setGroupByData([...x]);
     });
     return subscribe;
-  }, [navigation]);
+  }, [navigation, ListLikeRoom]);
 
   const [groupByData, setGroupByData] = useState([]);
 
@@ -86,9 +94,9 @@ const Bill = ({navigation, route}) => {
       tmp[index].quantity++;
       for (let i = 0; i < rooms.length; i++) {
         let check = tmp[index].value.indexOf(rooms[i]);
-        console.log(check);
         if (check === -1 && rooms[i].kind === key) {
           tmp[index].value.push(rooms[i]);
+          dispatch(addLike({id: rooms[i].id}));
           break;
         }
       }
@@ -99,6 +107,9 @@ const Bill = ({navigation, route}) => {
     if (groupByData[index].quantity > 1) {
       let tmp = [...groupByData];
       tmp[index].quantity--;
+      dispatch(
+        deleteLike({id: tmp[index].value[tmp[index].value.length - 1].id}),
+      );
       tmp[index].value.pop();
       setGroupByData([...tmp]);
     }
@@ -293,7 +304,7 @@ const Bill = ({navigation, route}) => {
       <Template_Bill
         visible={visibleModal}
         setVisible={setVisibleModal}
-        Data_Image={data}
+        Data_Image={groupByData}
         Infor_Customer={InforBooking}
         checkCustomer={checkCustomer}
         Birthday={Birthday}
@@ -485,7 +496,7 @@ const Bill = ({navigation, route}) => {
                 style={{
                   color: 'hsl(0,0%,60%)',
                 }}>
-                {InforBooking.date_check_in}
+                {moment(InforBooking.date_check_in).format('DD/MM/YYYY')}
               </Text>
             </View>
             <Divider />
@@ -506,7 +517,7 @@ const Bill = ({navigation, route}) => {
                 style={{
                   color: 'hsl(0,0%,60%)',
                 }}>
-                {InforBooking.date_check_out}
+                {moment(InforBooking.date_check_out).format('DD/MM/YYYY')}
               </Text>
             </View>
           </View>
