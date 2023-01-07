@@ -5,13 +5,14 @@ import {
   TouchableHighlight,
   Pressable,
   StatusBar,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {getAuth, signOut} from 'firebase/auth';
 import {useSelector} from 'react-redux';
-
+import {CommonActions, NavigationAction} from '@react-navigation/native';
 const CustomizeDrawer = ({props, navigation}) => {
   const currentEmployee = useSelector(state => state.data_infor).data
     .currentEmployee;
@@ -116,133 +117,140 @@ const CustomizeDrawer = ({props, navigation}) => {
             </View>
           </TouchableHighlight>
           {/* Customers */}
-          <TouchableHighlight
-            onPress={() => navigation.navigate('Customer')}
-            underlayColor={'hsl(241,65%,90%)'}
-            style={{
-              width: '120%',
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
-            }}>
-            <View
+          {currentEmployee.Level === 0 ? (
+            <TouchableHighlight
+              onPress={() => navigation.navigate('Customer')}
+              underlayColor={'hsl(241,65%,90%)'}
               style={{
-                width: '100%',
-                flexDirection: 'row',
+                width: '120%',
+                height: 50,
+                justifyContent: 'center',
                 alignItems: 'center',
-                // marginTop:20,
-                paddingHorizontal: 10,
+                marginTop: 10,
               }}>
-              <Image
-                source={{
-                  uri: 'https://img.icons8.com/external-fauzidea-outline-color-fauzidea/64/000000/external-customer-e-commerce-fauzidea-outline-color-fauzidea.png',
-                }}
+              <View
                 style={{
-                  width: 24,
-                  height: 24,
-                  resizeMode: 'contain',
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: '700',
-                  width: '60%',
+                  width: '100%',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  // marginTop:20,
                   paddingHorizontal: 10,
-                  color: 'black',
                 }}>
-                Customers
-              </Text>
-            </View>
-          </TouchableHighlight>
-          {/* Employee */}
-          <TouchableHighlight
-            onPress={() => {
-              navigation.navigate('Employee');
-            }}
-            underlayColor={'hsl(241,65%,90%)'}
-            style={{
-              width: '120%',
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
-            }}>
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                // marginTop:20,
-                paddingHorizontal: 10,
-              }}>
-              {/* <FontAwesome name='user-circle' color={"black"} size={24}/> */}
-              <Image
-                source={{
-                  uri: 'https://img.icons8.com/external-itim2101-lineal-color-itim2101/64/000000/external-employee-human-resource-itim2101-lineal-color-itim2101.png',
+                <Image
+                  source={{
+                    uri: 'https://img.icons8.com/external-fauzidea-outline-color-fauzidea/64/000000/external-customer-e-commerce-fauzidea-outline-color-fauzidea.png',
+                  }}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    resizeMode: 'contain',
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: '700',
+                    width: '60%',
+                    paddingHorizontal: 10,
+                    color: 'black',
+                  }}>
+                  Customers
+                </Text>
+              </View>
+            </TouchableHighlight>
+          ) : null}
+          {currentEmployee.Level < 2 ? (
+            <View>
+              {/*Employee */}
+              <TouchableHighlight
+                onPress={() => {
+                  navigation.navigate('Employee');
                 }}
+                underlayColor={'hsl(241,65%,90%)'}
                 style={{
-                  width: 24,
-                  height: 24,
-                  resizeMode: 'contain',
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: '700',
-                  width: '60%',
-                  paddingHorizontal: 10,
-                  color: 'black',
+                  width: '120%',
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 10,
                 }}>
-                Employees
-              </Text>
-            </View>
-          </TouchableHighlight>
-          {/* report */}
-          <TouchableHighlight
-            onPress={() => {
-              navigation.navigate('Report');
-            }}
-            underlayColor={'hsl(241,65%,90%)'}
-            style={{
-              width: '120%',
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
-            }}>
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                // marginTop:20,
-                paddingHorizontal: 10,
-              }}>
-              <Image
-                source={{
-                  uri: 'https://img.icons8.com/fluency/96/000000/profit-report.png',
+                <View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // marginTop:20,
+                    paddingHorizontal: 10,
+                  }}>
+                  {/* <FontAwesome name='user-circle' color={"black"} size={24}/> */}
+                  <Image
+                    source={{
+                      uri: 'https://img.icons8.com/external-itim2101-lineal-color-itim2101/64/000000/external-employee-human-resource-itim2101-lineal-color-itim2101.png',
+                    }}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: '700',
+                      width: '60%',
+                      paddingHorizontal: 10,
+                      color: 'black',
+                    }}>
+                    Employees
+                  </Text>
+                </View>
+              </TouchableHighlight>
+              {/* report */}
+              <TouchableHighlight
+                onPress={() => {
+                  navigation.navigate('Report');
                 }}
+                underlayColor={'hsl(241,65%,90%)'}
                 style={{
-                  width: 24,
-                  height: 24,
-                  resizeMode: 'contain',
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: '700',
-                  width: '60%',
-                  paddingHorizontal: 10,
-                  color: 'black',
+                  width: '120%',
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 10,
                 }}>
-                Report
-              </Text>
+                <View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    // marginTop:20,
+                    paddingHorizontal: 10,
+                  }}>
+                  <Image
+                    source={{
+                      uri: 'https://img.icons8.com/fluency/96/000000/profit-report.png',
+                    }}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: '700',
+                      width: '60%',
+                      paddingHorizontal: 10,
+                      color: 'black',
+                    }}>
+                    Report
+                  </Text>
+                </View>
+              </TouchableHighlight>
             </View>
-          </TouchableHighlight>
+          ) : null}
+
           {/* room */}
           <TouchableHighlight
             onPress={() => {
@@ -291,10 +299,15 @@ const CustomizeDrawer = ({props, navigation}) => {
               const auth = getAuth();
               signOut(auth)
                 .then(() => {
-                  navigation.navigate('AuthScreen');
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [navigation.navigate('AuthScreen')],
+                    }),
+                  );
                 })
                 .catch(error => {
-                  Alert.alert(error);
+                  Alert.alert('Notice', 'Sign out success');
                 });
             }}
             underlayColor={'hsl(241,65%,90%)'}

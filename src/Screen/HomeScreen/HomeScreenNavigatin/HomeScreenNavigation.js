@@ -13,10 +13,13 @@ import TabNavigationCustomer from '../CustomersScreen/TabNavigationCustomer';
 import EmployeeNavigation from '../Employees/EmployeeNavigation';
 import DashBoard from '../../HomeScreen/Dashboard/Dashboard';
 import BillNavigation from '../Bill/BillNavigation';
+import {useSelector} from 'react-redux';
 
 const Drawer = createDrawerNavigator();
 
 const HomeScreenNavigation = () => {
+  const currentEmployee = useSelector(state => state.data_infor).data
+    .currentEmployee;
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -24,11 +27,22 @@ const HomeScreenNavigation = () => {
       }}
       drawerContent={props => <CustomizeDrawer {...props} />}>
       <Drawer.Screen name="Home" component={DashBoard} />
-      <Drawer.Screen name="Customer" component={TabNavigationCustomer} />
-      <Drawer.Screen name="Employee" component={EmployeeNavigation} />
-      <Drawer.Screen name="Report" component={Report} />
       <Drawer.Screen name="BillNavigation" component={BillNavigation} />
       <Drawer.Screen name="Setting" component={Setting} />
+      {currentEmployee.Level < 2 ? (
+        <Drawer.Group
+          navigationKey={
+            currentEmployee.Level === 0 || currentEmployee.Level === 1
+              ? 'manager'
+              : 'employee'
+          }>
+          <Drawer.Screen name="Employee" component={EmployeeNavigation} />
+          <Drawer.Screen name="Report" component={Report} />
+        </Drawer.Group>
+      ) : null}
+      {currentEmployee.Level === 0 ? (
+        <Drawer.Screen name="Customer" component={TabNavigationCustomer} />
+      ) : null}
     </Drawer.Navigator>
   );
 };

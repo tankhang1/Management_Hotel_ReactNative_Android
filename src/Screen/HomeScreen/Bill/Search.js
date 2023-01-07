@@ -15,10 +15,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
 const Search = ({navigation, route}) => {
-  const Rooms = useSelector(state => state.list_room).rooms;
   const {width} = useWindowDimensions();
   const dispatch = useDispatch();
   const GroupRoom = route.params.item;
+  const Rooms = useSelector(state => state.list_room).rooms;
+
+  const R = useSelector(state => state.list_room).groupRoom.map(e => {
+    if (e.key === GroupRoom.key) return e;
+  });
+  console.log(R[0].value);
   const listlikeroom = useSelector(state => state.listlikeroom);
   const onChoose = id => {
     if (listlikeroom.indexOf(id) === -1) {
@@ -36,7 +41,7 @@ const Search = ({navigation, route}) => {
     }
   };
   const renderRoom = ({item, index}) => {
-    if (item.kind === GroupRoom.key) {
+    if (item.status === 1) {
       let check = listlikeroom.indexOf(item.id);
       return (
         <View
@@ -310,7 +315,7 @@ const Search = ({navigation, route}) => {
           alignItems: 'center',
         }}>
         <FlatList
-          data={Rooms}
+          data={R[0].value}
           renderItem={renderRoom}
           showsVerticalScrollIndicator={false}
           initialNumToRender={4}

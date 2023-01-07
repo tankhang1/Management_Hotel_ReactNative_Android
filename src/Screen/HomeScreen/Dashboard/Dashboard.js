@@ -14,7 +14,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {DataTable} from 'react-native-paper';
-import {Timestamp} from 'firebase/firestore';
 import {VictoryLegend, VictoryPie, VictoryTooltip} from 'victory-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -52,8 +51,8 @@ const Dashboard = ({navigation}) => {
         );
 
         if (
-          doc.data().Date_Check_In.toDate() < new Date() &&
-          doc.data().Date_Check_Out.toDate() > new Date() &&
+          doc.data().Date_Check_In.toDate() <= new Date() &&
+          doc.data().Date_Check_Out.toDate() >= new Date() &&
           doc.data().CheckIn === 1
         ) {
           if (tmp.Foreign === 1) {
@@ -132,7 +131,7 @@ const Dashboard = ({navigation}) => {
     Dueout: 0,
     CheckedIn: 0,
     CheckedOut: 0,
-    Day: '07/01/2023',
+    Day: moment(new Date()).format('DD/MM/YYYY'),
   });
   const [groupByGest, setGroupByGest] = useState({
     Local: {
@@ -155,9 +154,99 @@ const Dashboard = ({navigation}) => {
   const SumLocal = groupByGest.Local.Adults + groupByGest.Local.Children;
   const SumForeign = groupByGest.Foreign.Adults + groupByGest.Foreign.Children;
   const collectRoom = useSelector(state => state.list_room).groupRoom;
+  const renderGuests = ({item, index}) => {
+    let checkin = item.Date_Check_In;
+    let checkout = item.Date_Check_Out;
+    if (
+      new Date(
+        `${checkin.slice(6, 10)}-${checkin.slice(3, 5)}-${checkin.slice(0, 2)}`,
+      ) <= new Date() &&
+      new Date(
+        `${checkout.slice(6, 10)}-${checkout.slice(3, 5)}-${checkout.slice(
+          0,
+          2,
+        )}`,
+      ) >= new Date() &&
+      item.CheckIn === 1 &&
+      item.Phone_Number.indexOf(search) > -1
+    ) {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            setBill_Id(item.Bill_Id);
+            setCheckOut(true);
+            setShowTemplate(!showTemplate);
+          }}
+          key={index}
+          style={{
+            flex: 1,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            marginTop: 10,
+          }}>
+          <View
+            style={{
+              flex: 1,
+              paddingVertical: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: index % 2 === 0 ? 'hsl(0,0%,90%)' : null,
+              borderRadius: 5,
+              paddingHorizontal: 5,
+            }}>
+            <MaterialCommunityIcons
+              name="tag-arrow-right"
+              size={15}
+              style={{color: 'hsl(0,0%,50%)'}}
+            />
+            <Text style={{color: 'hsl(0,0%,50%)'}}>{item.Date_Check_In}</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              flexDirection: 'row',
+              paddingVertical: 10,
+              backgroundColor: index % 2 !== 0 ? 'hsl(0,0%,90%)' : null,
+              borderRadius: 5,
+              paddingHorizontal: 5,
+            }}>
+            <MaterialCommunityIcons
+              name="tag-arrow-left"
+              size={15}
+              style={{color: 'hsl(0,0%,50%)'}}
+            />
+
+            <Text style={{color: 'hsl(0,0%,50%)'}}>{item.Date_Check_Out}</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              paddingVertical: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: index % 2 === 0 ? 'hsl(0,0%,90%)' : null,
+              borderRadius: 5,
+              paddingHorizontal: 5,
+            }}>
+            <Ionicons
+              name="key-outline"
+              size={15}
+              style={{color: 'hsl(0,0%,50%)'}}
+            />
+            <Text numberOfLines={1} style={{color: 'hsl(0,0%,50%)'}}>
+              {item.List_Room_Id[0]}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+  };
+
   if (bills.length !== 0) {
     return (
-      <KeyboardAwareScrollView>
+      <KeyboardAwareScrollView nestedScrollEnabled={true}>
         <View
           style={{
             flex: 1,
@@ -498,20 +587,20 @@ const Dashboard = ({navigation}) => {
               </Text>
             </View>
           </View>
-          <ScrollView
+          {/* <ScrollView
             style={{
               flex: 1,
               paddingHorizontal: 10,
             }}>
             {bills.map((item, index) => {
               if (
-                moment(item.Date_Check_In, 'YYYY-MM-DD').toDate() <=
+                new Date(moment(item.Date_Check_In, 'YYYY-MM-DD')) <=
                   new Date() &&
-                moment(item.Date_Check_Out, 'YYYY-MM-DD').toDate() >=
+                new Date(moment(item.Date_Check_Out, 'YYYY-MM-DD')) >=
                   new Date() &&
                 item.CheckIn === 1 &&
                 item.Phone_Number.indexOf(search) > -1
-              )
+              ) {
                 return (
                   <TouchableOpacity
                     onPress={() => {
@@ -590,8 +679,23 @@ const Dashboard = ({navigation}) => {
                     </View>
                   </TouchableOpacity>
                 );
+              }
             })}
-          </ScrollView>
+          </ScrollView> */}
+          <View
+            style={{
+              marginVertical: 10,
+            }}>
+            <FlatList
+              data={bills}
+              renderItem={renderGuests}
+              keyExtractor={item => item.Bill_Id}
+              initialNumToRender={4}
+              removeClippedSubviews={true}
+              nestedScrollEnabled={true}
+            />
+          </View>
+
           {/*Number of Guest */}
           <View
             style={{
@@ -1007,7 +1111,7 @@ const Dashboard = ({navigation}) => {
                         height: 10,
                         borderRadius: 100,
                         backgroundColor:
-                          item.quantity > item.available
+                          item.quantity - item.available < item.available
                             ? 'hsl(162,95%,63%)'
                             : 'red',
                         marginRight: 10,
@@ -1017,7 +1121,7 @@ const Dashboard = ({navigation}) => {
                       style={{
                         color: 'black',
                       }}>
-                      {item.quantity > item.available
+                      {item.quantity - item.available < item.available
                         ? 'Available'
                         : 'Unavailable'}
                     </Text>

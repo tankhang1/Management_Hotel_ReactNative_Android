@@ -75,12 +75,12 @@ const Bill = ({navigation, route}) => {
 
   const onPlus = (key, index) => {
     let position = groupByMaxRoom.map(e => e.key).indexOf(key);
-    if (groupByData[index].quantity < groupByMaxRoom[position].quantity) {
+    if (groupByData[index].quantity < groupByMaxRoom[position].available) {
       let tmp = [...groupByData];
       tmp[index].quantity++;
       for (let i = 0; i < rooms.length; i++) {
         let check = tmp[index].value.indexOf(rooms[i]);
-        if (check === -1 && rooms[i].kind === key) {
+        if (check === -1 && rooms[i].kind === key && rooms[i].status === 1) {
           tmp[index].value.push(rooms[i]);
           dispatch(addLike({id: rooms[i].id}));
           break;
@@ -638,7 +638,7 @@ const Bill = ({navigation, route}) => {
                   color: 'white',
                   fontSize: 16,
                 }}>
-                Check out
+                Booking
               </Text>
             </View>
           </Pressable>

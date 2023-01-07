@@ -20,6 +20,7 @@ import {Slider} from '@miblanchard/react-native-slider';
 import {useState} from 'react';
 import {Checkbox} from 'react-native-paper';
 import moment from 'moment';
+import {setLike} from '../../../Redux/ListLikeRoom';
 const Booking = ({navigation}) => {
   const Rooms = useSelector(state => state.list_room).rooms;
   const [Data, setData] = useState(Rooms);
@@ -105,53 +106,54 @@ const Booking = ({navigation}) => {
     });
   };
   const renderItem = ({item}) => {
-    return (
-      <View
-        key={item.id}
-        style={{
-          width: '100%',
-          height: 250,
-          marginBottom: 20,
-          justifyContent: 'flex-start',
-        }}>
-        <Image
-          source={{uri: item.image}}
+    if (item.status === 1)
+      return (
+        <View
+          key={item.id}
           style={{
             width: '100%',
-            height: '100%',
-            resizeMode: 'cover',
-            borderRadius: 30,
-          }}
-        />
-        <Pressable
-          onPress={() => {
-            onDetail(item);
+            height: 250,
+            marginBottom: 20,
+            justifyContent: 'flex-start',
           }}>
-          <View
+          <Image
+            source={{uri: item.image}}
             style={{
-              position: 'absolute',
-              bottom: 0,
-              width: 100,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderBottomLeftRadius: 30,
-              borderTopRightRadius: 20,
-              borderBottomRightRadius: 20,
-              backgroundColor: 'hsl(205,100%,38%)',
+              width: '100%',
+              height: '100%',
+              resizeMode: 'cover',
+              borderRadius: 30,
+            }}
+          />
+          <Pressable
+            onPress={() => {
+              onDetail(item);
             }}>
-            <Text
+            <View
               style={{
-                fontSize: 14,
-                fontWeight: '700',
-                color: 'white',
+                position: 'absolute',
+                bottom: 0,
+                width: 100,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderBottomLeftRadius: 30,
+                borderTopRightRadius: 20,
+                borderBottomRightRadius: 20,
+                backgroundColor: 'hsl(205,100%,38%)',
               }}>
-              View Detail
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-    );
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '700',
+                  color: 'white',
+                }}>
+                View Detail
+              </Text>
+            </View>
+          </Pressable>
+        </View>
+      );
   };
 
   const [showFilter, setShowFilter] = useState(false);
@@ -542,7 +544,10 @@ const Booking = ({navigation}) => {
           }}>
           DISCOVER{'\n'}YOUR PLACE{'\n'}TO STAY
         </Text>
-        <Pressable onPress={() => navigation.navigate('Room')}>
+        <Pressable
+          onPress={() => {
+            dispatch(setLike()), navigation.navigate('Room');
+          }}>
           <View
             style={{
               width: 50,

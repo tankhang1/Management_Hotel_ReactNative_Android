@@ -10,6 +10,7 @@ import {
   Animated,
   ToastAndroid,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -136,7 +137,12 @@ const Template_Bill = ({
     data.forEach(element => {
       sum += Number(element.money);
     });
-    return sum;
+    return (
+      Math.ceil(
+        (Infor_Customer.date_check_out - Infor_Customer.date_check_in) /
+          (1000 * 60 * 60 * 24),
+      ) * sum
+    );
   };
   const List_Room_Id = () => {
     let tmp = [];
@@ -153,6 +159,7 @@ const Template_Bill = ({
 
   const dispatch = useDispatch();
   const AddNewCustomer = async () => {
+    console.log(new Date(Infor_Customer.date_check_out));
     const cusomter_Id = createId(dataCustomer.length);
     const DataCustomer = {
       Customer_Id: cusomter_Id,
@@ -189,7 +196,7 @@ const Template_Bill = ({
     await setDoc(
       doc(collection(db, 'Customer_Information'), cusomter_Id),
       DataCustomer,
-    );
+    ).then(() => console.log('Ok'));
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
     Alert.alert('Noticable', 'You has book success');
   };
@@ -197,7 +204,7 @@ const Template_Bill = ({
   const NoAddCustomer = async () => {
     const Data = {
       Bill_Id: bill_Id,
-      Customer_Id: cusomter_Id,
+      Customer_Id: '',
       Date_Check_In: new Timestamp.fromDate(
         new Date(Infor_Customer.date_check_in),
       ),
@@ -215,7 +222,9 @@ const Template_Bill = ({
       Children: 0,
       Foreign: 0,
     };
-    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
+    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data).then(() =>
+      console.log('Ok'),
+    );
     Alert.alert('Noticable', 'You has book success');
   };
   const AddNewBill = () => {
@@ -648,7 +657,7 @@ const Template_Bill = ({
             marginVertical: 10,
             justifyContent: 'space-between',
           }}>
-          <Pressable
+          <TouchableOpacity
             onPress={() => setVisible(!visible)}
             style={{
               width: '45%',
@@ -666,8 +675,8 @@ const Template_Bill = ({
               }}>
               Cancel
             </Text>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={AddNewBill}
             style={{
               width: '45%',
@@ -685,7 +694,7 @@ const Template_Bill = ({
               }}>
               Accept
             </Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </Modal>

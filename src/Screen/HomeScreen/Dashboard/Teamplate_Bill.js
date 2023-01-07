@@ -20,7 +20,7 @@ import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import {useState} from 'react';
 import {useEffect} from 'react';
-import {doc, updateDoc} from 'firebase/firestore';
+import {doc, Timestamp, updateDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {async} from '@firebase/util';
 
@@ -43,9 +43,9 @@ const Template_Bill = ({
   const [data_Image, setData_Image] = useState([]);
   useEffect(() => {
     let tmp = [];
-    for (let i = 0; i < bill[0]?.List_Room_Id.length; i++) {
+    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
       for (let j = 0; j < dataRooms?.length; j++) {
-        if (bill[0]?.List_Room_Id[i] === dataRooms[j].id) {
+        if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
           tmp.push(dataRooms[j]);
           break;
         }
@@ -137,16 +137,44 @@ const Template_Bill = ({
       </View>
     );
   };
+  const TotalMoneyRoom = () => {
+    let sum = 0;
+    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
+      for (let j = 0; j < dataRooms.length; j++) {
+        if (dataRooms[j].id === bill[0].List_Room_Id[i]) {
+          sum += dataRooms[j].money;
+          break;
+        }
+      }
+    }
+    return sum;
+  };
   const onCheck = async () => {
     if (CheckOut === true) {
       const updateBill = doc(db, 'Bill_List', Bill_Id);
       await updateDoc(updateBill, {
         Status: 1,
+        Date_Check_Out: new Timestamp.fromDate(new Date()),
+        Total_Money:
+          Math.ceil(
+            (new Date() -
+              new Date(
+                `${bill[0].Date_Check_In.slice(
+                  6,
+                  10,
+                )}-${bill[0].Date_Check_In.slice(
+                  3,
+                  5,
+                )}-${bill[0].Date_Check_In.slice(0, 2)}`,
+              )) /
+              (1000 * 60 * 60 * 24),
+          ) * TotalMoneyRoom(),
       });
       Alert.alert('Bill has check out success');
       let tmp = {...reservation};
       tmp.CheckedOut++;
       setReservation({...tmp});
+      setVisible(!visible);
     } else {
       setShowForm(!showForm);
     }
@@ -168,12 +196,14 @@ const Template_Bill = ({
       Adults: Number(adult),
       Children: Number(children),
       Foreign: checkForeign ? 1 : 0,
+      Date_Check_In: new Timestamp.fromDate(new Date()),
     });
     Alert.alert('Bill has check in success');
     let tmp = {...reservation};
     tmp.CheckedIn++;
     setReservation({...tmp});
     setShowForm(!showForm);
+    setVisible(!visible);
   };
   const scrollX = new Animated.Value(0);
   let position = Animated.divide(scrollX, width);
@@ -741,19 +771,19 @@ const Template_Bill = ({
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onCheck}
-            disabled={() => {
-              if (CheckOut === true) {
-                if (bill[0]?.Status === 0) {
-                  return false;
-                }
-                return true;
-              } else {
-                if (bill[0]?.CheckIn === 0) {
-                  return false;
-                }
-                return true;
-              }
-            }}
+            // disabled={() => {
+            //   if (CheckOut === true) {
+            //     if (bill[0]?.Status === 0) {
+            //       return false;
+            //     }
+            //     return true;
+            //   } else {
+            //     if (bill[0]?.CheckIn === 0) {
+            //       return false;
+            //     }
+            //     return true;
+            //   }
+            // }}
             style={{
               width: '45%',
               height: 50,

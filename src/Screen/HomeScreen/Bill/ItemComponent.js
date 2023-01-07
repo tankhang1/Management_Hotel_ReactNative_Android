@@ -127,7 +127,7 @@ const ItemComponent = ({
       <TouchAnimated
         onPress={() => {
           translationX.value = withTiming(0);
-          hide.value = 40;
+          hide.value = 20;
           navigation.navigate('SearchRoom', {item});
         }}
         style={[
