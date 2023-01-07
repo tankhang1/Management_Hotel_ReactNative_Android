@@ -1,13 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Dimensions,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, Image, ScrollView} from 'react-native';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
@@ -24,7 +15,6 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 const EmployeesProfile = () => {
   const id = useSelector(state => state.collect_Id_Employee);
-  console.log(id);
   const dataEmployee = useSelector(
     state => state.data_infor,
   ).data.employees.filter(value => value.Employee_Id === id);
@@ -398,15 +388,7 @@ const EmployeesProfile = () => {
             );
           })}
         </View>
-        <Calendar
-          // Collection of dates that have to be marked. Default = {}
-          markingType="multi-dot"
-          // markedDates={{
-          //   "2022-12-02":{dots:[working,workovertime]},
-          //   "2022-11-02":{dots:[off_A,off_noA]}
-          // }}
-          markedDates={date_list}
-        />
+        <Calendar markingType="multi-dot" markedDates={date_list} />
       </View>
     </ScrollView>
   );

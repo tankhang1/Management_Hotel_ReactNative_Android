@@ -8,6 +8,7 @@ import English_Level from './English_Level';
 import Collect_ID_Employee from './Collect_ID_Employee';
 import {dataReducer} from './slices/dataSlice';
 import {dataBills} from './slices/dataBills';
+import {dataRooms} from './slices/dataRoom';
 const Store = configureStore({
   reducer: {
     booking: InforBooking,
@@ -19,7 +20,11 @@ const Store = configureStore({
     english_level: English_Level,
     list_bill: dataBills,
     data_infor: dataReducer,
+    list_room: dataRooms,
   },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
-console.log(Store);
 export default Store;

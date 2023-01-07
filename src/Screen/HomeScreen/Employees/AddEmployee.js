@@ -26,6 +26,7 @@ import {uuidv4} from '@firebase/util';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {resetSkill} from '../../../Redux/English_Level';
 import {Picker} from '@react-native-picker/picker';
+import {Checkbox} from 'react-native-paper';
 
 const AddEmployee = () => {
   const dispatch = useDispatch();
@@ -47,6 +48,7 @@ const AddEmployee = () => {
   const dataEmployee = useSelector(state => state.data_infor).data.employees;
   const english_level = useSelector(state => state.english_level);
   const [onModalCalendar, setOnModalCalendar] = useState(false);
+  const [levelAccount, setLevelAccount] = useState(0);
   const onDateChange = date => {
     setDateBirth(moment(date).format('DD/MM/YYYY'));
     setOnModalCalendar(!onModalCalendar);
@@ -136,6 +138,7 @@ const AddEmployee = () => {
         Phone: phoneNumber,
         Position: position,
         Salary: salary,
+        Level: levelAccount,
       }),
     );
 
@@ -707,6 +710,66 @@ const AddEmployee = () => {
               English Level:
             </Text>
             <DropDownSkill />
+          </View>
+          {/*Level Account */}
+          <View
+            style={{
+              width: '90%',
+              marginBottom: 10,
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                marginLeft: 20,
+                marginBottom: 5,
+                color: 'black',
+              }}>
+              Level of account:
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginVertical: 10,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Checkbox
+                  onPress={() => setLevelAccount(0)}
+                  status={levelAccount === 0 ? 'checked' : 'unchecked'}
+                  color="black"
+                />
+                <Text style={{fontSize: 18, color: 'black'}}>0</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Checkbox
+                  onPress={() => setLevelAccount(1)}
+                  status={levelAccount === 1 ? 'checked' : 'unchecked'}
+                  color="black"
+                />
+                <Text style={{fontSize: 18, color: 'black'}}>1</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Checkbox
+                  onPress={() => setLevelAccount(2)}
+                  status={levelAccount === 2 ? 'checked' : 'unchecked'}
+                  color="black"
+                />
+                <Text style={{fontSize: 18, color: 'black'}}>2</Text>
+              </View>
+            </View>
           </View>
           {/*Date join */}
           <View

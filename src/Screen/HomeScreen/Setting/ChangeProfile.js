@@ -17,15 +17,12 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {getAuth} from 'firebase/auth';
 import {useSelector} from 'react-redux';
-import {useEffect} from 'react';
 import {
   collection,
   query,
   where,
   getDocs,
-  getDoc,
   doc,
   updateDoc,
 } from 'firebase/firestore';
@@ -47,14 +44,6 @@ const ChangeProfile = () => {
   const [address, setAddress] = useState(dataEmployee.Address);
   const [nationality, setNationality] = useState(dataEmployee.Nationality);
   const firstdayworking = dataEmployee.Date_Join;
-  const [position, setPosition] = useState(dataEmployee.Position);
-
-  let List_Date_Off = dataEmployee.List_Date_Off;
-  let List_Date_Off_NoAdmit = dataEmployee.List_Date_Off_NoAdmit;
-  let List_Date_Work = dataEmployee.List_Date_Work;
-  let List_Date_WorkOvertime = dataEmployee.List_Date_WorkOvertime;
-  let List_Skill_Id = dataEmployee.List_Skill_Id;
-  let Salary = dataEmployee.Salary;
   const [onModalCalendar, setOnModalCalendar] = useState(false);
   const onDateChange = date => {
     setDateBirth(moment(date).format('DD/MM/YYYY'));
@@ -85,15 +74,8 @@ const ChangeProfile = () => {
       Employee_Name: name,
       Gender: gender,
       Identification: identification,
-      List_Date_Off: List_Date_Off,
-      List_Date_Off_NoAdmit: List_Date_Off_NoAdmit,
-      List_Date_Work: List_Date_Work,
-      List_Date_WorkOvertime: List_Date_WorkOvertime,
-      List_Skill_Id: List_Skill_Id,
       Nationality: nationality,
       Phone: phoneNumber,
-      Position: position,
-      Salary: Salary,
     });
     ToastAndroid.show('Profile has been updated', ToastAndroid.LONG);
   };
@@ -618,35 +600,6 @@ const ChangeProfile = () => {
                 color: 'black',
               }}
               placeholder="Nationality"
-              placeholderTextColor="hsl(0,0%,60%)"
-            />
-          </View>
-          <View
-            style={{
-              width: '90%',
-              marginBottom: 10,
-            }}>
-            <Text
-              style={{
-                fontSize: 16,
-                marginLeft: 20,
-                marginBottom: 5,
-                color: 'black',
-              }}>
-              Position:
-            </Text>
-            <TextInput
-              value={position}
-              onChangeText={setPosition}
-              style={{
-                borderRadius: 100,
-                paddingHorizontal: 20,
-                fontWeight: '600',
-                backgroundColor: 'hsl(222,56%,96%)',
-                height: 55,
-                color: 'black',
-              }}
-              placeholder="Position"
               placeholderTextColor="hsl(0,0%,60%)"
             />
           </View>

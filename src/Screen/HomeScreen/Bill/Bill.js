@@ -32,10 +32,9 @@ if (Platform.OS === 'android') {
 }
 const Bill = ({navigation, route}) => {
   const ListLikeRoom = useSelector(state => state.listlikeroom);
-
-  const rooms = useSelector(state => state.data_infor).data.rooms;
   const {width, height} = useWindowDimensions();
-
+  const rooms = useSelector(state => state.list_room).rooms;
+  const groupByMaxRoom = useSelector(state => state.list_room).groupRoom;
   useEffect(() => {
     const subscribe = navigation.addListener('focus', () => {
       let tmp = [];
@@ -44,18 +43,6 @@ const Bill = ({navigation, route}) => {
           if (Item.id === item && tmp.indexOf(Item) === -1) tmp.push(Item);
         });
       });
-
-      let y = [];
-      rooms.map((item, index) => {
-        let position = y.map(e => e.key).indexOf(item.kind);
-        if (position === -1) {
-          y.push({key: item.kind, value: [item], quantity: 1});
-        } else {
-          y[position].value.push(item);
-          y[position].quantity++;
-        }
-      });
-      setGroupByMaxRoom([...y]);
       let x = [];
       tmp.map((item, index) => {
         let position = x.map(e => e.key).indexOf(item.kind);
@@ -72,7 +59,6 @@ const Bill = ({navigation, route}) => {
 
   const [groupByData, setGroupByData] = useState([]);
 
-  const [groupByMaxRoom, setGroupByMaxRoom] = useState([]);
   const dispatch = useDispatch();
   const InforBooking = useSelector(state => state.booking);
   const [name, setName] = useState(InforBooking.name);

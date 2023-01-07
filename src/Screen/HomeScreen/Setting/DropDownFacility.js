@@ -22,38 +22,32 @@ const DropDownFacility = ({
         backgroundColor: 'white',
         top: 0,
       }}>
-      <View
+      <Pressable
+        onPress={() => {
+          setOpen(!open);
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          height: 50,
+          paddingHorizontal: 10,
         }}>
-        <TextInput
+        <Text
           style={{
             width: '90%',
             color: 'black',
-          }}
-          placeholderTextColor="hsl(0,0%,60%)"
-          placeholder="Kind Room"
-          value={value}
-          onChangeText={setValue}
-          onFocus={() => setOpen(true)}
-          onBlur={() => {
-            value !== '' && dataKind.indexOf(value) === -1
-              ? setChip([...chip, value])
-              : null;
-          }}
-        />
-        <Pressable
-          onPress={() => {
-            setOpen(!open);
+            fontSize: 16,
           }}>
-          <Entypo
-            name={open === true ? 'chevron-up' : 'chevron-down'}
-            color={'black'}
-            size={20}
-          />
-        </Pressable>
-      </View>
+          {value}
+        </Text>
+
+        <Entypo
+          name={open === true ? 'chevron-up' : 'chevron-down'}
+          color={'black'}
+          size={20}
+        />
+      </Pressable>
+
       <ScrollView>
         {open === true
           ? dataKind.map((item, index) => {
@@ -70,10 +64,12 @@ const DropDownFacility = ({
                   style={{
                     paddingVertical: 5,
                     paddingLeft: 5,
+                    height: 40,
                   }}>
                   <Text
                     style={{
                       color: 'black',
+                      fontSize: 16,
                     }}>
                     {item}
                   </Text>

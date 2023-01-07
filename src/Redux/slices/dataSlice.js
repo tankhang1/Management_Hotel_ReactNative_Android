@@ -7,7 +7,6 @@ const datas = createSlice({
     data: {
       employees: [],
       customers: [],
-      rooms: [],
       currentEmployee: null,
     },
     isLoading: false,
@@ -20,11 +19,6 @@ const datas = createSlice({
     },
     addCustomer: (state, action) => {
       state.data.customers.push(action.payload);
-      return state;
-    },
-
-    addRoom: (state, action) => {
-      state.data.rooms.push(action.payload);
       return state;
     },
   },
@@ -42,5 +36,5 @@ const datas = createSlice({
     });
   },
 });
-export const {addEmployee, addCustomer, addBill, addRoom} = datas.actions;
+export const {addEmployee, addCustomer} = datas.actions;
 export const dataReducer = datas.reducer;

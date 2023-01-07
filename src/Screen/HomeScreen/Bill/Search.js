@@ -15,7 +15,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
 const Search = ({navigation, route}) => {
-  const Rooms = useSelector(state => state.data_infor).data.rooms;
+  const Rooms = useSelector(state => state.list_room).rooms;
   const {width} = useWindowDimensions();
   const dispatch = useDispatch();
   const GroupRoom = route.params.item;
@@ -35,7 +35,6 @@ const Search = ({navigation, route}) => {
       );
     }
   };
-  console.log(listlikeroom);
   const renderRoom = ({item, index}) => {
     if (item.kind === GroupRoom.key) {
       let check = listlikeroom.indexOf(item.id);

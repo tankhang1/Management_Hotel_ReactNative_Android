@@ -12,8 +12,6 @@ import Setting from '../Setting/Setting';
 import TabNavigationCustomer from '../CustomersScreen/TabNavigationCustomer';
 import EmployeeNavigation from '../Employees/EmployeeNavigation';
 import DashBoard from '../../HomeScreen/Dashboard/Dashboard';
-import {fetchData} from '../../../Redux/thunk/fetchData';
-import {useDispatch, useSelector} from 'react-redux';
 import BillNavigation from '../Bill/BillNavigation';
 
 const Drawer = createDrawerNavigator();
@@ -30,7 +28,6 @@ const HomeScreenNavigation = () => {
       <Drawer.Screen name="Employee" component={EmployeeNavigation} />
       <Drawer.Screen name="Report" component={Report} />
       <Drawer.Screen name="BillNavigation" component={BillNavigation} />
-
       <Drawer.Screen name="Setting" component={Setting} />
     </Drawer.Navigator>
   );

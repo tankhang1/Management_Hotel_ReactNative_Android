@@ -22,7 +22,7 @@ const CustomizeDrawer = ({props, navigation}) => {
       }}>
       <DrawerContentScrollView {...props}>
         <View>
-          {/* <Pressable
+          <Pressable
             style={{
               width: '100%',
             }}
@@ -71,7 +71,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               </View>
               <FontAwesome5 name="angle-down" size={20} color="black" />
             </View>
-          </Pressable> */}
+          </Pressable>
           {/* DashBoard */}
           <TouchableHighlight
             onPress={() => {

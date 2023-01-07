@@ -15,7 +15,7 @@ import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
 const RoomDetail = ({navigation, route}) => {
   const dispatch = useDispatch();
   const Id = useSelector(state => state.id);
-  const Data_Room = useSelector(state => state.data_infor).data.rooms;
+  const Data_Room = useSelector(state => state.list_room).rooms;
   const bookMark1 = useRef(route.params.bookMark);
 
   let data = Data_Room.filter(item => item.id === Id);

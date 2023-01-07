@@ -181,6 +181,9 @@ const Template_Bill = ({
       Phone_Number: Infor_Customer.phone,
       Status: 0,
       CheckIn: 0,
+      Adults: 0,
+      Children: 0,
+      Foreign: 0,
     };
     dispatch(addCustomer(DataCustomer));
     await setDoc(
@@ -208,6 +211,9 @@ const Template_Bill = ({
       Phone_Number: Infor_Customer.phone,
       Status: 0,
       CheckIn: 0,
+      Adults: 0,
+      Children: 0,
+      Foreign: 0,
     };
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
     Alert.alert('Noticable', 'You has book success');
@@ -218,8 +224,8 @@ const Template_Bill = ({
     } else {
       NoAddCustomer();
     }
-    //dispatch(setLike());
-    //navigation.navigate('Room');
+    dispatch(setLike());
+    navigation.navigate('Room');
   };
 
   const scrollX = new Animated.Value(0);

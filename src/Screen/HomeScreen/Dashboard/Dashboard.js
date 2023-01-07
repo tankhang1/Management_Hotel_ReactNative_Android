@@ -22,77 +22,139 @@ import {collection, onSnapshot, orderBy, query} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {setBillList} from '../../../Redux/slices/dataBills';
 import Template_Bill from './Teamplate_Bill';
+import {setRoomList} from '../../../Redux/slices/dataRoom';
 const Dashboard = ({navigation}) => {
   const dispath = useDispatch();
   useEffect(() => {
-    const subscribe = navigation.addListener('focus', () => {
-      const q = query(collection(db, 'Bill_List'), orderBy('Date', 'desc'));
-      onSnapshot(q, snapshot => {
-        let bill = [];
-        snapshot.forEach(doc => {
-          let tmp = {...doc.data()};
-          tmp.Date = moment(tmp.Date?.toDate()).format('DD/MM/YYYY');
-          tmp.Date_Check_Out = moment(tmp.Date_Check_Out?.toDate()).format(
-            'DD/MM/YYYY',
-          );
+    //const subscribe = navigation.addListener('focus', () => {
+    const q = query(collection(db, 'Bill_List'), orderBy('Date', 'desc'));
+    onSnapshot(q, snapshot => {
+      let bill = [];
+      let groupGest = {
+        Local: {
+          Adults: 0,
+          Children: 0,
+        },
+        Foreign: {
+          Adults: 0,
+          Children: 0,
+        },
+      };
+      snapshot.forEach(doc => {
+        let tmp = {...doc.data()};
+        tmp.Date = moment(tmp.Date?.toDate()).format('DD/MM/YYYY');
+        tmp.Date_Check_Out = moment(tmp.Date_Check_Out?.toDate()).format(
+          'DD/MM/YYYY',
+        );
 
-          tmp.Date_Check_In = moment(tmp.Date_Check_In?.toDate()).format(
-            'DD/MM/YYYY',
-          );
-          // console.log(tmp);
+        tmp.Date_Check_In = moment(tmp.Date_Check_In?.toDate()).format(
+          'DD/MM/YYYY',
+        );
 
-          const data = {
-            Bill_Id: doc.data().Bill_Id,
-            CheckIn: doc.data().CheckIn,
-            Customer_Id: doc.data().Customer_Id,
-            Date: moment(doc.data().Date.toDate()).format('DD/MM/YYYY'),
-            Date_Check_In: moment(doc.data().Date_Check_In.toDate()).format(
-              'DD/MM/YYYY',
-            ),
-            Date_Check_Out: moment(doc.data().Date_Check_Out.toDate()).format(
-              'DD/MM/YYYY',
-            ),
-            Employee_Id: doc.data().Employee_Id,
-            List_Room_Id: doc.data().List_Room_Id,
-            Phone_Number: doc.data().Phone_Number,
-            Status: doc.data().Status,
-            Total_Money: doc.data().Total_Money,
-          };
-          bill.push(tmp);
-        });
-        dispath(setBillList(bill));
+        if (
+          doc.data().Date_Check_In.toDate() < new Date() &&
+          doc.data().Date_Check_Out.toDate() > new Date() &&
+          doc.data().CheckIn === 1
+        ) {
+          if (tmp.Foreign === 1) {
+            groupGest.Foreign.Adults += tmp.Adults;
+            groupGest.Foreign.Children += tmp.Children;
+          } else {
+            groupGest.Local.Adults += tmp.Adults;
+            groupGest.Local.Children += tmp.Children;
+          }
+        }
+        bill.push(tmp);
       });
+      setGroupByGest({...groupGest});
+      let currentDay = moment(new Date()).format('DD/MM/YYYY');
+      let tmp = {...reservation};
+      if (tmp.Day === currentDay) {
+        tmp.Duein = 0;
+        tmp.Dueout = 0;
+        tmp.New = 0;
+      } else {
+        tmp.New = 0;
+        (tmp.Duein = 0),
+          (tmp.Dueout = 0),
+          (tmp.CheckedIn = 0),
+          (tmp.CheckedOut = 0),
+          (tmp.Day = currentDay);
+      }
+      bill.map((item, index) => {
+        if (item.Date_Check_In === currentDay) {
+          tmp.Duein++;
+        } else if (item.Date_Check_Out === currentDay) {
+          tmp.Dueout++;
+        }
+        if (item.Date === currentDay) {
+          tmp.New++;
+        }
+      });
+      setReservation({...tmp});
+      dispath(setBillList(bill));
     });
-    return subscribe;
-  }, [navigation]);
+
+    onSnapshot(collection(db, 'DataRoom'), snapshot => {
+      let rooms = [];
+      let groupRoom = [];
+      snapshot.forEach(doc => {
+        rooms.push(doc.data());
+        let position = groupRoom.map(e => e.key).indexOf(doc.data().kind);
+        if (position === -1) {
+          groupRoom.push({
+            key: doc.data().kind,
+            value: [doc.data()],
+            quantity: 1,
+            available: doc.data().status,
+          });
+        } else {
+          groupRoom[position].value.push(doc.data());
+          groupRoom[position].quantity++;
+          if (doc.data().status === 1) {
+            groupRoom[position].available++;
+          }
+        }
+      });
+      dispath(setRoomList({rooms, groupRoom}));
+    });
+    // });
+    // return subscribe;
+  }, []);
   const bills = useSelector(state => state.list_bill);
   const [search, setSearch] = useState('');
   const [bill_Id, setBill_Id] = useState('OEGRPP8RrgAQDsmdb6L9');
   const [checkOut, setCheckOut] = useState(false);
-  const DataRoomsStatus = [
-    {
-      Type: 'Single',
-      Available: 22,
-      Unavailable: 11,
+
+  const [reservation, setReservation] = useState({
+    New: 0,
+    Duein: 0,
+    Dueout: 0,
+    CheckedIn: 0,
+    CheckedOut: 0,
+    Day: '07/01/2023',
+  });
+  const [groupByGest, setGroupByGest] = useState({
+    Local: {
+      Adults: 0,
+      Children: 0,
     },
-    {
-      Type: 'Double',
-      Available: 22,
-      Unavailable: 22,
+    Foreign: {
+      Adults: 0,
+      Children: 0,
     },
-    {
-      Type: 'Big',
-      Available: 13,
-      Unavailable: 11,
-    },
-    {
-      Type: 'Resident',
-      Available: 22,
-      Unavailable: 11,
-    },
-  ];
+  });
+
   const [showTemplate, setShowTemplate] = useState(false);
   const [searchBooking, setSearchBooking] = useState('');
+  const SumPeople =
+    groupByGest.Foreign.Adults +
+    groupByGest.Foreign.Children +
+    groupByGest.Local.Adults +
+    groupByGest.Local.Children;
+  const SumLocal = groupByGest.Local.Adults + groupByGest.Local.Children;
+  const SumForeign = groupByGest.Foreign.Adults + groupByGest.Foreign.Children;
+  const collectRoom = useSelector(state => state.list_room).groupRoom;
   if (bills.length !== 0) {
     return (
       <KeyboardAwareScrollView>
@@ -108,6 +170,8 @@ const Dashboard = ({navigation}) => {
             setVisible={setShowTemplate}
             Bill_Id={bill_Id}
             CheckOut={checkOut}
+            reservation={reservation}
+            setReservation={setReservation}
           />
           <View
             style={{
@@ -169,7 +233,7 @@ const Dashboard = ({navigation}) => {
                     fontSize: 10,
                     color: 'white',
                   }}>
-                  3
+                  {reservation.New}
                 </Text>
               </View>
             </Pressable>
@@ -227,40 +291,55 @@ const Dashboard = ({navigation}) => {
           {/*Victory Pie */}
           <View
             style={{
+              width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
             }}>
             <VictoryPie
-              width={260}
-              height={300}
-              colorScale={['#fdbe57', '#3be5c6', '#df8026', '#6a9111']}
-              data={[
-                {x: 'New', y: 35},
-                {x: 'Due in', y: 40},
-                {x: 'Due out', y: 55},
-                {x: 'Checked in', y: 30},
+              width={250}
+              height={250}
+              colorScale={[
+                '#fdbe57',
+                '#3be5c6',
+                '#df8026',
+                '#6a9111',
+                '#3ee363',
               ]}
-              innerRadius={100}
+              data={[
+                {x: 'New', y: reservation.New},
+                {x: 'Due in', y: reservation.Duein},
+                {x: 'Due out', y: reservation.Dueout},
+                {x: 'Checked in', y: reservation.CheckedIn},
+                {x: 'Check out', y: reservation.CheckedOut},
+              ]}
+              innerRadius={40}
               labelRadius={({innerRadius}) => innerRadius + 10}
-              labelComponent={<VictoryTooltip active renderInPortal={false} />}
-              labels={({datum}) => datum.y}
+              labels={({datum}) => {
+                if (datum.y !== 0) return datum.y;
+              }}
               style={{
-                labels: {fill: 'black', fontSize: 15, fontWeight: 'bold'},
+                labels: {fill: 'white', fontSize: 16, fontWeight: 'bold'},
               }}
               labelPosition="centroid"
             />
+
             <VictoryLegend
               orientation="vertical"
-              x={20}
-              y={50}
               gutter={20}
-              colorScale={['#fdbe57', '#3be5c6', '#df8026', '#6a9111']}
+              y={60}
+              colorScale={[
+                '#fdbe57',
+                '#3be5c6',
+                '#df8026',
+                '#6a9111',
+                '#3ee363',
+              ]}
               data={[
                 {name: 'New'},
                 {name: 'Due in'},
                 {name: 'Due out'},
                 {name: 'Checked in'},
+                {name: 'Checked out'},
               ]}
             />
           </View>
@@ -426,9 +505,12 @@ const Dashboard = ({navigation}) => {
             }}>
             {bills.map((item, index) => {
               if (
+                moment(item.Date_Check_In, 'YYYY-MM-DD').toDate() <=
+                  new Date() &&
+                moment(item.Date_Check_Out, 'YYYY-MM-DD').toDate() >=
+                  new Date() &&
                 item.CheckIn === 1 &&
-                item.Phone_Number.indexOf(search) > -1 &&
-                index < (search === '' ? 4 : bills.length)
+                item.Phone_Number.indexOf(search) > -1
               )
                 return (
                   <TouchableOpacity
@@ -589,7 +671,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     fontWeight: '600',
                   }}>
-                  527
+                  {SumPeople}
                 </Text>
               </View>
               <View
@@ -610,7 +692,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     fontWeight: '600',
                   }}>
-                  443
+                  {groupByGest.Foreign.Adults + groupByGest.Local.Adults}
                 </Text>
               </View>
               <View
@@ -631,7 +713,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     fontWeight: '600',
                   }}>
-                  15
+                  {groupByGest.Foreign.Children + groupByGest.Local.Children}
                 </Text>
               </View>
             </View>
@@ -664,7 +746,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  363 Adults
+                  {groupByGest.Local.Adults} Adults
                 </Text>
                 <Text
                   style={{
@@ -672,7 +754,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  76 Children
+                  {groupByGest.Local.Children} Children
                 </Text>
               </View>
             </View>
@@ -694,7 +776,7 @@ const Dashboard = ({navigation}) => {
                 }}>
                 <View
                   style={{
-                    width: '40%',
+                    width: `${(SumLocal / SumPeople).toFixed(2) * 100}%`,
                     height: 10,
                     backgroundColor: 'red',
                     borderRadius: 100,
@@ -705,7 +787,7 @@ const Dashboard = ({navigation}) => {
                 style={{
                   color: 'hsl(0,0%,50%)',
                 }}>
-                40%
+                {(SumLocal / SumPeople).toFixed(2) * 100}%
               </Text>
             </View>
             {/*Foreign people */}
@@ -736,7 +818,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  363 Adults
+                  {groupByGest.Foreign.Adults} Adults
                 </Text>
                 <Text
                   style={{
@@ -744,7 +826,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  76 Children
+                  {groupByGest.Foreign.Children} Children
                 </Text>
               </View>
             </View>
@@ -766,7 +848,7 @@ const Dashboard = ({navigation}) => {
                 }}>
                 <View
                   style={{
-                    width: '60%',
+                    width: `${(SumForeign / SumPeople).toFixed(2) * 100}%`,
                     height: 10,
                     backgroundColor: 'hsl(32,92%,72%)',
                     borderRadius: 100,
@@ -777,90 +859,9 @@ const Dashboard = ({navigation}) => {
                 style={{
                   color: 'hsl(0,0%,50%)',
                 }}>
-                60%
+                {(SumForeign / SumPeople).toFixed(2) * 100}%
               </Text>
             </View>
-          </View>
-          {/*Reservation Type */}
-          <View
-            style={{
-              marginTop: 10,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 10,
-                borderBottomWidth: 1,
-                borderColor: 'hsl(0,0%,85%)',
-                paddingVertical: 10,
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <MaterialCommunityIcons
-                  name="dots-grid"
-                  size={20}
-                  color="hsl(0,0%,73%)"
-                />
-                <Text
-                  style={{
-                    fontSize: 20,
-                    color: 'black',
-                    fontWeight: '600',
-                    marginLeft: 10,
-                  }}>
-                  Reservation type
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: 30,
-                  height: 30,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: 'hsl(0,0%,73%)',
-                  borderRadius: 5,
-                }}>
-                <Ionicons
-                  name="ios-settings-outline"
-                  size={20}
-                  color="hsl(0,0%,73%)"
-                />
-              </View>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <VictoryPie
-              width={250}
-              height={250}
-              colorScale={['#fdbe57', '#3be5c6']}
-              data={[
-                {x: 'Single', y: 60},
-                {x: 'Group', y: 40},
-              ]}
-              labels={({datum}) => `${datum.y}%`}
-              labelRadius={25}
-              style={{
-                labels: {fill: 'white', fontSize: 15, fontWeight: 'bold'},
-              }}
-              labelPosition="centroid"
-            />
-            <VictoryLegend
-              orientation="vertical"
-              x={15}
-              y={50}
-              colorScale={['#fdbe57', '#3be5c6']}
-              data={[{name: 'Single'}, {name: 'Group'}]}
-            />
           </View>
           {/*Rooms Status */}
           <View
@@ -970,7 +971,7 @@ const Dashboard = ({navigation}) => {
               flex: 1,
               paddingHorizontal: 10,
             }}>
-            {DataRoomsStatus.map((item, index) => {
+            {collectRoom?.map((item, index) => {
               return (
                 <View
                   key={index}
@@ -985,14 +986,14 @@ const Dashboard = ({navigation}) => {
                     paddingVertical: 10,
                     borderRadius: 5,
                   }}>
-                  <Text style={{color: 'black', flex: 1}}>{item.Type}</Text>
+                  <Text style={{color: 'black', flex: 1}}>{item.key}</Text>
 
                   <Text style={{color: 'black', flex: 1}}>
-                    {item.Available}
+                    {item.available}
                   </Text>
 
                   <Text style={{color: 'black', flex: 1}}>
-                    {item.Unavailable}
+                    {item.quantity - item.available}
                   </Text>
                   <View
                     style={{
@@ -1006,7 +1007,7 @@ const Dashboard = ({navigation}) => {
                         height: 10,
                         borderRadius: 100,
                         backgroundColor:
-                          item.Available - item.Unavailable > 0
+                          item.quantity > item.available
                             ? 'hsl(162,95%,63%)'
                             : 'red',
                         marginRight: 10,
@@ -1016,7 +1017,7 @@ const Dashboard = ({navigation}) => {
                       style={{
                         color: 'black',
                       }}>
-                      {item.Available - item.Unavailable > 0
+                      {item.quantity > item.available
                         ? 'Available'
                         : 'Unavailable'}
                     </Text>

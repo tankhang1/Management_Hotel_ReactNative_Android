@@ -26,9 +26,8 @@ import {async} from '@firebase/util';
 const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const dataBills = useSelector(state => state.list_bill);
   const bill = dataBills.filter(value => value.Bill_Id === Bill_Id);
-  const dataRooms = useSelector(state => state.data_infor).data.rooms;
+  const dataRooms = useSelector(state => state.list_room).rooms;
   const dataCustomers = useSelector(state => state.data_infor).data.customers;
-  console.log(bill);
   const customer = dataCustomers.filter(
     value => value.Customer_Id == bill[0].Customer_Id,
   );

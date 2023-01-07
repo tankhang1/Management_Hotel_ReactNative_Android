@@ -57,7 +57,6 @@ const CustomersList = () => {
       let tmp = [];
       data_table.forEach(e => {
         if (e.Status === 'New Customer') {
-          console.log(e);
           tmp.push(e);
         }
       });

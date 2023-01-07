@@ -19,9 +19,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import DropDownKind from './DropDownKind';
 import DropDownFacility from './DropDownFacility';
-import {useCallback} from 'react';
-import {useEffect} from 'react';
-import {addListener} from 'npm';
 import {useDispatch, useSelector} from 'react-redux';
 import {collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
@@ -30,10 +27,15 @@ import {uuidv4} from '@firebase/util';
 const AddNewRoom = () => {
   //Animation Kind Room lef
 
-  const Rooms = useSelector(state => state.data_infor).data.rooms;
   //DataKindRoom
   const [open, setOpen] = useState(false);
-  const dataKind = ['One Room', 'Twin Room', 'King Room'];
+  const dataKind = [
+    'Single Room',
+    'Twin Room',
+    'Double Room',
+    'Deluxe',
+    'President',
+  ];
   const [value, setValue] = useState('');
   //DataFacility
   const [open_facility, setOpen_facility] = useState(false);
@@ -47,7 +49,7 @@ const AddNewRoom = () => {
   const [value_facility, setValue_facility] = useState('');
   const [dataChip, setDataChip] = useState([]);
   //Value Kind Room
-  const [kindRoom, setKindRoom] = useState('one-bed');
+  const [kindRoom, setKindRoom] = useState('Single Room');
   const [roomCharge, setRoomCharge] = useState('');
   const [decribe, setDecribe] = useState('');
 
@@ -102,8 +104,8 @@ const AddNewRoom = () => {
       id: Id,
       image: picture,
       kind: kindRoom,
-      money: roomCharge,
-      no_rom: 'N_' + Math.floor(Math.random() * 1000) + 1,
+      money: Number(roomCharge),
+      no_room: 'N_' + Math.floor(Math.random() * 1000) + 1,
       rating: Math.floor(Math.random() * 5) + 1,
       airconditioning: dataChip.indexOf('Airconditioning') === -1 ? 0 : 1,
       breakfast: dataChip.indexOf('Breakfast') === -1 ? 0 : 1,
@@ -111,10 +113,15 @@ const AddNewRoom = () => {
       receptionist: dataChip.indexOf('Receptionist') === -1 ? 0 : 1,
       service: dataChip.indexOf('Service') === -1 ? 0 : 1,
       wifi: dataChip.indexOf('Wifi') === -1 ? 0 : 1,
+      status: 0,
     };
     await setDoc(doc(collection(db, 'DataRoom')), Room);
-    dispatch(addRoom(Room));
     Alert.alert('Notice', 'New Room has been added');
+    setPicture('');
+    setKindRoom('Single Room');
+    setRoomCharge();
+    setDataChip([]);
+    setDecribe('');
   };
 
   return (

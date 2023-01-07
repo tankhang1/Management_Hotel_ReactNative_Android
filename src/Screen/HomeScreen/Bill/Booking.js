@@ -21,7 +21,7 @@ import {useState} from 'react';
 import {Checkbox} from 'react-native-paper';
 import moment from 'moment';
 const Booking = ({navigation}) => {
-  const Rooms = useSelector(state => state.data_infor).data.rooms;
+  const Rooms = useSelector(state => state.list_room).rooms;
   const [Data, setData] = useState(Rooms);
   //panresponder
   const pan = useRef(new Animated.ValueXY()).current;
@@ -181,7 +181,6 @@ const Booking = ({navigation}) => {
     setShowFilter(!showFilter);
 
     let tmp = [];
-    console.log(sortResult);
     if (sortResult !== null || starPerNight !== null || value !== 0) {
       Rooms.map(item => {
         if (sortResult !== null) {

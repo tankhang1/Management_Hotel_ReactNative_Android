@@ -11,10 +11,11 @@ import {
   Alert,
   ToastAndroid,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Divider} from 'react-native-paper';
+import {Checkbox, Divider} from 'react-native-paper';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import {useState} from 'react';
@@ -23,9 +24,16 @@ import {doc, updateDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {async} from '@firebase/util';
 
-const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
+const Template_Bill = ({
+  visible,
+  setVisible,
+  Bill_Id,
+  CheckOut,
+  reservation,
+  setReservation,
+}) => {
   const dataBills = useSelector(state => state.list_bill);
-  const dataRooms = useSelector(state => state.data_infor).data.rooms;
+  const dataRooms = useSelector(state => state.list_room).rooms;
   const dataCustomers = useSelector(state => state.data_infor).data.customers;
   const bill = dataBills.filter(value => value.Bill_Id === Bill_Id);
   const customer = dataCustomers.filter(
@@ -36,7 +44,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   useEffect(() => {
     let tmp = [];
     for (let i = 0; i < bill[0]?.List_Room_Id.length; i++) {
-      for (let j = 0; j < dataRooms.length; j++) {
+      for (let j = 0; j < dataRooms?.length; j++) {
         if (bill[0]?.List_Room_Id[i] === dataRooms[j].id) {
           tmp.push(dataRooms[j]);
           break;
@@ -136,14 +144,16 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
         Status: 1,
       });
       Alert.alert('Bill has check out success');
+      let tmp = {...reservation};
+      tmp.CheckedOut++;
+      setReservation({...tmp});
     } else {
-      const updateBill = doc(db, 'Bill_List', Bill_Id);
-      await updateDoc(updateBill, {
-        CheckIn: 1,
-      });
-      Alert.alert('Bill has check in success');
+      setShowForm(!showForm);
     }
   };
+  const [adult, setAdult] = useState('');
+  const [children, setChildren] = useState('');
+  const [checkForeign, setCheckForeign] = useState(false);
   const SumMoney = () => {
     let sum = 0;
     data_Image.forEach(element => {
@@ -151,10 +161,24 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
     });
     return sum;
   };
-
+  const Confirm = async () => {
+    const updateBill = doc(db, 'Bill_List', Bill_Id);
+    await updateDoc(updateBill, {
+      CheckIn: 1,
+      Adults: Number(adult),
+      Children: Number(children),
+      Foreign: checkForeign ? 1 : 0,
+    });
+    Alert.alert('Bill has check in success');
+    let tmp = {...reservation};
+    tmp.CheckedIn++;
+    setReservation({...tmp});
+    setShowForm(!showForm);
+  };
   const scrollX = new Animated.Value(0);
   let position = Animated.divide(scrollX, width);
   let color_ = 'hsl(220,61%,80%)';
+  const [showForm, setShowForm] = useState(false);
   return (
     <Modal
       visible={visible}
@@ -163,6 +187,123 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
         setVisible(!visible);
       }}
       statusBarTranslucent>
+      <Modal
+        visible={showForm}
+        onRequestClose={() => setShowForm(!showForm)}
+        transparent
+        statusBarTranslucent>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: '80%',
+              height: 300,
+              backgroundColor: 'white',
+              borderRadius: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: 10,
+              paddingHorizontal: 10,
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                marginBottom: 10,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'hsl(0,0%,50%)',
+                }}>
+                Number of Adults:
+              </Text>
+              <TextInput
+                value={adult}
+                onChangeText={setAdult}
+                placeholder="Number"
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                }}
+                keyboardType="number-pad"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                marginBottom: 10,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'hsl(0,0%,50%)',
+                }}>
+                Number of Children:
+              </Text>
+              <TextInput
+                value={children}
+                onChangeText={setChildren}
+                placeholder="Number"
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                }}
+                keyboardType="number-pad"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                }}>
+                Are you a foreigner?
+              </Text>
+              <Checkbox
+                color="black"
+                onPress={() => {
+                  setCheckForeign(!checkForeign);
+                }}
+                status={checkForeign ? 'checked' : 'unchecked'}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={Confirm}
+              style={{
+                width: 150,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                backgroundColor: 'hsl(224,75%,53%)',
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 18,
+                }}>
+                Confirm
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <ScrollView
         style={{
           flex: 1,
@@ -600,6 +741,19 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onCheck}
+            disabled={() => {
+              if (CheckOut === true) {
+                if (bill[0]?.Status === 0) {
+                  return false;
+                }
+                return true;
+              } else {
+                if (bill[0]?.CheckIn === 0) {
+                  return false;
+                }
+                return true;
+              }
+            }}
             style={{
               width: '45%',
               height: 50,

@@ -30,8 +30,8 @@ const Room = ({navigation}) => {
   const [modalVisibleCheckOut, setModalVisibleCheckOut] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [dateCheckIn, setDateCheckIn] = useState(new Date());
-  const [dateCheckOut, setDateCheckOut] = useState(new Date());
+  const [dateCheckIn, setDateCheckIn] = useState('');
+  const [dateCheckOut, setDateCheckOut] = useState('');
   const [passport, setPassport] = useState('');
   const CheckIn = date => {
     setDateCheckIn(date);
