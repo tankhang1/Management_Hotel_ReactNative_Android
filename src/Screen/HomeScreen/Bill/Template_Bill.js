@@ -12,13 +12,19 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {cloneElement, useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Divider} from 'react-native-paper';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import {addCustomer} from '../../../Redux/slices/dataSlice';
-import {collection, doc, setDoc, Timestamp} from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {uuidv4} from '@firebase/util';
 import {setLike} from '../../../Redux/ListLikeRoom';
@@ -191,6 +197,8 @@ const Template_Bill = ({
       Adults: 0,
       Children: 0,
       Foreign: 0,
+      DateIn: new Timestamp.fromDate(new Date('1975-12-01')),
+      DateOut: new Timestamp.fromDate(new Date('1975-12-20')),
     };
     dispatch(addCustomer(DataCustomer));
     await setDoc(
@@ -198,6 +206,7 @@ const Template_Bill = ({
       DataCustomer,
     ).then(() => console.log('Ok'));
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
+
     Alert.alert('Noticable', 'You has book success');
   };
 
@@ -221,10 +230,10 @@ const Template_Bill = ({
       Adults: 0,
       Children: 0,
       Foreign: 0,
+      DateIn: new Timestamp.fromDate(new Date('1975-12-01')),
+      DateOut: new Timestamp.fromDate(new Date('1975-12-20')),
     };
-    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data).then(() =>
-      console.log('Ok'),
-    );
+    await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
     Alert.alert('Noticable', 'You has book success');
   };
   const AddNewBill = () => {
@@ -233,6 +242,15 @@ const Template_Bill = ({
     } else {
       NoAddCustomer();
     }
+    List_Room_Id().map(async (item, index) => {
+      let ref = collection(db, 'DataRoom', item);
+      await updateDoc(ref, {
+        DateFrom: new Timestamp.fromDate(
+          new Date(Infor_Customer.date_check_in),
+        ),
+        DateTo: new Timestamp.fromDate(new Date(Infor_Customer.date_check_out)),
+      });
+    });
     dispatch(setLike());
     navigation.navigate('Room');
   };

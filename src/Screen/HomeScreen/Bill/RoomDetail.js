@@ -16,7 +16,7 @@ const RoomDetail = ({navigation, route}) => {
   const dispatch = useDispatch();
   const Id = useSelector(state => state.id);
   const Data_Room = useSelector(state => state.list_room).rooms;
-  const bookMark1 = useRef(route.params.bookMark);
+  const bookMark1 = useRef(route.params?.bookMark);
 
   let data = Data_Room.filter(item => item.id === Id);
   const datafacility = [
@@ -98,7 +98,10 @@ const RoomDetail = ({navigation, route}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
         }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Booking')}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(route.params ? 'Booking' : 'Bill')
+          }>
           <AntDesign name="arrowleft" size={30} color={'white'} />
         </TouchableOpacity>
         <TouchableOpacity onPress={onLikeRoom}>

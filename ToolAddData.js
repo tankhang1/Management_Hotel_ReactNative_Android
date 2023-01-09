@@ -1,6 +1,13 @@
 import {View, Text, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
-import {doc, query, setDoc, Timestamp, where} from 'firebase/firestore';
+import {
+  doc,
+  query,
+  queryEqual,
+  setDoc,
+  Timestamp,
+  where,
+} from 'firebase/firestore';
 import {uuidv4} from '@firebase/util';
 import {db} from './src/Firebase/firebase';
 import {collection, getDocs} from 'firebase/firestore';
@@ -25,10 +32,7 @@ const ToolAddData = () => {
           0,
         ),
       };
-      await setDoc(
-        doc(db, 'Employee/l3TLUDx5ltEro8H1NivH/Calendar_Work', Id),
-        Data,
-      );
+      await setDoc(doc(db, 'TMP', Id), Data);
     }
   };
   const [List, setList] = useState([]);

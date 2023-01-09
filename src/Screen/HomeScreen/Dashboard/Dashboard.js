@@ -6,6 +6,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,7 +15,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {DataTable} from 'react-native-paper';
-import {VictoryLegend, VictoryPie, VictoryTooltip} from 'victory-native';
+import {
+  VictoryBar,
+  VictoryChart,
+  VictoryLegend,
+  VictoryPie,
+  VictoryTheme,
+  VictoryTooltip,
+} from 'victory-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
 import {collection, onSnapshot, orderBy, query} from 'firebase/firestore';
@@ -24,101 +32,112 @@ import Template_Bill from './Teamplate_Bill';
 import {setRoomList} from '../../../Redux/slices/dataRoom';
 const Dashboard = ({navigation}) => {
   const dispath = useDispatch();
+  const {width, height} = useWindowDimensions();
   useEffect(() => {
-    //const subscribe = navigation.addListener('focus', () => {
-    const q = query(collection(db, 'Bill_List'), orderBy('Date', 'desc'));
-    onSnapshot(q, snapshot => {
-      let bill = [];
-      let groupGest = {
-        Local: {
-          Adults: 0,
-          Children: 0,
-        },
-        Foreign: {
-          Adults: 0,
-          Children: 0,
-        },
-      };
-      snapshot.forEach(doc => {
-        let tmp = {...doc.data()};
-        tmp.Date = moment(tmp.Date?.toDate()).format('DD/MM/YYYY');
-        tmp.Date_Check_Out = moment(tmp.Date_Check_Out?.toDate()).format(
-          'DD/MM/YYYY',
-        );
+    async function GetData() {
+      const q = query(collection(db, 'Bill_List'), orderBy('Date', 'desc'));
+      await onSnapshot(q, snapshot => {
+        let bill = [];
+        let groupGest = {
+          Local: {
+            Adults: 0,
+            Children: 0,
+          },
+          Foreign: {
+            Adults: 0,
+            Children: 0,
+          },
+        };
+        snapshot.forEach(doc => {
+          let tmp = {...doc.data()};
+          tmp.Date = moment(tmp.Date?.toDate()).format('DD/MM/YYYY');
+          tmp.Date_Check_Out = moment(tmp.Date_Check_Out?.toDate()).format(
+            'DD/MM/YYYY',
+          );
 
-        tmp.Date_Check_In = moment(tmp.Date_Check_In?.toDate()).format(
-          'DD/MM/YYYY',
-        );
+          tmp.Date_Check_In = moment(tmp.Date_Check_In?.toDate()).format(
+            'DD/MM/YYYY',
+          );
 
-        if (
-          doc.data().Date_Check_In.toDate() <= new Date() &&
-          doc.data().Date_Check_Out.toDate() >= new Date() &&
-          doc.data().CheckIn === 1
-        ) {
-          if (tmp.Foreign === 1) {
-            groupGest.Foreign.Adults += tmp.Adults;
-            groupGest.Foreign.Children += tmp.Children;
+          if (
+            doc.data().Date_Check_In.toDate() <= new Date() &&
+            doc.data().Date_Check_Out.toDate() >= new Date() &&
+            doc.data().CheckIn === 1
+          ) {
+            if (tmp.Foreign === 1) {
+              groupGest.Foreign.Adults += tmp.Adults;
+              groupGest.Foreign.Children += tmp.Children;
+            } else {
+              groupGest.Local.Adults += tmp.Adults;
+              groupGest.Local.Children += tmp.Children;
+            }
+          }
+          bill.push(tmp);
+        });
+        setGroupByGest({...groupGest});
+        let currentDay = moment(new Date()).format('DD/MM/YYYY');
+        let tmp = {
+          New: 0,
+          Duein: 0,
+          Dueout: 0,
+          CheckedIn: 0,
+          CheckedOut: 0,
+        };
+
+        bill.map((item, index) => {
+          if (item.Date_Check_In === currentDay) {
+            tmp.Duein++;
+          } else if (item.Date_Check_Out === currentDay) {
+            tmp.Dueout++;
+          }
+          if (item.Date === currentDay) {
+            tmp.New++;
+          }
+          if (
+            moment(item.DateIn.toDate()).format('DD/MM/YYYY') === currentDay
+          ) {
+            tmp.CheckedIn++;
+          }
+          if (
+            moment(item.DateOut.toDate()).format('DD/MM/YYYY') === currentDay
+          ) {
+            tmp.CheckedOut++;
+          }
+        });
+        setReservation({...tmp});
+        dispath(setBillList(bill));
+      });
+
+      await onSnapshot(collection(db, 'DataRoom'), snapshot => {
+        let rooms = [];
+        let groupRoom = [];
+        snapshot.forEach(doc => {
+          rooms.push(doc.data());
+
+          let position = groupRoom.map(e => e.key).indexOf(doc.data().kind);
+          if (position === -1) {
+            groupRoom.push({
+              key: doc.data().kind,
+              value: [doc.data()],
+              quantity: 1,
+              available: doc.data().status,
+            });
           } else {
-            groupGest.Local.Adults += tmp.Adults;
-            groupGest.Local.Children += tmp.Children;
+            groupRoom[position].value.push(doc.data());
+            groupRoom[position].quantity++;
+            if (
+              doc.data().status === 1 &&
+              (doc.data().DateFrom.toDate() > new Date() ||
+                doc.data().DateTo.toDate() < new Date())
+            ) {
+              groupRoom[position].available++;
+            }
           }
-        }
-        bill.push(tmp);
+        });
+        dispath(setRoomList({rooms, groupRoom}));
       });
-      setGroupByGest({...groupGest});
-      let currentDay = moment(new Date()).format('DD/MM/YYYY');
-      let tmp = {...reservation};
-      if (tmp.Day === currentDay) {
-        tmp.Duein = 0;
-        tmp.Dueout = 0;
-        tmp.New = 0;
-      } else {
-        tmp.New = 0;
-        (tmp.Duein = 0),
-          (tmp.Dueout = 0),
-          (tmp.CheckedIn = 0),
-          (tmp.CheckedOut = 0),
-          (tmp.Day = currentDay);
-      }
-      bill.map((item, index) => {
-        if (item.Date_Check_In === currentDay) {
-          tmp.Duein++;
-        } else if (item.Date_Check_Out === currentDay) {
-          tmp.Dueout++;
-        }
-        if (item.Date === currentDay) {
-          tmp.New++;
-        }
-      });
-      setReservation({...tmp});
-      dispath(setBillList(bill));
-    });
-
-    onSnapshot(collection(db, 'DataRoom'), snapshot => {
-      let rooms = [];
-      let groupRoom = [];
-      snapshot.forEach(doc => {
-        rooms.push(doc.data());
-        let position = groupRoom.map(e => e.key).indexOf(doc.data().kind);
-        if (position === -1) {
-          groupRoom.push({
-            key: doc.data().kind,
-            value: [doc.data()],
-            quantity: 1,
-            available: doc.data().status,
-          });
-        } else {
-          groupRoom[position].value.push(doc.data());
-          groupRoom[position].quantity++;
-          if (doc.data().status === 1) {
-            groupRoom[position].available++;
-          }
-        }
-      });
-      dispath(setRoomList({rooms, groupRoom}));
-    });
-    // });
-    // return subscribe;
+    }
+    GetData();
   }, []);
   const bills = useSelector(state => state.list_bill);
   const [search, setSearch] = useState('');
@@ -131,7 +150,6 @@ const Dashboard = ({navigation}) => {
     Dueout: 0,
     CheckedIn: 0,
     CheckedOut: 0,
-    Day: moment(new Date()).format('DD/MM/YYYY'),
   });
   const [groupByGest, setGroupByGest] = useState({
     Local: {
@@ -179,7 +197,7 @@ const Dashboard = ({navigation}) => {
           }}
           key={index}
           style={{
-            flex: 1,
+            width: width,
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: 'row',
@@ -187,7 +205,7 @@ const Dashboard = ({navigation}) => {
           }}>
           <View
             style={{
-              flex: 1,
+              width: width / 3,
               paddingVertical: 10,
               flexDirection: 'row',
               alignItems: 'center',
@@ -204,7 +222,7 @@ const Dashboard = ({navigation}) => {
           </View>
           <View
             style={{
-              flex: 1,
+              width: width / 3,
               alignItems: 'center',
               flexDirection: 'row',
               paddingVertical: 10,
@@ -222,7 +240,7 @@ const Dashboard = ({navigation}) => {
           </View>
           <View
             style={{
-              flex: 1,
+              width: width / 3,
               paddingVertical: 10,
               flexDirection: 'row',
               alignItems: 'center',
@@ -384,7 +402,7 @@ const Dashboard = ({navigation}) => {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <VictoryPie
+            {/* <VictoryPie
               width={250}
               height={250}
               colorScale={[
@@ -410,9 +428,24 @@ const Dashboard = ({navigation}) => {
                 labels: {fill: 'white', fontSize: 16, fontWeight: 'bold'},
               }}
               labelPosition="centroid"
-            />
-
-            <VictoryLegend
+            /> */}
+            <VictoryChart theme={VictoryTheme.material} domainPadding={{x: 35}}>
+              <VictoryBar
+                barRatio={0.8}
+                style={{
+                  data: {fill: 'hsl(145,67%,47%)'},
+                }}
+                cornerRadius={10}
+                data={[
+                  {x: 'New', y: reservation.New},
+                  {x: 'Due in', y: reservation.Duein},
+                  {x: 'Due out', y: reservation.Dueout},
+                  {x: 'Check in', y: reservation.CheckedIn},
+                  {x: 'Check out', y: reservation.CheckedOut},
+                ]}
+              />
+            </VictoryChart>
+            {/* <VictoryLegend
               orientation="vertical"
               gutter={20}
               y={60}
@@ -430,7 +463,7 @@ const Dashboard = ({navigation}) => {
                 {name: 'Checked in'},
                 {name: 'Checked out'},
               ]}
-            />
+            /> */}
           </View>
           {/*Check-in guest*/}
 
@@ -501,7 +534,7 @@ const Dashboard = ({navigation}) => {
             }}>
             <View
               style={{
-                flex: 1,
+                width: width / 3,
                 alignItems: 'center',
                 flexDirection: 'row',
               }}>
@@ -531,7 +564,7 @@ const Dashboard = ({navigation}) => {
             </View>
             <View
               style={{
-                flex: 1,
+                width: width / 3,
 
                 alignItems: 'center',
                 flexDirection: 'row',
@@ -562,7 +595,8 @@ const Dashboard = ({navigation}) => {
             </View>
             <View
               style={{
-                flex: 1,
+                width: width / 3,
+
                 alignItems: 'center',
                 flexDirection: 'row',
               }}>
@@ -682,9 +716,11 @@ const Dashboard = ({navigation}) => {
               }
             })}
           </ScrollView> */}
-          <View
+          <ScrollView
+            horizontal
             style={{
               marginVertical: 10,
+              width: width,
             }}>
             <FlatList
               data={bills}
@@ -694,7 +730,7 @@ const Dashboard = ({navigation}) => {
               removeClippedSubviews={true}
               nestedScrollEnabled={true}
             />
-          </View>
+          </ScrollView>
 
           {/*Number of Guest */}
           <View
@@ -1111,9 +1147,7 @@ const Dashboard = ({navigation}) => {
                         height: 10,
                         borderRadius: 100,
                         backgroundColor:
-                          item.quantity - item.available < item.available
-                            ? 'hsl(162,95%,63%)'
-                            : 'red',
+                          item.available > 0 ? 'hsl(162,95%,63%)' : 'red',
                         marginRight: 10,
                       }}
                     />
@@ -1121,9 +1155,7 @@ const Dashboard = ({navigation}) => {
                       style={{
                         color: 'black',
                       }}>
-                      {item.quantity - item.available < item.available
-                        ? 'Available'
-                        : 'Unavailable'}
+                      {item.available > 0 ? 'Available' : 'Unavailable'}
                     </Text>
                   </View>
                 </View>

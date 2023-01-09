@@ -27,12 +27,10 @@ import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {resetSkill} from '../../../Redux/English_Level';
 import {Picker} from '@react-native-picker/picker';
 import {Checkbox} from 'react-native-paper';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const AddEmployee = () => {
   const dispatch = useDispatch();
-  const [picture, setPicture] = useState(
-    'https://gentlenobra.com/wp-content/uploads/2021/10/hot-girl-dep-kinh-5.jpg',
-  );
+  const [picture, setPicture] = useState('');
   const [name, setName] = useState('');
   const [identification, setIdentification] = useState('');
   const [dateBirth, setDateBirth] = useState('');
@@ -322,15 +320,20 @@ const AddEmployee = () => {
               marginTop: 10,
               marginBottom: 30,
             }}>
-            <Image
-              source={{uri: picture}}
-              style={{
-                width: 150,
-                height: 150,
+            {picture === '' ? (
+              <Ionicons name="person-circle-outline" size={150} color="black" />
+            ) : (
+              <Image
+                source={{uri: picture}}
+                style={{
+                  width: 150,
+                  height: 150,
+                  resizeMode: 'contain',
+                  borderRadius: 100,
+                }}
+              />
+            )}
 
-                borderRadius: 100,
-              }}
-            />
             <Pressable onPress={() => setOnOptionC_L(!onOptionC_L)}>
               <View
                 style={{

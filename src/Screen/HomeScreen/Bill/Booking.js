@@ -88,11 +88,7 @@ const Booking = ({navigation}) => {
   const listlikeroom1 = useSelector(state => state.listlikeroom);
   const {width, height} = Dimensions.get('screen');
   const onDetail = item => {
-    dispatch(
-      setId({
-        id: item.id,
-      }),
-    );
+    dispatch(setId(item.id));
     navigation.reset({
       index: 0,
       routes: [
@@ -106,7 +102,10 @@ const Booking = ({navigation}) => {
     });
   };
   const renderItem = ({item}) => {
-    if (item.status === 1)
+    if (
+      item.status === 1 &&
+      new Date(dataBooking.date_check_in) > item.DateFrom.toDate()
+    )
       return (
         <View
           key={item.id}

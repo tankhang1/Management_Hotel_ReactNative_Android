@@ -14,16 +14,16 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
+import {setId} from '../../../Redux/ManageId';
 const Search = ({navigation, route}) => {
   const {width} = useWindowDimensions();
   const dispatch = useDispatch();
   const GroupRoom = route.params.item;
-  const Rooms = useSelector(state => state.list_room).rooms;
+  const R = useSelector(state => state.list_room).groupRoom.filter(
+    value => value.key === GroupRoom.key,
+  );
 
-  const R = useSelector(state => state.list_room).groupRoom.map(e => {
-    if (e.key === GroupRoom.key) return e;
-  });
-  console.log(R[0].value);
+  //console.log(R[0].value);
   const listlikeroom = useSelector(state => state.listlikeroom);
   const onChoose = id => {
     if (listlikeroom.indexOf(id) === -1) {
@@ -232,6 +232,10 @@ const Search = ({navigation, route}) => {
               alignSelf: 'flex-end',
             }}>
             <Pressable
+              onPress={() => {
+                dispatch(setId(item.id));
+                navigation.navigate('RoomDetail');
+              }}
               style={{
                 justifyContent: 'center',
                 alignItems: 'center',

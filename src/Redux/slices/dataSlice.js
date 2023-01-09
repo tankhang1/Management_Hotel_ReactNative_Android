@@ -21,6 +21,17 @@ const datas = createSlice({
       state.data.customers.push(action.payload);
       return state;
     },
+    resetDatas: (state, action) => {
+      return {
+        data: {
+          employees: [],
+          customers: [],
+          currentEmployee: null,
+        },
+        isLoading: false,
+        error: null,
+      };
+    },
   },
   extraReducers(builder) {
     builder.addCase(fetchData.pending, (state, action) => {
@@ -36,5 +47,5 @@ const datas = createSlice({
     });
   },
 });
-export const {addEmployee, addCustomer} = datas.actions;
+export const {addEmployee, addCustomer, resetDatas} = datas.actions;
 export const dataReducer = datas.reducer;

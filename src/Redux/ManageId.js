@@ -4,7 +4,7 @@ const ManageId = createSlice({
   initialState: null,
   reducers: {
     setId: (state, action) => {
-      return action.payload.id;
+      return action.payload;
     },
   },
 });
