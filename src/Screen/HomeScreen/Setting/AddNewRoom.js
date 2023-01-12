@@ -24,6 +24,7 @@ import {collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {addRoom} from '../../../Redux/slices/dataSlice';
 import {uuidv4} from '@firebase/util';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 const AddNewRoom = () => {
   //Animation Kind Room lef
 
@@ -125,333 +126,330 @@ const AddNewRoom = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="position"
-      keyboardVerticalOffset={-200}
+    <KeyboardAwareScrollView
+      showsVerticalScrollIndicator={false}
+      enableOnAndroid={true}
       style={{
         flex: 1,
-        backgroundColor: 'white',
         paddingHorizontal: 10,
-      }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Modal
-          visible={onOptionC_L}
-          animationType="fade"
-          onRequestClose={() => {
-            setOnOptionC_L(!onOptionC_L);
+        backgroundColor: 'white',
+      }}
+      extraScrollHeight={20}>
+      <Modal
+        visible={onOptionC_L}
+        animationType="fade"
+        onRequestClose={() => {
+          setOnOptionC_L(!onOptionC_L);
+        }}
+        transparent
+        statusBarTranslucent>
+        <Pressable
+          onPress={() => setOnOptionC_L(!onOptionC_L)}
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.3)',
           }}
-          transparent
-          statusBarTranslucent>
-          <Pressable
-            onPress={() => setOnOptionC_L(!onOptionC_L)}
+        />
+        <View
+          style={{
+            width: '80%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+            alignSelf: 'center',
+            borderRadius: 5,
+            elevation: 5,
+            position: 'absolute',
+            top: 200,
+          }}>
+          <Text
             style={{
-              flex: 1,
-              backgroundColor: 'rgba(0,0,0,0.3)',
-            }}
-          />
-          <View
+              color: 'black',
+              textAlign: 'center',
+              fontSize: 18,
+              fontWeight: '600',
+              marginVertical: 20,
+            }}>
+            Would you like access your libary or camera to collect image
+          </Text>
+          <TouchableOpacity
+            onPress={onLunchCamera}
             style={{
-              width: '80%',
+              borderTopWidth: 1,
+              borderBottomWidth: 1,
+              width: '100%',
+              paddingVertical: 10,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: 'white',
-              alignSelf: 'center',
-              borderRadius: 5,
-              elevation: 5,
-              position: 'absolute',
-              top: 200,
+              borderColor: 'hsl(0,0%,80%)',
             }}>
             <Text
               style={{
-                color: 'black',
-                textAlign: 'center',
-                fontSize: 18,
-                fontWeight: '600',
-                marginVertical: 20,
+                color: 'hsl(224,75%,53%)',
+                fontSize: 16,
+                fontWeight: '500',
               }}>
-              Would you like access your libary or camera to collect image
+              Access Camera
             </Text>
-            <TouchableOpacity
-              onPress={onLunchCamera}
-              style={{
-                borderTopWidth: 1,
-                borderBottomWidth: 1,
-                width: '100%',
-                paddingVertical: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderColor: 'hsl(0,0%,80%)',
-              }}>
-              <Text
-                style={{
-                  color: 'hsl(224,75%,53%)',
-                  fontSize: 16,
-                  fontWeight: '500',
-                }}>
-                Access Camera
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={onLunchLibary}
-              style={{
-                borderBottomWidth: 1,
-                width: '100%',
-                paddingVertical: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderColor: 'hsl(0,0%,80%)',
-              }}>
-              <Text
-                style={{
-                  color: 'hsl(224,75%,53%)',
-                  fontSize: 16,
-                  fontWeight: '400',
-                }}>
-                Access Library
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setOnOptionC_L(!onOptionC_L);
-              }}
-              style={{
-                width: '100%',
-                paddingVertical: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{
-                  color: 'hsl(224,75%,53%)',
-                  fontSize: 16,
-                  fontWeight: '400',
-                }}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-        <KeyboardAvoidingView>
-          <View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onLunchLibary}
+            style={{
+              borderBottomWidth: 1,
+              width: '100%',
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderColor: 'hsl(0,0%,80%)',
+            }}>
             <Text
               style={{
-                fontSize: 20,
+                color: 'hsl(224,75%,53%)',
+                fontSize: 16,
+                fontWeight: '400',
+              }}>
+              Access Library
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setOnOptionC_L(!onOptionC_L);
+            }}
+            style={{
+              width: '100%',
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: 'hsl(224,75%,53%)',
+                fontSize: 16,
+                fontWeight: '400',
+              }}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <View>
+        <Text
+          style={{
+            fontSize: 20,
+            color: 'black',
+            fontWeight: '700',
+            marginBottom: 20,
+          }}>
+          Add New Room
+        </Text>
+
+        <Pressable onPress={() => setOnOptionC_L(!onOptionC_L)}>
+          {picture === '' ? (
+            <View
+              style={{
+                width: '100%',
+                height: 200,
+                borderWidth: 1,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}>
+              <Image
+                source={require('../asset/upload.png')}
+                style={{
+                  resizeMode: 'contain',
+                }}
+              />
+              <Text
+                style={{
+                  color: 'hsl(0,0%,60%)',
+                }}>
+                Upload image room
+              </Text>
+            </View>
+          ) : (
+            <Image
+              source={{uri: picture}}
+              style={{
+                width: '100%',
+                height: 200,
+                borderRadius: 16,
+                marginBottom: 20,
+              }}
+            />
+          )}
+        </Pressable>
+        {/*Kind room and room charge */}
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+          }}>
+          {/*Kind Room */}
+          <View
+            style={{
+              width: '45%',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
                 color: 'black',
                 fontWeight: '700',
-                marginBottom: 20,
+                marginBottom: 5,
               }}>
-              Add New Room
+              Kind room
             </Text>
 
-            <Pressable onPress={() => setOnOptionC_L(!onOptionC_L)}>
-              {picture === '' ? (
-                <View
-                  style={{
-                    width: '100%',
-                    height: 200,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 20,
-                  }}>
-                  <Image
-                    source={require('../asset/upload.png')}
-                    style={{
-                      resizeMode: 'contain',
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: 'hsl(0,0%,60%)',
-                    }}>
-                    Upload image room
-                  </Text>
-                </View>
-              ) : (
-                <Image
-                  source={{uri: picture}}
-                  style={{
-                    width: '100%',
-                    height: 200,
-                    borderRadius: 16,
-                    marginBottom: 20,
-                  }}
-                />
-              )}
-            </Pressable>
-            {/*Kind room and room charge */}
-            <View
-              style={{
-                flexDirection: 'row',
-                width: '100%',
-                justifyContent: 'space-between',
-                marginBottom: 20,
-              }}>
-              {/*Kind Room */}
-              <View
-                style={{
-                  width: '45%',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '700',
-                    marginBottom: 5,
-                  }}>
-                  Kind room
-                </Text>
-
-                <View>
-                  <DropDownKind
-                    width={150}
-                    open={open}
-                    setOpen={setOpen}
-                    value={value}
-                    setValue={setValue}
-                    dataKind={dataKind}
-                  />
-                </View>
-              </View>
-
-              {/*Money Rent*/}
-              <View
-                style={{
-                  width: '45%',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '700',
-                    marginBottom: 5,
-                  }}>
-                  Room charge
-                </Text>
-                <TextInput
-                  value={roomCharge}
-                  onChangeText={setRoomCharge}
-                  placeholder="How much ?"
-                  style={{
-                    width: '100%',
-                    borderWidth: 1,
-                    height: 50,
-                    borderRadius: 10,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    paddingHorizontal: 10,
-                    color: 'black',
-                  }}
-                  placeholderTextColor="hsl(0,0%,60%)"
-                />
-              </View>
+            <View>
+              <DropDownKind
+                width={150}
+                open={open}
+                setOpen={setOpen}
+                value={value}
+                setValue={setValue}
+                dataKind={dataKind}
+              />
             </View>
+          </View>
 
-            {/*choose facility*/}
+          {/*Money Rent*/}
+          <View
+            style={{
+              width: '45%',
+            }}>
             <Text
               style={{
+                fontSize: 16,
                 color: 'black',
-                fontSize: 18,
-                fontWeight: '600',
-                marginBottom: 10,
+                fontWeight: '700',
+                marginBottom: 5,
               }}>
-              Choose material facilities
+              Room charge
             </Text>
-            <View
+            <TextInput
+              value={roomCharge}
+              onChangeText={setRoomCharge}
+              placeholder="How much ?"
               style={{
-                marginBottom: 60,
-              }}>
-              <DropDownFacility
-                open={open_facility}
-                setOpen={setOpen_facility}
-                value={value_facility}
-                setValue={setValue_facility}
-                dataKind={dataFacility}
-                setChip={setDataChip}
-                chip={dataChip}
-              />
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {dataChip.map((item, index) => {
-                return (
-                  <Pressable
-                    onPress={() => DeleteChip(item)}
-                    key={index}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      marginHorizontal: 10,
-                      borderRadius: 10,
-                      backgroundColor: 'hsl(0,0%,73%)',
-                    }}>
-                    <Text
-                      style={{
-                        color: 'black',
-                      }}>
-                      {item}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-            {/*Decribe */}
-            <View>
-              <Text
-                style={{
-                  color: 'black',
-                  fontSize: 18,
-                  fontWeight: '600',
-                  marginBottom: 10,
-                }}>
-                Decribe
-              </Text>
-              <TextInput
-                value={decribe}
-                onChangeText={setDecribe}
-                placeholder="Decribe about your room"
-                style={{
-                  width: '100%',
-                  borderWidth: 1,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  borderRadius: 10,
-                  color: 'black',
-                }}
-                allowFontScaling={true}
-                autoCapitalize={'sentences'}
-                multiline
-                placeholderTextColor="hsl(0,0%,60%)"
-              />
-            </View>
+                width: '100%',
+                borderWidth: 1,
+                height: 50,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row',
+                paddingHorizontal: 10,
+                color: 'black',
+              }}
+              placeholderTextColor="hsl(0,0%,60%)"
+            />
+          </View>
+        </View>
 
-            <Pressable onPress={AddRoom}>
-              <View
+        {/*choose facility*/}
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 18,
+            fontWeight: '600',
+            marginBottom: 10,
+          }}>
+          Choose material facilities
+        </Text>
+        <View
+          style={{
+            marginBottom: 20,
+          }}>
+          <DropDownFacility
+            open={open_facility}
+            setOpen={setOpen_facility}
+            value={value_facility}
+            setValue={setValue_facility}
+            dataKind={dataFacility}
+            setChip={setDataChip}
+            chip={dataChip}
+          />
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {dataChip.map((item, index) => {
+            return (
+              <Pressable
+                onPress={() => DeleteChip(item)}
+                key={index}
                 style={{
-                  width: 150,
-                  height: 50,
-                  marginBottom: 10,
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: 'hsl(221,100%,80%)',
-                  alignSelf: 'center',
-                  marginVertical: 20,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  marginHorizontal: 10,
+                  borderRadius: 10,
+                  backgroundColor: 'hsl(0,0%,73%)',
                 }}>
                 <Text
                   style={{
-                    color: 'white',
-                    fontWeight: '700',
+                    color: 'black',
                   }}>
-                  Add new room
+                  {item}
                 </Text>
-              </View>
-            </Pressable>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+        {/*Decribe */}
+        <View>
+          <Text
+            style={{
+              color: 'black',
+              fontSize: 18,
+              fontWeight: '600',
+              marginBottom: 10,
+            }}>
+            Decribe
+          </Text>
+          <TextInput
+            value={decribe}
+            onChangeText={setDecribe}
+            placeholder="Decribe about your room"
+            style={{
+              width: '100%',
+              borderWidth: 1,
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              borderRadius: 10,
+              color: 'black',
+            }}
+            allowFontScaling={true}
+            autoCapitalize={'sentences'}
+            multiline
+            placeholderTextColor="hsl(0,0%,60%)"
+          />
+        </View>
+
+        <Pressable onPress={AddRoom}>
+          <View
+            style={{
+              width: 150,
+              height: 50,
+              marginBottom: 10,
+              borderRadius: 100,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'hsl(221,100%,80%)',
+              alignSelf: 'center',
+              marginVertical: 20,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '700',
+              }}>
+              Add new room
+            </Text>
           </View>
-        </KeyboardAvoidingView>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </Pressable>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 

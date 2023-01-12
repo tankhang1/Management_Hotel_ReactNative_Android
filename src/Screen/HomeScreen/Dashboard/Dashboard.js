@@ -264,7 +264,13 @@ const Dashboard = ({navigation}) => {
 
   if (bills.length !== 0) {
     return (
-      <KeyboardAwareScrollView nestedScrollEnabled={true}>
+      <KeyboardAwareScrollView
+        nestedScrollEnabled={true}
+        enableOnAndroid={true}
+        extraScrollHeight={20}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}>
         <View
           style={{
             flex: 1,
@@ -402,33 +408,6 @@ const Dashboard = ({navigation}) => {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            {/* <VictoryPie
-              width={250}
-              height={250}
-              colorScale={[
-                '#fdbe57',
-                '#3be5c6',
-                '#df8026',
-                '#6a9111',
-                '#3ee363',
-              ]}
-              data={[
-                {x: 'New', y: reservation.New},
-                {x: 'Due in', y: reservation.Duein},
-                {x: 'Due out', y: reservation.Dueout},
-                {x: 'Checked in', y: reservation.CheckedIn},
-                {x: 'Check out', y: reservation.CheckedOut},
-              ]}
-              innerRadius={40}
-              labelRadius={({innerRadius}) => innerRadius + 10}
-              labels={({datum}) => {
-                if (datum.y !== 0) return datum.y;
-              }}
-              style={{
-                labels: {fill: 'white', fontSize: 16, fontWeight: 'bold'},
-              }}
-              labelPosition="centroid"
-            /> */}
             <VictoryChart theme={VictoryTheme.material} domainPadding={{x: 35}}>
               <VictoryBar
                 barRatio={0.8}
@@ -445,25 +424,6 @@ const Dashboard = ({navigation}) => {
                 ]}
               />
             </VictoryChart>
-            {/* <VictoryLegend
-              orientation="vertical"
-              gutter={20}
-              y={60}
-              colorScale={[
-                '#fdbe57',
-                '#3be5c6',
-                '#df8026',
-                '#6a9111',
-                '#3ee363',
-              ]}
-              data={[
-                {name: 'New'},
-                {name: 'Due in'},
-                {name: 'Due out'},
-                {name: 'Checked in'},
-                {name: 'Checked out'},
-              ]}
-            /> */}
           </View>
           {/*Check-in guest*/}
 

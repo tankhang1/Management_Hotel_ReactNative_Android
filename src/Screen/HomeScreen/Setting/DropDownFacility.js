@@ -17,7 +17,7 @@ const DropDownFacility = ({
         width: '100%',
         borderWidth: 1,
         borderRadius: 10,
-        position: 'absolute',
+        position: 'relative',
         zIndex: 999,
         backgroundColor: 'white',
         top: 0,

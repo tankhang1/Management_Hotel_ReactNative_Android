@@ -6,6 +6,7 @@ import {
   queryEqual,
   setDoc,
   Timestamp,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import {uuidv4} from '@firebase/util';
@@ -18,30 +19,29 @@ const ToolAddData = () => {
     for (let i = 1; i <= datamonth; i++) {
       const Id = uuidv4();
       const date = `2022-${month}-${i}`;
-      const randomHour1 = Math.floor(Math.random() * 9) + 4;
-      const randomHour2 = Math.floor(Math.random() * 24) + 13;
       const Data = {
-        Id: Id,
-        Date: new Timestamp(new Date(`${date} 00:00:00`).getTime() / 1000, 0),
-        Arrival: new Timestamp(
-          new Date(`${date} ${randomHour1}:34:00`).getTime() / 1000,
-          0,
-        ),
-        Depart: new Timestamp(
-          new Date(`${date} ${randomHour2}:34:00`).getTime() / 1000,
-          0,
-        ),
+        key: Id,
+        Date: new Timestamp.fromDate(new Date(date)),
+        Money: Math.floor(Math.random() * 3000) + 300,
       };
-      await setDoc(doc(db, 'TMP', Id), Data);
+      await setDoc(
+        doc(
+          db,
+          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/${key}/Revenue_Daily`,
+          Id,
+        ),
+        Data,
+      );
     }
   };
   const [List, setList] = useState([]);
   const GetDataCaculate = async () => {
     const querySnapshot = await getDocs(
       query(
-        collection(db, 'Employee/l3TLUDx5ltEro8H1NivH/Calendar_Work'),
-        where('Date', '>=', new Date(`2022-${month}-1`)),
-        where('Date', '<=', new Date(`2022-${month}-${datamonth}`)),
+        collection(
+          db,
+          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/${key}/Revenue_Daily`,
+        ),
       ),
     );
 
@@ -49,58 +49,118 @@ const ToolAddData = () => {
     querySnapshot.forEach(doc => {
       console.log(doc.data());
       // doc.data() is never undefined for query doc snapshots
-      tmp.push({
-        Id: doc.data().Id,
-        Arrival: doc.data().Arrival,
-        Date: doc.data().Date,
-        Depart: doc.data().Depart,
-      });
+      tmp.push(doc.data());
     });
     setList([...tmp]);
   };
   const Caluated = async () => {
-    let workovertime = 0;
-    let date_work = List.length;
-    let date_off = datamonth - date_work;
-    console.log('date off', date_off);
-    console.log('date work', date_work);
-    const Id = uuidv4();
-    const date = `2022-${month}-${1}`;
-
+    let sum = 0;
     List.map((item, index) => {
-      console.log(
-        moment(item.Depart.toDate()).format('DD/MM/YYYY, h:mm:ss a'),
-        moment(item.Arrival.toDate()).format('DD/MM/YYYY, h:mm:ss a'),
-      );
-      workovertime += (item.Depart - item.Arrival) / 3600;
+      sum += Number(item.Money);
     });
-    const Data = {
-      HourWorkOvertime: workovertime - 8 * datamonth,
-      Id: Id,
-      Month: new Timestamp(new Date(`${date} 00:00:00`).getTime() / 1000, 0),
-      Number_Date_Off: date_off,
-      Number_Date_Work: date_work,
-      Total_Salary: (workovertime - 8 * datamonth) * 80 + 6000,
-    };
+    return sum;
+  };
 
-    await setDoc(
-      doc(db, 'Employee/l3TLUDx5ltEro8H1NivH/Salary_Monthly', Id),
-      Data,
+  const UpdateMonthly = async () => {
+    console.log(List);
+    let sum = 0;
+    List.map((item, index) => {
+      sum += Number(item.Money);
+    });
+    console.log(sum);
+    const Id = uuidv4();
+    const date = `2022-${month}-${datamonth}`;
+    const Data = {
+      key: Id,
+      Date: new Timestamp.fromDate(new Date(date)),
+      Income: sum,
+      Outcome: Math.floor(Math.random() * 2000) + 1000,
+    };
+    console.log(Data);
+    await updateDoc(
+      doc(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/${key}`),
+      {
+        key: Id,
+        Date: new Timestamp.fromDate(new Date(date)),
+        Income: sum,
+        Outcome: Math.floor(Math.random() * 2000) + 1000,
+      },
     );
   };
   console.log(List.length);
-  const datamonth = 31;
-  const month = 9;
+  const datamonth = 30;
+  const month = 12;
+  const AddMonth = async () => {
+    const Id = uuidv4();
+    setKey(Id);
+    const date = `2022-${month}-${datamonth}`;
+    const Data = {
+      key: Id,
+      Date: new Timestamp.fromDate(new Date(date)),
+      Income: Math.floor(Math.random() * 3000) + 300,
+      Outcome: Math.floor(Math.random() * 3000) + 300,
+    };
+    await setDoc(
+      doc(db, '/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly', Id),
+      Data,
+    );
+  };
+  const [getListMonth, setListMonth] = useState([]);
+  const getMonth = async () => {
+    const querySnapshot = await getDocs(
+      query(collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`)),
+    );
+
+    let tmp = [];
+    querySnapshot.forEach(doc => {
+      console.log(doc.data());
+      // doc.data() is never undefined for query doc snapshots
+      tmp.push(doc.data());
+    });
+    setListMonth([...tmp]);
+  };
+  const UpdateYear = async () => {
+    console.log(getListMonth);
+    let income = 0;
+    let outcome = 0;
+    getListMonth.map((item, index) => {
+      income += Number(item.Income);
+      outcome += Number(item.Outcome);
+    });
+    console.log(income, outcome);
+    const Id = uuidv4();
+    const date = `2022-12-31`;
+
+    await updateDoc(doc(db, `/Revenue/bKypk6E9kcOQZqzu9CZq`), {
+      key: Id,
+      Date: new Timestamp.fromDate(new Date(date)),
+      Income: income,
+      Outcome: outcome,
+    });
+  };
+  const [key, setKey] = useState('');
   return (
     <View>
       <TouchableOpacity onPress={AddData}>
-        <Text>add</Text>
+        <Text>add daily</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={UpdateMonthly}>
+        <Text>update monthly</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={AddMonth}>
+        <Text>add monthly</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={GetDataCaculate}>
         <Text>get</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={Caluated}>
         <Text>caculate</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={getMonth}>
+        <Text>get Month</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={UpdateYear}>
+        <Text>update year</Text>
       </TouchableOpacity>
     </View>
   );

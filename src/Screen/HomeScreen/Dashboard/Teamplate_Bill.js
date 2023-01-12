@@ -131,12 +131,28 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const TotalMoneyRoom = () => {
     let sum = 0;
     for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
-      for (let j = 0; j < dataRooms.length; j++) {
+      for (let j = 0; j < (dataRooms || []).length; j++) {
         if (dataRooms[j].id === bill[0].List_Room_Id[i]) {
           sum += dataRooms[j].money;
           break;
         }
       }
+    }
+    let number_day =
+      (new Date() -
+        new Date(
+          `${bill[0].Date_Check_In.slice(6, 10)}-${bill[0].Date_Check_In.slice(
+            3,
+            5,
+          )}-${bill[0].Date_Check_In.slice(0, 2)}`,
+        )) /
+      (1000 * 60 * 60 * 24);
+    let addition = Number(surcharge);
+
+    if (number_day - Math.floor(number_day) > 0.5) {
+      sum = sum * Math.ceil(number_day) + addition;
+    } else {
+      sum = sum * number_day + addition;
     }
     return sum;
   };
@@ -148,22 +164,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
         Date_Check_Out: new Timestamp.fromDate(new Date()),
         DateOut: new Timestamp.fromDate(new Date()),
 
-        Total_Money:
-          Math.ceil(
-            (new Date() -
-              new Date(
-                `${bill[0].Date_Check_In.slice(
-                  6,
-                  10,
-                )}-${bill[0].Date_Check_In.slice(
-                  3,
-                  5,
-                )}-${bill[0].Date_Check_In.slice(0, 2)}`,
-              )) /
-              (1000 * 60 * 60 * 24),
-          ) *
-            TotalMoneyRoom() +
-          Number(surcharge),
+        Total_Money: TotalMoneyRoom(),
       });
       Alert.alert('Bill has check out success');
       bill[0].List_Room_Id.map(async (item, index) => {
@@ -773,7 +774,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                     fontWeight: '600',
                     fontSize: 20,
                   }}>
-                  ${SumMoney() + Number(surcharge)}
+                  ${TotalMoneyRoom()}
                 </Text>
               </View>
             </View>

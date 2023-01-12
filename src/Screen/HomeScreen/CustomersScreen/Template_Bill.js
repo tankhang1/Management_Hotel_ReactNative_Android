@@ -35,15 +35,17 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const [data_Image, setData_Image] = useState([]);
   useEffect(() => {
     let tmp = [];
-    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
-      for (let j = 0; j < dataRooms.length; j++) {
-        if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
-          tmp.push(dataRooms[j]);
-          break;
+    setTimeout(() => {
+      for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
+        for (let j = 0; j < dataRooms.length; j++) {
+          if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
+            tmp.push(dataRooms[j]);
+            break;
+          }
         }
       }
-    }
-    setData_Image(tmp);
+      setData_Image(tmp);
+    }, 1000);
   }, []);
   const {width, height} = Dimensions.get('screen');
   const Dot_Line = () => {

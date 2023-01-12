@@ -25,11 +25,13 @@ const HomeScreenNavigation = () => {
       screenOptions={{
         headerShown: false,
       }}
-      drawerContent={props => <CustomizeDrawer {...props} />}>
-      <Drawer.Screen name="Home" component={DashBoard} />
+      // drawerContent={props => <CustomizeDrawer {...props} />}
+    >
+      {/* <Drawer.Screen name="Home" component={DashBoard} />
       <Drawer.Screen name="BillNavigation" component={BillNavigation} />
-      <Drawer.Screen name="Setting" component={Setting} />
-      {currentEmployee.Level < 2 ? (
+      <Drawer.Screen name="Setting" component={Setting} /> */}
+      <Drawer.Screen name="Report" component={Report} />
+      {/* {currentEmployee.Level < 2 ? (
         <Drawer.Group
           navigationKey={
             currentEmployee.Level === 0 || currentEmployee.Level === 1
@@ -42,7 +44,7 @@ const HomeScreenNavigation = () => {
       ) : null}
       {currentEmployee.Level === 0 ? (
         <Drawer.Screen name="Customer" component={TabNavigationCustomer} />
-      ) : null}
+      ) : null} */}
     </Drawer.Navigator>
   );
 };

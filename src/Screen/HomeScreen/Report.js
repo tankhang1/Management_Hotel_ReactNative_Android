@@ -3,140 +3,288 @@ import {
   Text,
   Image,
   ScrollView,
-  Pressable,
-  TouchableOpacity,
   LogBox,
+  Pressable,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {cloneElement, useEffect, useRef, useState} from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Lottie from 'lottie-react-native';
 import {
   VictoryAxis,
   VictoryBar,
   VictoryChart,
   VictoryGroup,
+  VictoryLine,
+  VictoryPie,
   VictoryTheme,
 } from 'victory-native';
-import {Divider} from 'react-native-paper';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import {
   query,
   collection,
   onSnapshot,
   orderBy,
   limit,
+  where,
+  getDocs,
+  doc,
 } from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import moment from 'moment';
 const Report = ({navigation}) => {
-  useEffect(() => {
-    LogBox.ignoreLogs([
-      'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
-    ]);
-    const subscribe = navigation.addListener('focus', () => {
-      const q = query(
-        collection(db, 'History_Revenue'),
-        orderBy('Date', 'desc'),
-        limit(5),
-      );
-      onSnapshot(q, snapShot => {
-        const tmp = [];
-        snapShot.forEach(doc => {
-          tmp.push(doc.data());
-        });
-        const income = [];
-        let sumIncome = 0;
-        const outcome = [];
-        let sumOutcome = 0;
-        tmp.reverse().map((item, index) => {
-          const m = Number(moment(item.Date.toDate()).format('M'));
-          const month = convertMonth(m);
-          sumIncome += item.Income;
-          sumOutcome += item.Outcome;
-          income.push({x: month, y: item.Income});
-          outcome.push({x: month, y: item.Outcome});
-        });
-        setIncome([...income]);
-        setOutcome([...outcome]);
-        setSumIncome(sumIncome);
-        setSumOutcome(sumOutcome);
-      });
-      const queryDaily = query(
-        collection(db, 'History_Daily_Revenue'),
-        orderBy('Date', 'desc'),
-        limit(4),
-      );
-      onSnapshot(queryDaily, snaps => {
-        const tmp = [];
-        snaps.forEach(doc => {
-          const data = {
-            title: 'Default Bank Account',
-            bankNumber: doc.data().Bank_Number,
-            lastUpdate: moment(doc.data().Date.toDate()).format('DD/MM/YYYY'),
-            money: doc.data().Revenue,
-          };
-          tmp.push(data);
-        });
-        setDataBanking([...tmp]);
-      });
-    });
-    return subscribe;
-  }, [navigation]);
+  LogBox.ignoreLogs([
+    'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
+  ]);
 
-  const [Income, setIncome] = useState([]);
-  const [Outcome, setOutcome] = useState([]);
+  useEffect(() => {
+    async function GetDB() {
+      setMapIncome([]);
+      setMapOutcome([]);
+      let income = 0;
+      let outcome = 0;
+      if (kindFilter === 0) {
+        console.log('kind', kindFilter);
+        console.log(kindFilter);
+        const getDbDate = await getDocs(
+          query(
+            collection(
+              db,
+              `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/12a7e0fb-f8e1-4488-b174-9fce340d9eb5/Revenue_Daily`,
+            ),
+            orderBy('Date', 'desc'),
+            limit(7),
+          ),
+        );
+        let monthIncome = [];
+        let monthOutcome = [];
+
+        getDbDate.forEach(monthItem => {
+          let dataIncome = {
+            x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
+            y: monthItem.data().Money,
+          };
+
+          income += monthItem.data().Money;
+          monthIncome.push(dataIncome);
+        });
+        setMapIncome([...monthIncome]);
+
+        setSumIncome(income);
+        setSumOutcome(outcome);
+      }
+      if (kindFilter === 1) {
+        console.log(kindFilter);
+        const getDbMonth = await getDocs(
+          query(
+            collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
+            orderBy('Date', 'asc'),
+          ),
+        );
+        let monthIncome = [];
+        let monthOutcome = [];
+
+        getDbMonth.forEach(monthItem => {
+          let dataIncome = {
+            x: moment(monthItem.data().Date.toDate()).format('MM'),
+            y: monthItem.data().Income,
+          };
+          let dataOutcome = {
+            x: moment(monthItem.data().Date.toDate()).format('MM'),
+            y: monthItem.data().Outcome,
+          };
+          income += monthItem.data().Income;
+          outcome += monthItem.data().Outcome;
+          monthIncome.push(dataIncome);
+          monthOutcome.push(dataOutcome);
+        });
+        setMapIncome([...monthIncome]);
+        setMapOutcome([...monthOutcome]);
+
+        setSumIncome(income);
+        setSumOutcome(outcome);
+      }
+      if (kindFilter === 2) {
+        const getDbMonth = await getDocs(
+          query(collection(db, 'Revenue'), orderBy('Date', 'asc')),
+        );
+        let monthIncome = [];
+        let monthOutcome = [];
+
+        getDbMonth.forEach(monthItem => {
+          let dataIncome = {
+            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+            y: monthItem.data().Income,
+          };
+          let dataOutcome = {
+            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+            y: monthItem.data().Outcome,
+          };
+          income += monthItem.data().Income;
+          outcome += monthItem.data().Outcome;
+          monthIncome.push(dataIncome);
+          monthOutcome.push(dataOutcome);
+        });
+        setMapIncome([...monthIncome]);
+        setMapOutcome([...monthOutcome]);
+
+        setSumIncome(income);
+        setSumOutcome(outcome);
+      }
+    }
+    GetDB();
+  }, []);
+
+  const getMonth = async index => {
+    setKindFilter(index);
+    setMapIncome([]);
+    setMapOutcome([]);
+    let income = 0;
+    let outcome = 0;
+    if (index === 0) {
+      console.log(index);
+      const getDbDate = await getDocs(
+        query(
+          collection(
+            db,
+            `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/12a7e0fb-f8e1-4488-b174-9fce340d9eb5/Revenue_Daily`,
+          ),
+          orderBy('Date', 'desc'),
+          limit(7),
+        ),
+      );
+      let monthIncome = [];
+      let monthOutcome = [];
+
+      getDbDate.forEach(monthItem => {
+        let dataIncome = {
+          x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
+          y: monthItem.data().Money,
+        };
+
+        income += monthItem.data().Money;
+        monthIncome.push(dataIncome);
+      });
+      setMapIncome([...monthIncome]);
+
+      setSumIncome(income);
+      setSumOutcome(outcome);
+    }
+    if (index === 1) {
+      const getDbMonth = await getDocs(
+        query(
+          collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
+          orderBy('Date', 'asc'),
+        ),
+      );
+      let monthIncome = [];
+      let monthOutcome = [];
+
+      getDbMonth.forEach(monthItem => {
+        let dataIncome = {
+          x: moment(monthItem.data().Date.toDate()).format('MM'),
+          y: monthItem.data().Income,
+        };
+        let dataOutcome = {
+          x: moment(monthItem.data().Date.toDate()).format('MM'),
+          y: monthItem.data().Outcome,
+        };
+        income += monthItem.data().Income;
+        outcome += monthItem.data().Outcome;
+        monthIncome.push(dataIncome);
+        monthOutcome.push(dataOutcome);
+      });
+      setMapIncome([...monthIncome]);
+      setMapOutcome([...monthOutcome]);
+
+      setSumIncome(income);
+      setSumOutcome(outcome);
+    }
+
+    if (index === 2) {
+      const getDbMonth = await getDocs(
+        query(collection(db, 'Revenue'), orderBy('Date', 'asc')),
+      );
+      let monthIncome = [];
+      let monthOutcome = [];
+
+      getDbMonth.forEach(monthItem => {
+        let dataIncome = {
+          x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+          y: monthItem.data().Income,
+        };
+        let dataOutcome = {
+          x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+          y: monthItem.data().Outcome,
+        };
+        income += monthItem.data().Income;
+        outcome += monthItem.data().Outcome;
+        monthIncome.push(dataIncome);
+        monthOutcome.push(dataOutcome);
+      });
+      setMapIncome([...monthIncome]);
+      setMapOutcome([...monthOutcome]);
+
+      setSumIncome(income);
+      setSumOutcome(outcome);
+    }
+  };
+
   const [sumIncome, setSumIncome] = useState(0);
   const [sumOutcome, setSumOutcome] = useState(0);
+  const [mapIncome, setMapIncome] = useState([]);
+  const [mapOutcome, setMapOutcome] = useState([]);
 
-  const convertMonth = month => {
-    switch (month) {
-      case 1:
-        return 'Jan';
-      case 2:
-        return 'Feb';
-      case 3:
-        return 'Mar';
-      case 4:
-        return 'Apr';
-      case 5:
-        return 'May';
-      case 6:
-        return 'Jun';
-      case 7:
-        return 'Jul';
-      case 8:
-        return 'Aug';
-      case 9:
-        return 'Sep';
-      case 10:
-        return 'Oct';
-      case 11:
-        return 'Nov';
-      case 12:
-        return 'Dec';
-      default:
-        break;
-    }
+  const [multiTouchFilter, setMultiTouchFilter] = useState([
+    'Week',
+    'Month',
+    'Year',
+  ]);
+  console.log(sumIncome);
+  const [kindFilter, setKindFilter] = useState(0);
+  const renderFilter = ({item, index}) => {
+    return (
+      <Pressable
+        onPress={() => getMonth(index)}
+        key={index}
+        style={{
+          width: 100,
+          height: 50,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderWidth: 2,
+          borderColor: 'black',
+          marginHorizontal: 10,
+          borderRadius: 10,
+          backgroundColor: kindFilter === index ? 'hsl(151,82%,72%)' : null,
+        }}>
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 16,
+          }}>
+          {item}
+        </Text>
+      </Pressable>
+    );
   };
-  const [dataBanking, setDataBanking] = useState([]);
+  const Avg = money => {
+    let avg = 0;
+    for (let i = 0; i < money.length - 1; i++)
+      for (let j = i + 1; j < money.length; j++) {
+        avg += (money[j].y - money[i].y) / money[i].y;
+      }
 
-  const ConvertBankNumber = number => {
-    for (let i = 0; i < number.length - 4; i++) {
-      number = number.replace(number[i], '*');
-    }
-
-    return number;
+    console.log(avg);
+    return avg > 0
+      ? (avg / money.length).toFixed(2) * 100
+      : -(Math.abs(avg) / money.length).toFixed(2) * 100;
   };
-
-  const Overdue = 3555.4;
-  const Unpaid = 6000;
-  const rate = Overdue / Unpaid.toFixed(1);
-
   return (
-    <View
+    <ScrollView
       style={{
-        backgroundColor: 'backgroundColor:hsl(213,21%,90%)',
+        backgroundColor: 'hsl(213,21%,90%)',
         flex: 1,
       }}>
       {/*Header */}
@@ -178,77 +326,126 @@ const Report = ({navigation}) => {
         />
       </View>
       {/*Body */}
-      <ScrollView style={{}} showsVerticalScrollIndicator={false}>
-        {/*Profit and Loss */}
+      {/*Profit and Loss */}
+      <View
+        style={{
+          backgroundColor: 'white',
+          paddingVertical: 20,
+          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 10,
+          flex: 1,
+        }}>
         <View
           style={{
-            backgroundColor: 'white',
-            paddingVertical: 20,
-            borderBottomLeftRadius: 10,
-            borderBottomRightRadius: 10,
-            elevation: 4,
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 20,
           }}>
-          <View
+          <Entypo name="bar-graph" size={20} color={'hsl(0,0%,73%)'} />
+          <Text
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginLeft: 20,
+              fontSize: 20,
+              color: 'hsl(203,37%,32%)',
+              fontWeight: '700',
+              paddingLeft: 10,
+              letterSpacing: 0.8,
             }}>
-            <Entypo name="bar-graph" size={20} color={'hsl(0,0%,73%)'} />
-            <Text
-              style={{
-                fontSize: 20,
-                color: 'hsl(203,37%,32%)',
-                fontWeight: '700',
-                paddingLeft: 10,
-                letterSpacing: 0.8,
-              }}>
-              Profit and Loss
-            </Text>
-          </View>
-          <View
+            Profit and Loss
+          </Text>
+        </View>
+
+        <View
+          style={{
+            alignItems: 'center',
+            marginVertical: 10,
+          }}>
+          <FlatList
+            data={multiTouchFilter}
+            renderItem={renderFilter}
+            horizontal
+          />
+        </View>
+
+        <View
+          style={{
+            alignSelf: 'center',
+          }}>
+          <Text
             style={{
-              alignSelf: 'center',
+              fontSize: 24,
+              color: 'hsl(203,37%,32%)',
+              fontWeight: '700',
+              paddingVertical: 5,
+              letterSpacing: 1,
+              textAlign: 'center',
             }}>
-            <Text
-              style={{
-                fontSize: 24,
-                color: 'hsl(203,37%,32%)',
-                fontWeight: '700',
-                paddingVertical: 5,
-                letterSpacing: 1,
-                textAlign: 'center',
-              }}>
-              $ {sumIncome - sumOutcome}
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '600',
-                textAlign: 'center',
-              }}>
-              Net Profit
-            </Text>
-          </View>
+            $ {sumIncome - sumOutcome}
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: '600',
+              textAlign: 'center',
+            }}>
+            Net Profit
+          </Text>
+        </View>
+        {mapIncome.length === 0 && mapOutcome.length === 0 ? (
+          <ActivityIndicator color={'blue'} size={30} />
+        ) : kindFilter === 2 ? (
           <View
             style={{
               flex: 1,
             }}>
-            <VictoryChart theme={VictoryTheme.material}>
-              <VictoryAxis
-                style={{
-                  axis: {stroke: 'none'},
-                }}
+            {mapIncome.length === 1 ? (
+              <VictoryPie
+                colorScale={['hsl(171,62%,48%)', 'hsl(215,62%,60%)']}
+                data={[
+                  {x: 'Income', y: sumIncome},
+                  {x: 'Expenses', y: sumOutcome},
+                ]}
               />
-              <VictoryAxis
-                style={{
-                  axis: {stroke: 'none'},
-                }}
-                dependentAxis
-              />
-              <VictoryGroup offset={12}>
+            ) : (
+              <VictoryChart theme={VictoryTheme.material}>
+                <VictoryGroup>
+                  <VictoryLine
+                    style={{
+                      data: {stroke: '#c43a31'},
+                      parent: {border: '1px solid hsl(171,62%,48%)'},
+                    }}
+                    data={mapIncome}
+                  />
+                  <VictoryLine
+                    style={{
+                      data: {stroke: '#c43a31'},
+                      parent: {border: '1px solid hsl(215,62%,60%)'},
+                    }}
+                    data={mapOutcome}
+                  />
+                </VictoryGroup>
+              </VictoryChart>
+            )}
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+            }}>
+            {mapIncome.length !== 0 ? (
+              <VictoryChart theme={VictoryTheme.material}>
+                <VictoryAxis
+                  style={{
+                    axis: {stroke: 'none'},
+                  }}
+                />
+                <VictoryAxis
+                  style={{
+                    axis: {stroke: 'none'},
+                  }}
+                  dependentAxis
+                />
                 <VictoryBar
-                  data={Income}
+                  data={mapIncome}
                   style={{
                     data: {
                       fill: 'hsl(171,62%,48%)',
@@ -257,8 +454,23 @@ const Report = ({navigation}) => {
                   }}
                   cornerRadius={{top: 5, bottom: 5}}
                 />
+              </VictoryChart>
+            ) : null}
+            {mapOutcome.length !== 0 ? (
+              <VictoryChart theme={VictoryTheme.material}>
+                <VictoryAxis
+                  style={{
+                    axis: {stroke: 'none'},
+                  }}
+                />
+                <VictoryAxis
+                  style={{
+                    axis: {stroke: 'none'},
+                  }}
+                  dependentAxis
+                />
                 <VictoryBar
-                  data={Outcome}
+                  data={mapOutcome}
                   style={{
                     data: {
                       fill: 'hsl(215,62%,60%)',
@@ -267,423 +479,154 @@ const Report = ({navigation}) => {
                   }}
                   cornerRadius={{top: 5, bottom: 5}}
                 />
-              </VictoryGroup>
-            </VictoryChart>
+              </VictoryChart>
+            ) : null}
           </View>
-          {/*Legend */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
-            }}>
-            <View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 10,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: 'hsl(171,62%,48%)',
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '600',
-                    paddingLeft: 5,
-                  }}>
-                  Income
-                </Text>
-              </View>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: 'hsl(171,62%,48%)',
-                  letterSpacing: 1,
-                  lineHeight: 30,
-                  fontWeight: '600',
-                }}>
-                $ {sumIncome}
-              </Text>
-            </View>
-            <View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '600',
-                    paddingRight: 5,
-                  }}>
-                  Expenses
-                </Text>
-                <View
-                  style={{
-                    width: 10,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: 'hsl(215,62%,60%)',
-                  }}
-                />
-              </View>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: 'hsl(215,62%,60%)',
-                  letterSpacing: 1,
-                  lineHeight: 30,
-                  fontWeight: '600',
-                }}>
-                $ {sumOutcome}
-              </Text>
-            </View>
-          </View>
-        </View>
-        {/*Banking*/}
+        )}
+        {/*Legend */}
         <View
           style={{
-            marginTop: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
           }}>
-          <TouchableOpacity>
+          <View>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                marginLeft: 20,
-                marginRight: 10,
               }}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  width: 10,
+                  height: 30,
+                  borderRadius: 10,
+                  backgroundColor: 'hsl(171,62%,48%)',
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: 'black',
+                  fontWeight: '600',
+                  paddingLeft: 5,
                 }}>
-                <FontAwesome name="bank" size={20} color={'hsl(0,0%,73%)'} />
-                <Text
-                  style={{
-                    fontSize: 20,
-                    color: 'hsl(203,37%,32%)',
-                    fontWeight: '700',
-                    paddingLeft: 10,
-                    letterSpacing: 0.8,
-                  }}>
-                  Average daily revenue
-                </Text>
-              </View>
-              <AntDesign name="right" size={16} />
+                Income
+              </Text>
             </View>
-          </TouchableOpacity>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {dataBanking.map((item, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    paddingHorizontal: 10,
-                    paddingVertical: 10,
-                    borderRadius: 10,
-                    elevation: 4,
-                    backgroundColor: 'white',
-                    marginRight: 20,
-                    marginVertical: 10,
-                    marginLeft: index === 0 ? 30 : 0,
-                  }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: 'hsl(203,37%,32%)',
-                        fontWeight: '700',
-                        marginRight: 30,
-                      }}>
-                      {item.title}
-                    </Text>
-                    <Text
-                      style={{
-                        fontWeight: '600',
-                        color: 'hsl(0,0%,60%)',
-                      }}>
-                      {ConvertBankNumber(item.bankNumber)}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{
-                      paddingVertical: 10,
-                      color: 'hsl(0,0%,60%)',
-                    }}>
-                    Last update: {item.lastUpdate}
-                  </Text>
-                  <Divider
-                    style={{
-                      width: '100%',
-                      height: 2,
-                    }}
-                  />
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      paddingVertical: 10,
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '700',
-                        color: 'hsl(203,37%,32%)',
-                      }}>
-                      $ {item.money}
-                    </Text>
-                    <Pressable
-                      style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        paddingVertical: 5,
-                        paddingHorizontal: 10,
-                        borderRadius: 20,
-                        backgroundColor: 'hsl(215,62%,50%)',
-                      }}>
-                      <Text
-                        style={{
-                          color: 'white',
-                          fontWeight: '600',
-                        }}>
-                        Details
-                      </Text>
-                    </Pressable>
-                  </View>
-                </View>
-              );
-            })}
-          </ScrollView>
-        </View>
-        {/*Revenue*/}
-        <View
-          style={{
-            paddingVertical: 15,
-            backgroundColor: 'white',
-            borderRadius: 10,
-            elevation: 4,
-            marginVertical: 20,
-          }}>
-          <TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 18,
+                color: 'hsl(171,62%,48%)',
+                letterSpacing: 1,
+                lineHeight: 30,
+                fontWeight: '600',
+              }}>
+              $ {sumIncome}
+            </Text>
+          </View>
+          <View>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                marginLeft: 20,
-                marginRight: 10,
+                justifyContent: 'flex-end',
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  source={require('./asset/icons8-revenue-64.png')}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    resizeMode: 'cover',
-                  }}
-                />
-
-                <Text
-                  style={{
-                    fontSize: 20,
-                    color: 'hsl(203,37%,32%)',
-                    fontWeight: '700',
-                    paddingLeft: 10,
-                    letterSpacing: 0.8,
-                  }}>
-                  Sales
-                </Text>
-              </View>
-              <AntDesign name="right" size={16} />
-            </View>
-          </TouchableOpacity>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 15,
-              marginTop: 10,
-            }}>
-            <Text
-              style={{
-                width: 25,
-                height: 25,
-                backgroundColor: 'hsl(338,68%,90%)',
-                borderRadius: 30,
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                fontWeight: '700',
-                color: 'hsl(338,68%,49%)',
-              }}>
-              {Math.round(rate * 10)}
-            </Text>
-            {/* <ProgressCircle
-              style={{
-                height: 175,
-                width: 200,
-                transform: [{rotateZ: '-90deg'}],
-              }}
-              progress={rate}
-              progressColor={'hsl(338,68%,49%)'}
-              startAngle={0}
-              endAngle={Math.PI}
-              strokeWidth={10}
-              cornerRadius={10}
-            /> */}
-            <Text
-              style={{
-                width: 25,
-                height: 25,
-                backgroundColor: 'hsl(0,0%,90%)',
-                borderRadius: 30,
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                fontWeight: '700',
-                color: 'hsl(0,0%,49%)',
-              }}>
-              {Math.round((1 - rate) * 10)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
-              marginTop: -20,
-            }}>
-            <View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 10,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: 'hsl(338,68%,49%)',
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '600',
-                    paddingLeft: 5,
-                  }}>
-                  Overdue
-                </Text>
-              </View>
               <Text
                 style={{
-                  fontSize: 18,
-                  color: 'hsl(338,68%,49%)',
-                  letterSpacing: 1,
-                  lineHeight: 30,
+                  fontSize: 16,
+                  color: 'black',
                   fontWeight: '600',
+                  paddingRight: 5,
                 }}>
-                ${Overdue}
+                Expenses
               </Text>
-            </View>
-            <View>
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: 'black',
-                    fontWeight: '600',
-                    paddingRight: 5,
-                  }}>
-                  Unpaid
-                </Text>
-                <View
-                  style={{
-                    width: 10,
-                    height: 30,
-                    borderRadius: 10,
-                    backgroundColor: 'hsl(0,0%,49%)',
-                  }}
-                />
-              </View>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: 'hsl(0,0%,49%)',
-                  letterSpacing: 1,
-                  lineHeight: 30,
-                  fontWeight: '600',
-                  textAlign: 'right',
-                }}>
-                ${Unpaid}
-              </Text>
+                  width: 10,
+                  height: 30,
+                  borderRadius: 10,
+                  backgroundColor: 'hsl(215,62%,60%)',
+                }}
+              />
             </View>
+            <Text
+              style={{
+                fontSize: 18,
+                color: 'hsl(215,62%,60%)',
+                letterSpacing: 1,
+                lineHeight: 30,
+                fontWeight: '600',
+              }}>
+              $ {sumOutcome}
+            </Text>
           </View>
-          <Divider
+        </View>
+      </View>
+      {/*Review */}
+      <View
+        style={{
+          backgroundColor: 'white',
+          marginVertical: 10,
+          paddingVertical: 10,
+          paddingHorizontal: 10,
+        }}>
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 16,
+          }}>
+          Average revenue:{' '}
+          <Text>
+            ${(sumIncome / 12).toFixed(2)} per{' '}
+            {multiTouchFilter[kindFilter].toLocaleLowerCase()} {'  '}
+          </Text>
+          <Text
             style={{
-              width: '95%',
-              height: 1,
-              marginVertical: 10,
-              alignSelf: 'center',
-            }}
+              color: 'red',
+            }}>
+            ({Avg(mapIncome)}%)
+          </Text>
+          <Ionicons
+            name={
+              Avg(mapIncome) > 0
+                ? 'trending-up-outline'
+                : 'trending-down-outline'
+            }
+            size={24}
+            color={Avg(mapIncome) > 0 ? 'green' : 'red'}
           />
-          <View
+        </Text>
+        <Text
+          style={{
+            color: 'black',
+            fontSize: 16,
+          }}>
+          Average expense:{' '}
+          <Text>
+            ${(sumOutcome / 12).toFixed(2)} per{' '}
+            {multiTouchFilter[kindFilter].toLocaleLowerCase()}
+            {'  '}
+          </Text>
+          <Text
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
+              color: Avg(mapOutcome) > 0 ? 'green' : 'red',
             }}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: 'hsl(0,0%,60%)',
-              }}>
-              Paid
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: 'hsl(0,0%,60%)',
-              }}>
-              $ {Overdue + Unpaid}
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+            ({Avg(mapOutcome)}%)
+          </Text>
+          <Ionicons
+            name={
+              Avg(mapOutcome) > 0
+                ? 'trending-up-outline'
+                : 'trending-down-outline'
+            }
+            size={24}
+            color={Avg(mapOutcome) > 0 ? 'green' : 'red'}
+          />
+        </Text>
+      </View>
+    </ScrollView>
   );
 };
 
