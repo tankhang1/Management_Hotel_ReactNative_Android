@@ -16,6 +16,7 @@ import {addEmployee} from '../../Redux/DataEmployee';
 import {addCustomer} from '../../Redux/DataCustomer';
 import {useEffect} from 'react';
 import {fetchData} from '../../Redux/thunk/fetchData';
+import {ActivityIndicator} from 'react-native-paper';
 const Introduce = ({navigation}) => {
   const {width, height} = Dimensions.get('screen');
   const DataIntroduce = [
@@ -46,11 +47,24 @@ const Introduce = ({navigation}) => {
   let position = Animated.divide(scrollX, width);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchData());
+    const promise = dispatch(fetchData());
+    return () => {
+      promise.abort();
+    };
   }, [dispatch]);
   const {isLoading, data, error} = useSelector(state => state.data_infor);
   if (isLoading) {
-    return <Text>Loading.....</Text>;
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'white',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator color="green" size={100} />
+      </View>
+    );
   } else if (error) {
     console.log(error);
     return;

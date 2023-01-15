@@ -110,7 +110,7 @@ const AddNewRoom = () => {
       rating: Math.floor(Math.random() * 5) + 1,
       airconditioning: dataChip.indexOf('Airconditioning') === -1 ? 0 : 1,
       breakfast: dataChip.indexOf('Breakfast') === -1 ? 0 : 1,
-      decribe: decribe,
+      decription: decribe,
       receptionist: dataChip.indexOf('Receptionist') === -1 ? 0 : 1,
       service: dataChip.indexOf('Service') === -1 ? 0 : 1,
       wifi: dataChip.indexOf('Wifi') === -1 ? 0 : 1,

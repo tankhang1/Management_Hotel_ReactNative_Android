@@ -104,7 +104,7 @@ const Booking = ({navigation}) => {
   const renderItem = ({item}) => {
     if (
       item.status === 1 &&
-      new Date(dataBooking.date_check_in) > item.DateFrom.toDate()
+      new Date(dataBooking.date_check_in) > item.dateFrom.toDate()
     )
       return (
         <View

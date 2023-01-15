@@ -139,7 +139,12 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
       }
     }
     let number_day =
-      (new Date() -
+      (new Date(
+        `${bill[0].Date_Check_Out.slice(6, 10)}-${bill[0].Date_Check_Out.slice(
+          3,
+          5,
+        )}-${bill[0].Date_Check_Out.slice(0, 2)}`,
+      ) -
         new Date(
           `${bill[0].Date_Check_In.slice(6, 10)}-${bill[0].Date_Check_In.slice(
             3,
@@ -149,10 +154,10 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
       (1000 * 60 * 60 * 24);
     let addition = Number(surcharge);
 
-    if (number_day - Math.floor(number_day) > 0.5) {
-      sum = sum * Math.ceil(number_day) + addition;
-    } else {
+    if (number_day > 0) {
       sum = sum * number_day + addition;
+    } else {
+      sum = sum * 1 + addition;
     }
     return sum;
   };
@@ -171,7 +176,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
         let ref = doc(db, 'DataRoom', item);
         await updateDoc(ref, {
           status: 1,
-          DateTo: new Timestamp.fromDate(new Date()),
+          dateTo: new Timestamp.fromDate(new Date()),
         });
       });
       setVisible(!visible);
@@ -204,7 +209,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
       let ref = doc(db, 'DataRoom', item);
       await updateDoc(ref, {
         status: 0,
-        DateFrom: new Timestamp.fromDate(new Date()),
+        dateFrom: new Timestamp.fromDate(new Date()),
         DateIn: new Timestamp.fromDate(new Date()),
       });
     });

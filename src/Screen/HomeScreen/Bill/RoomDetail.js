@@ -215,7 +215,7 @@ const RoomDetail = ({navigation, route}) => {
             textAlign: 'justify',
             color: 'hsl(0,0%,60%)',
           }}>
-          {data[0].decribe}
+          {data[0].decription}
         </Text>
         <Text
           style={{

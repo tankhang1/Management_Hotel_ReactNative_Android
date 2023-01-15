@@ -22,7 +22,6 @@ import {setDoc, doc, collection} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import DropDownSkill from './DropDownSkill';
 import {addEmployee} from '../../../Redux/slices/dataSlice';
-import {uuidv4} from '@firebase/util';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
 import {resetSkill} from '../../../Redux/English_Level';
 import {Picker} from '@react-native-picker/picker';
@@ -147,6 +146,13 @@ const AddEmployee = () => {
     Alert.alert(
       'New Account has been added',
       `Email: ${email}\t Password:${password}`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+      ],
     );
     setName('');
     setIdentification('');
@@ -321,7 +327,19 @@ const AddEmployee = () => {
               marginBottom: 30,
             }}>
             {picture === '' ? (
-              <Ionicons name="person-circle-outline" size={150} color="black" />
+              <View
+                style={{
+                  width: 150,
+                  height: 150,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Ionicons
+                  name="person-outline"
+                  size={100}
+                  color={'hsl(0,0%,73%)'}
+                />
+              </View>
             ) : (
               <Image
                 source={{uri: picture}}
@@ -788,7 +806,7 @@ const AddEmployee = () => {
               Joined <Text style={{fontWeight: '700'}}>{firstdayworking}</Text>
             </Text>
           </View>
-          <Pressable
+          <TouchableOpacity
             onPress={AddNewEmployee}
             style={{
               marginBottom: 25,
@@ -811,7 +829,7 @@ const AddEmployee = () => {
                 Add
               </Text>
             </View>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </ScrollView>

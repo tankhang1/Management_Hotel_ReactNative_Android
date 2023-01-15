@@ -9,6 +9,7 @@ import Collect_ID_Employee from './Collect_ID_Employee';
 import {dataReducer} from './slices/dataSlice';
 import {dataBills} from './slices/dataBills';
 import {dataRooms} from './slices/dataRoom';
+import {devToolsEnhancer} from 'redux-devtools-extension';
 const Store = configureStore({
   reducer: {
     booking: InforBooking,
@@ -26,5 +27,6 @@ const Store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }),
+  devTools: [devToolsEnhancer({realtime: true})],
 });
 export default Store;

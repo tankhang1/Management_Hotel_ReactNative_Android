@@ -14,7 +14,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {DataTable} from 'react-native-paper';
+import {ActivityIndicator, DataTable} from 'react-native-paper';
 import {
   VictoryBar,
   VictoryChart,
@@ -127,8 +127,8 @@ const Dashboard = ({navigation}) => {
             groupRoom[position].quantity++;
             if (
               doc.data().status === 1 &&
-              (doc.data().DateFrom.toDate() > new Date() ||
-                doc.data().DateTo.toDate() < new Date())
+              (doc.data().dateFrom.toDate() > new Date() ||
+                doc.data().dateTo.toDate() < new Date())
             ) {
               groupRoom[position].available++;
             }
@@ -1261,7 +1261,11 @@ const Dashboard = ({navigation}) => {
       </KeyboardAwareScrollView>
     );
   }
-  return <Text>Loading...</Text>;
+  return (
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <ActivityIndicator color="green" size={100} />
+    </View>
+  );
 };
 
 export default Dashboard;
