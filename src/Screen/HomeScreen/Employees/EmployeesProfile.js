@@ -1,4 +1,4 @@
-import {View, Text, Image, ScrollView} from 'react-native';
+import {View, Text, Image, ScrollView, LogBox} from 'react-native';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
@@ -17,6 +17,9 @@ import moment from 'moment';
 import {collection, getDocs, query, where} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 const EmployeesProfile = () => {
+  LogBox.ignoreLogs([
+    'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
+  ]);
   const id = useSelector(state => state.collect_Id_Employee);
   const dataEmployee = useSelector(
     state => state.data_infor,
@@ -34,7 +37,6 @@ const EmployeesProfile = () => {
         ),
       );
       getDate_Off.forEach(item => {
-        console.log(item.data());
         let x = moment(item.data().Date.toDate()).format('YYYY-MM-DD');
         const object = {
           name: x,

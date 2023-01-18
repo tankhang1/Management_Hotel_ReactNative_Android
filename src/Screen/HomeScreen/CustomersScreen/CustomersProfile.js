@@ -43,7 +43,6 @@ const CustomersProfile = () => {
           source={{
             uri: 'https://i.pinimg.com/564x/b3/45/cb/b345cb93ef9660158e4a490db36eebf8.jpg',
           }}
-          resizeMode="cover"
           imageStyle={{
             borderRadius: 10,
           }}

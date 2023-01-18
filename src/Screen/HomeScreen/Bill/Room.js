@@ -176,7 +176,12 @@ const Room = ({navigation}) => {
             fontWeight: '700',
             color: 'black',
           }}>
-          Name {checkName ? <Text style={{color: 'red'}}>*</Text> : null}
+          Name{' '}
+          {checkName ? (
+            <Text style={{color: 'red', fontSize: 14}}>
+              ( Name must character )
+            </Text>
+          ) : null}
         </Text>
         <View
           style={{
@@ -213,7 +218,11 @@ const Room = ({navigation}) => {
             color: 'black',
           }}>
           Phone Number{' '}
-          {checkNumber ? <Text style={{color: 'red'}}>*</Text> : null}
+          {checkNumber ? (
+            <Text style={{color: 'red', fontSize: 14}}>
+              ( Phone must number1 )
+            </Text>
+          ) : null}
         </Text>
         <View
           style={{

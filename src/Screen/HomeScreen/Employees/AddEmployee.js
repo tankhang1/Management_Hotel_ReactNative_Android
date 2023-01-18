@@ -36,6 +36,7 @@ import {Checkbox} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {getDownloadURL, ref, uploadString} from 'firebase/storage';
 import {uuidv4} from '@firebase/util';
+
 const AddEmployee = () => {
   const dispatch = useDispatch();
   const [picture, setPicture] = useState('');
@@ -113,15 +114,15 @@ const AddEmployee = () => {
 
     await uploadString(imageRef, picture.base64, 'base64', {
       contentType: picture.type,
-    })
-      .then(() => {
-        global.Blob = Blob;
-      })
-      .then(() => {
-        getDownloadURL(imageRef).then(url => {
+    }).then(() => {
+      getDownloadURL(imageRef)
+        .then(url => {
           AddNewEmployee(url);
+        })
+        .then(() => {
+          global.Blob = Blob;
         });
-      });
+    });
   };
   const AddNewEmployee = async url => {
     const Id = createId(dataEmployee.length);

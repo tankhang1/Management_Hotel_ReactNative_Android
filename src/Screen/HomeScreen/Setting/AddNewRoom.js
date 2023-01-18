@@ -4,35 +4,21 @@ import {
   Image,
   Pressable,
   TextInput,
-  Animated,
   Modal,
-  KeyboardAvoidingView,
-  Easing,
   TouchableOpacity,
   ScrollView,
-  AccessibilityInfo,
   ToastAndroid,
   Alert,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import DropDownKind from './DropDownKind';
 import DropDownFacility from './DropDownFacility';
-import {useDispatch, useSelector} from 'react-redux';
 import {collection, doc, setDoc, Timestamp} from 'firebase/firestore';
 import {db, storage} from '../../../Firebase/firebase';
-import {addRoom} from '../../../Redux/slices/dataSlice';
 import {uuidv4} from '@firebase/util';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {
-  getStorage,
-  ref,
-  listAll,
-  getDownloadURL,
-  uploadBytes,
-  uploadString,
-} from 'firebase/storage';
+import {ref, getDownloadURL, uploadString} from 'firebase/storage';
 const AddNewRoom = () => {
   //Animation Kind Room lef
   const [listImage, setListImage] = useState([]);
@@ -47,15 +33,15 @@ const AddNewRoom = () => {
 
     await uploadString(imageRef, base64.base64, 'base64', {
       contentType: base64.type,
-    })
-      .then(() => {
-        global.Blob = Blob;
-      })
-      .then(() => {
-        getDownloadURL(imageRef).then(url => {
+    }).then(() => {
+      getDownloadURL(imageRef)
+        .then(url => {
           AddRoom(url);
+        })
+        .then(() => {
+          global.Blob = Blob;
         });
-      });
+    });
   };
   //DataKindRoom
   const [open, setOpen] = useState(false);
@@ -66,7 +52,6 @@ const AddNewRoom = () => {
     'Deluxe',
     'President',
   ];
-  const [value, setValue] = useState('');
   //DataFacility
   const [open_facility, setOpen_facility] = useState(false);
   const dataFacility = [
@@ -84,7 +69,6 @@ const AddNewRoom = () => {
   const [decribe, setDecribe] = useState('');
 
   //Picture room
-  const [picture, setPicture] = useState('');
   const [onOptionC_L, setOnOptionC_L] = useState(false);
 
   const onLunchCamera = () => {
@@ -153,7 +137,7 @@ const AddNewRoom = () => {
       dateFrom: new Timestamp.fromDate(new Date('1975-12-01')),
     };
     await setDoc(doc(collection(db, 'DataRoom')), Room).then(() => {
-      Alert.alert('Notice', 'New Room has been added');
+      ToastAndroid.show('New Room has been added', 2000);
       setBase64('');
       setKindRoom('Single Room');
       setRoomCharge();
@@ -485,16 +469,6 @@ const AddNewRoom = () => {
             </Text>
           </View>
         </Pressable>
-        {/* {listImage.map((item, index) => {
-          console.log(item);
-          return (
-           
-          );
-        })} */}
-        <Image
-          source={{uri: listImage[0]}}
-          style={{width: 100, height: 100, resizeMode: 'contain'}}
-        />
       </View>
     </KeyboardAwareScrollView>
   );

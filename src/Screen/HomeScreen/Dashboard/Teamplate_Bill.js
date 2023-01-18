@@ -7,10 +7,9 @@ import {
   ScrollView,
   Dimensions,
   Animated,
-  Alert,
   TouchableOpacity,
   TextInput,
-  KeyboardAvoidingView,
+  ToastAndroid,
 } from 'react-native';
 import React, {useRef} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -171,7 +170,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
 
         Total_Money: TotalMoneyRoom(),
       });
-      Alert.alert('Bill has check out success');
+      ToastAndroid.show('Bill has check out success', 2000);
       bill[0].List_Room_Id.map(async (item, index) => {
         let ref = doc(db, 'DataRoom', item);
         await updateDoc(ref, {
@@ -187,13 +186,6 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const [adult, setAdult] = useState('');
   const [children, setChildren] = useState('');
   const [checkForeign, setCheckForeign] = useState(false);
-  const SumMoney = () => {
-    let sum = 0;
-    data_Image.forEach(element => {
-      sum += Number(element.money);
-    });
-    return sum;
-  };
   const Confirm = async () => {
     const updateBill = doc(db, 'Bill_List', Bill_Id);
     await updateDoc(updateBill, {
@@ -203,7 +195,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
       Foreign: checkForeign ? 1 : 0,
       Date_Check_In: new Timestamp.fromDate(new Date()),
     });
-    Alert.alert('Bill has check in success');
+    ToastAndroid.show('Bill has check in success', 2000);
 
     bill[0].List_Room_Id.map(async (item, index) => {
       let ref = doc(db, 'DataRoom', item);

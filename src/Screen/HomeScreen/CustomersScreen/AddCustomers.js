@@ -81,23 +81,13 @@ const AddCustomers = () => {
     };
     await setDoc(doc(collection(db, 'Customer_Information'), Id), Data);
 
-    dispatch(
-      addCustomer({
-        Customer_Id: Id,
-        Customer_Name: name,
-        Birthday: date_of_birth,
-        Gender: gender,
-        Identification: identification,
-        Phone: phone_number,
-        Status: 'New Customer',
-      }),
-    );
+    dispatch(addCustomer(Data));
     setName('');
     setDate_of_birth('');
     setGender('');
     setPhone_number('');
     setIdentification('');
-    Alert.alert('Notice', 'Information customer has been added');
+    ToastAndroid.show('Information customer has been added', 2000);
   };
 
   return (

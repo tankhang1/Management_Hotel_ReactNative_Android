@@ -4,12 +4,10 @@ import {
   Modal,
   StatusBar,
   Image,
-  Pressable,
   ScrollView,
   Dimensions,
   Animated,
   ToastAndroid,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import React, {cloneElement, useEffect, useState} from 'react';
@@ -165,7 +163,6 @@ const Template_Bill = ({
 
   const dispatch = useDispatch();
   const AddNewCustomer = async () => {
-    console.log(new Date(Infor_Customer.date_check_out));
     const cusomter_Id = createId(dataCustomer.length);
     const DataCustomer = {
       Customer_Id: cusomter_Id,
@@ -204,10 +201,10 @@ const Template_Bill = ({
     await setDoc(
       doc(collection(db, 'Customer_Information'), cusomter_Id),
       DataCustomer,
-    ).then(() => console.log('Ok'));
+    );
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
 
-    Alert.alert('Noticable', 'You has book success');
+    ToastAndroid.show('You has book success', 2000);
   };
 
   const NoAddCustomer = async () => {
@@ -234,7 +231,7 @@ const Template_Bill = ({
       DateOut: new Timestamp.fromDate(new Date('1975-12-20')),
     };
     await setDoc(doc(collection(db, 'Bill_List'), bill_Id), Data);
-    Alert.alert('Noticable', 'You has book success');
+    ToastAndroid.show('You has book success', 2000);
   };
   const AddNewBill = () => {
     if (checkCustomer === true) {

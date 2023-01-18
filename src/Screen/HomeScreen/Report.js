@@ -1,3 +1,4 @@
+'use strict';
 import {
   View,
   Text,
@@ -36,8 +37,6 @@ const Report = ({navigation}) => {
       let income = 0;
       let outcome = 0;
       if (kindFilter === 0) {
-        console.log('kind', kindFilter);
-        console.log(kindFilter);
         const getDbDate = await getDocs(
           query(
             collection(
@@ -66,7 +65,6 @@ const Report = ({navigation}) => {
         setSumOutcome(outcome);
       }
       if (kindFilter === 1) {
-        console.log(kindFilter);
         const getDbMonth = await getDocs(
           query(
             collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
@@ -134,7 +132,6 @@ const Report = ({navigation}) => {
     let income = 0;
     let outcome = 0;
     if (index === 0) {
-      console.log(index);
       const getDbDate = await getDocs(
         query(
           collection(
@@ -232,7 +229,6 @@ const Report = ({navigation}) => {
     'Month',
     'Year',
   ]);
-  console.log(sumIncome);
   const [kindFilter, setKindFilter] = useState(0);
   const renderFilter = ({item, index}) => {
     return (
@@ -267,7 +263,6 @@ const Report = ({navigation}) => {
         avg += (money[j].y - money[i].y) / money[i].y;
       }
 
-    console.log(avg);
     return avg > 0
       ? (avg / money.length).toFixed(2) * 100
       : -(Math.abs(avg) / money.length).toFixed(2) * 100;
@@ -288,17 +283,19 @@ const Report = ({navigation}) => {
           backgroundColor: 'white',
           paddingVertical: 10,
         }}>
-        <Lottie
-          source={{
-            uri: 'https://assets7.lottiefiles.com/packages/lf20_xufsq6mg.json',
-          }}
-          style={{
-            width: 50,
-            height: 50,
-          }}
-          loop
-          autoPlay
-        />
+        <Pressable onPress={() => navigation.openDrawer()}>
+          <Lottie
+            source={{
+              uri: 'https://assets7.lottiefiles.com/packages/lf20_xufsq6mg.json',
+            }}
+            style={{
+              width: 50,
+              height: 50,
+            }}
+            loop
+            autoPlay
+          />
+        </Pressable>
         <Text
           style={{
             fontSize: 20,

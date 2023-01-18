@@ -23,7 +23,6 @@ const Search = ({navigation, route}) => {
     value => value.key === GroupRoom.key,
   );
 
-  //console.log(R[0].value);
   const listlikeroom = useSelector(state => state.listlikeroom);
   const onChoose = id => {
     if (listlikeroom.indexOf(id) === -1) {
