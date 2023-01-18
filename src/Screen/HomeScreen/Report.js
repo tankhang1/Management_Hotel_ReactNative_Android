@@ -21,16 +21,7 @@ import {
   VictoryPie,
   VictoryTheme,
 } from 'victory-native';
-import {
-  query,
-  collection,
-  onSnapshot,
-  orderBy,
-  limit,
-  where,
-  getDocs,
-  doc,
-} from 'firebase/firestore';
+import {query, collection, orderBy, limit, getDocs} from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import moment from 'moment';
 const Report = ({navigation}) => {

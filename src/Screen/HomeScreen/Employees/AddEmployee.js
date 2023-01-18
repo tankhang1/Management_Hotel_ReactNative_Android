@@ -18,8 +18,15 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
-import {setDoc, doc, collection} from 'firebase/firestore';
-import {db} from '../../../Firebase/firebase';
+import {
+  setDoc,
+  doc,
+  collection,
+  updateDoc,
+  Timestamp,
+  addDoc,
+} from 'firebase/firestore';
+import {db, storage} from '../../../Firebase/firebase';
 import DropDownSkill from './DropDownSkill';
 import {addEmployee} from '../../../Redux/slices/dataSlice';
 import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
@@ -27,13 +34,14 @@ import {resetSkill} from '../../../Redux/English_Level';
 import {Picker} from '@react-native-picker/picker';
 import {Checkbox} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {getDownloadURL, ref, uploadString} from 'firebase/storage';
+import {uuidv4} from '@firebase/util';
 const AddEmployee = () => {
   const dispatch = useDispatch();
   const [picture, setPicture] = useState('');
   const [name, setName] = useState('');
   const [identification, setIdentification] = useState('');
   const [dateBirth, setDateBirth] = useState('');
-  const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
@@ -64,7 +72,9 @@ const AddEmployee = () => {
       if (response.didCancel === true) Alert.alert('Camera is cancel');
       else
         response.assets.map(item => {
-          if (item.uri !== null) setPicture(item.uri.toString());
+          if (item.uri !== null) {
+            setPicture(item);
+          }
         });
     });
     setOnOptionC_L(!onOptionC_L);
@@ -81,32 +91,50 @@ const AddEmployee = () => {
       if (response.didCancel === true) Alert.alert('Camera is cancel');
       else
         response.assets.map(item => {
-          if (item.uri !== null) setPicture(item.uri.toString());
+          if (item.uri !== null) {
+            setPicture(item);
+          }
         });
     });
     setOnOptionC_L(!onOptionC_L);
   };
+
   const createId = number => {
     if (number < 10) return `E00000${number + 1}`;
     else if (number < 100) return `E0000${number + 1}`;
   };
-  const AddNewEmployee = async () => {
+  const AddImage = async () => {
+    const imageRef = ref(storage, `Employees/${name}`);
+    if (typeof global.atob === 'undefined') {
+      global.atob = a => Buffer.from(a, 'base64').toString('binary');
+    }
+    const Blob = global.Blob;
+    delete global.Blob; // Blob must be undefined (setting it to null won't work)
+
+    await uploadString(imageRef, picture.base64, 'base64', {
+      contentType: picture.type,
+    })
+      .then(() => {
+        global.Blob = Blob;
+      })
+      .then(() => {
+        getDownloadURL(imageRef).then(url => {
+          AddNewEmployee(url);
+        });
+      });
+  };
+  const AddNewEmployee = async url => {
     const Id = createId(dataEmployee.length);
     const Data = {
       Address: address,
-      Age: age,
       Birthday: dateBirth,
       Date_Join: firstdayworking,
       Email: email,
       Employee_Id: Id,
-      Employee_Image: picture,
+      Employee_Image: url,
       Employee_Name: name,
       Gender: gender,
       Identification: identification,
-      List_Date_Off: [],
-      List_Date_Off_NoAdmit: [],
-      List_Date_Work: [],
-      List_Date_WorkOvertime: [],
       List_Skill_Id: english_level,
       Nationality: nationality,
       Phone: phoneNumber,
@@ -114,30 +142,7 @@ const AddEmployee = () => {
       Salary: salary,
     };
     await setDoc(doc(collection(db, 'Employee_Information'), Id), Data);
-    dispatch(
-      addEmployee({
-        Address: address,
-        Age: age,
-        Birthday: dateBirth,
-        Date_Join: firstdayworking,
-        Email: email,
-        Employee_Id: Id,
-        Employee_Image: picture,
-        Employee_Name: name,
-        Gender: gender,
-        Identification: identification,
-        List_Date_Off: [],
-        List_Date_Off_NoAdmit: [],
-        List_Date_Work: [],
-        List_Date_WorkOvertime: [],
-        List_Skill_Id: english_level,
-        Nationality: nationality,
-        Phone: phoneNumber,
-        Position: position,
-        Salary: salary,
-        Level: levelAccount,
-      }),
-    );
+    dispatch(addEmployee(Data));
 
     const auth = getAuth();
     const password =
@@ -158,7 +163,6 @@ const AddEmployee = () => {
     setIdentification('');
     setPhoneNumber('');
     setDateBirth('');
-    setAge('');
     setGender('');
     setEmail('');
     setAddress('');
@@ -342,7 +346,7 @@ const AddEmployee = () => {
               </View>
             ) : (
               <Image
-                source={{uri: picture}}
+                source={{uri: picture.uri}}
                 style={{
                   width: 150,
                   height: 150,
@@ -502,36 +506,7 @@ const AddEmployee = () => {
               </TouchableOpacity>
             </View>
           </View>
-          {/*Age */}
-          <View
-            style={{
-              width: '90%',
-              marginBottom: 10,
-            }}>
-            <Text
-              style={{
-                fontSize: 16,
-                marginLeft: 20,
-                marginBottom: 5,
-                color: 'black',
-              }}>
-              Age:
-            </Text>
-            <TextInput
-              value={age}
-              onChangeText={setAge}
-              style={{
-                borderRadius: 10,
-                paddingHorizontal: 20,
-                fontWeight: '600',
-                backgroundColor: 'hsl(222,56%,96%)',
-                height: 55,
-                color: 'black',
-              }}
-              placeholder="Age"
-              placeholderTextColor="hsl(0,0%,60%)"
-            />
-          </View>
+
           {/*Gender */}
           <View
             style={{
@@ -807,7 +782,7 @@ const AddEmployee = () => {
             </Text>
           </View>
           <TouchableOpacity
-            onPress={AddNewEmployee}
+            onPress={AddImage}
             style={{
               marginBottom: 25,
             }}>

@@ -25,6 +25,7 @@ const HomeScreenNavigation = () => {
       screenOptions={{
         headerShown: false,
       }}
+      useLegacyImplementation={false}
       drawerContent={props => <CustomizeDrawer {...props} />}>
       <Drawer.Screen name="Home" component={DashBoard} />
       <Drawer.Screen name="BillNavigation" component={BillNavigation} />

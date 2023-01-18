@@ -1,6 +1,7 @@
 import {View, Text, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import {
+  addDoc,
   doc,
   query,
   queryEqual,
@@ -88,8 +89,7 @@ const ToolAddData = () => {
     );
   };
   console.log(List.length);
-  const datamonth = 30;
-  const month = 12;
+
   const AddMonth = async () => {
     const Id = uuidv4();
     setKey(Id);
@@ -138,13 +138,156 @@ const ToolAddData = () => {
       Outcome: outcome,
     });
   };
+  let TemplateObject = {
+    Address: '',
+    Age: '',
+    Birthday: '',
+    Date_Join: '',
+    Email: '',
+    Employee_Id: '',
+    Employee_Image: '',
+    Employee_Name: '',
+    Gender: '',
+    Identification: '',
+    Level: 0,
+    List_Date_Off: [],
+    List_Date_Off_NoAdmit: [],
+    List_Date_Work: [],
+    List_Date_WorkOvertime: [],
+    List_Skill_Id: [
+      {
+        x: 'Reading',
+        y: 0,
+      },
+      {
+        x: 'Writting',
+        y: 0,
+      },
+      {
+        x: 'Listening',
+        y: 0,
+      },
+      {
+        x: 'Speaking',
+        y: 0,
+      },
+    ],
+    Nationality: '',
+    Phone: '',
+    Position: '',
+    Salary: 0,
+  };
+
+  const AddDbEmployee = () => {
+    for (let i = 0; i < 80; i++) {}
+  };
   const [key, setKey] = useState('');
+
+  const RandomDateOff = [
+    Math.floor(Math.random() * 20) + 5,
+    Math.floor(Math.random() * 20) + 5,
+    Math.floor(Math.random() * 20) + 5,
+    Math.floor(Math.random() * 20) + 5,
+    Math.floor(Math.random() * 20) + 5,
+  ];
+  const RandomDateOff_NoAddmit = [];
+  const AddDataDateWork = async () => {
+    let RandomDateOff = [];
+    for (let i = 0; i < 4; i++) {
+      let tmp = Math.floor(Math.random() * 28) + 1;
+      while (RandomDateOff.includes(tmp)) {
+        tmp = Math.floor(Math.random() * 28) + 1;
+      }
+      RandomDateOff.push(tmp);
+    }
+    let RandomDateOff_NoAddmit = [];
+    for (let i = 0; i < 2; i++) {
+      let tmp = Math.floor(Math.random() * 28) + 1;
+      while (
+        RandomDateOff.includes(tmp) ||
+        RandomDateOff_NoAddmit.includes(tmp)
+      ) {
+        tmp = Math.floor(Math.random() * 28) + 1;
+      }
+      RandomDateOff_NoAddmit.push(tmp);
+    }
+    let List_Date_WorkOvertime = [];
+    for (let i = 0; i < 10; i++) {
+      let tmp = Math.floor(Math.random() * 28) + 1;
+      while (
+        RandomDateOff.includes(tmp) ||
+        RandomDateOff_NoAddmit.includes(tmp) ||
+        List_Date_WorkOvertime.includes(tmp)
+      ) {
+        tmp = Math.floor(Math.random() * 28) + 1;
+        console.log(tmp);
+      }
+      List_Date_WorkOvertime.push(tmp);
+    }
+    let DateWork = [];
+    for (let i = 0; i < datamonth - 4 - 2 - 10; i++) {
+      let tmp = Math.floor(Math.random() * datamonth) + 1;
+      while (
+        RandomDateOff.includes(tmp) ||
+        RandomDateOff_NoAddmit.includes(tmp) ||
+        List_Date_WorkOvertime.includes(tmp) ||
+        DateWork.includes(tmp)
+      ) {
+        tmp = Math.floor(Math.random() * datamonth) + 1;
+      }
+      DateWork.push(tmp);
+    }
+    DateWork.map(async item => {
+      await addDoc(
+        collection(db, 'Employee_Information', 'E000001', 'List_Date_Work'),
+        {
+          Date: new Timestamp.fromDate(new Date(`2023-01-${item}`)),
+        },
+      );
+    });
+    RandomDateOff.map(async item => {
+      await addDoc(
+        collection(db, 'Employee_Information', 'E000001', 'List_Date_Off'),
+        {
+          Date: new Timestamp.fromDate(new Date(`2023-01-${item}`)),
+        },
+      );
+    });
+    RandomDateOff_NoAddmit.map(async item => {
+      await addDoc(
+        collection(
+          db,
+          'Employee_Information',
+          'E000001',
+          'List_Date_Off_NoAdmit',
+        ),
+        {
+          Date: new Timestamp.fromDate(new Date(`2023-01-${item}`)),
+        },
+      );
+    });
+    List_Date_WorkOvertime.map(async item => {
+      await addDoc(
+        collection(
+          db,
+          'Employee_Information',
+          'E000001',
+          'List_Date_WorkOvertime',
+        ),
+        {
+          Date: new Timestamp.fromDate(new Date(`2023-01-${item}`)),
+        },
+      );
+    });
+  };
+  const datamonth = 30;
+  const month = 12;
   return (
     <View>
-      <TouchableOpacity onPress={AddData}>
-        <Text>add daily</Text>
+      <TouchableOpacity onPress={AddDataDateWork}>
+        <Text>add DateWork</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={UpdateMonthly}>
+      {/* <TouchableOpacity onPress={UpdateMonthly}>
         <Text>update monthly</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={AddMonth}>
@@ -161,7 +304,7 @@ const ToolAddData = () => {
       </TouchableOpacity>
       <TouchableOpacity onPress={UpdateYear}>
         <Text>update year</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

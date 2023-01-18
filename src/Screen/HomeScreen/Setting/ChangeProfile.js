@@ -37,7 +37,6 @@ const ChangeProfile = () => {
     dataEmployee.Identification,
   );
   const [dateBirth, setDateBirth] = useState(dataEmployee.Birthday);
-  const [age, setAge] = useState(dataEmployee.Age);
   const [gender, setGender] = useState(dataEmployee.Gender);
   const [phoneNumber, setPhoneNumber] = useState(dataEmployee.Phone);
   const [email, setEmail] = useState(dataEmployee.Email);
@@ -65,7 +64,6 @@ const ChangeProfile = () => {
     let employee = doc(db, 'Employee_Information', id);
     await updateDoc(employee, {
       Address: address,
-      Age: age,
       Birthday: dateBirth,
       Date_Join: firstdayworking,
       Email: email,
@@ -429,7 +427,7 @@ const ChangeProfile = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View
+          {/* <View
             style={{
               width: '90%',
               marginBottom: 10,
@@ -457,7 +455,7 @@ const ChangeProfile = () => {
               placeholder="Age"
               placeholderTextColor="hsl(0,0%,60%)"
             />
-          </View>
+          </View> */}
           <View
             style={{
               width: '90%',

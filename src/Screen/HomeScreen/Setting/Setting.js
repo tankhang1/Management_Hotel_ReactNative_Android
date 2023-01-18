@@ -165,6 +165,7 @@ const Setting = ({navigation}) => {
                     <AnimatedTouchable
                       onPress={() => {
                         OnTouchNavigation(index);
+                        setOpen(!open);
                       }}
                       key={index}
                       style={{

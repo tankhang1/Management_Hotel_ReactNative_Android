@@ -13,43 +13,83 @@ import {Calendar} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
 import {useState} from 'react';
 import {useEffect} from 'react';
+import moment from 'moment';
+import {collection, getDocs, query, where} from 'firebase/firestore';
+import {db} from '../../../Firebase/firebase';
 const EmployeesProfile = () => {
   const id = useSelector(state => state.collect_Id_Employee);
   const dataEmployee = useSelector(
     state => state.data_infor,
   ).data.employees.filter(value => value.Employee_Id === id);
   useEffect(() => {
-    const AddNew = () => {
+    async function AddNew() {
       let tmp = [];
-      dataEmployee[0].List_Date_Off.map((item, index) => {
-        let x = convertString(item);
+
+      const getDate_Off = await getDocs(
+        query(
+          collection(
+            db,
+            `/Employee_Information/${dataEmployee[0].Employee_Id}/List_Date_Off`,
+          ),
+        ),
+      );
+      getDate_Off.forEach(item => {
+        console.log(item.data());
+        let x = moment(item.data().Date.toDate()).format('YYYY-MM-DD');
         const object = {
           name: x,
           property: {dots: [off_A]},
         };
         tmp.push(object);
       });
-      dataEmployee[0].List_Date_Work.map((item, index) => {
-        let x = convertString(item);
+
+      const getDate_Work = await getDocs(
+        query(
+          collection(
+            db,
+            `/Employee_Information/${dataEmployee[0].Employee_Id}/List_Date_Work`,
+          ),
+        ),
+      );
+      getDate_Work.forEach(item => {
+        let x = moment(item.data().Date.toDate()).format('YYYY-MM-DD');
         const object = {
           name: x,
           property: {dots: [working]},
         };
         tmp.push(object);
       });
-      dataEmployee[0].List_Date_Off_NoAdmit.map((item, index) => {
-        let x = convertString(item);
-        const object = {
-          name: x,
-          property: {dots: [off_noA]},
-        };
-        tmp.push(object);
-      });
-      dataEmployee[0].List_Date_WorkOvertime.map((item, index) => {
-        let x = convertString(item);
+
+      const getDate_WorkOvertime = await getDocs(
+        query(
+          collection(
+            db,
+            `/Employee_Information/${dataEmployee[0].Employee_Id}/List_Date_WorkOvertime`,
+          ),
+        ),
+      );
+      getDate_WorkOvertime.forEach(item => {
+        let x = moment(item.data().Date.toDate()).format('YYYY-MM-DD');
         const object = {
           name: x,
           property: {dots: [workovertime]},
+        };
+        tmp.push(object);
+      });
+
+      const getDate_OffNoAdmit = await getDocs(
+        query(
+          collection(
+            db,
+            `/Employee_Information/${dataEmployee[0].Employee_Id}/List_Date_Off_NoAdmit`,
+          ),
+        ),
+      );
+      getDate_OffNoAdmit.forEach(item => {
+        let x = moment(item.data().Date.toDate()).format('YYYY-MM-DD');
+        const object = {
+          name: x,
+          property: {dots: [off_noA]},
         };
         tmp.push(object);
       });
@@ -58,20 +98,13 @@ const EmployeesProfile = () => {
         rv[tmp[i].name] = tmp[i].property;
       }
       setDate_List(rv);
-    };
+    }
     AddNew();
   }, [dataEmployee[0]]);
   const working = {key: 'dateworking', color: 'hsl(145,67%,47%)'};
   const workovertime = {key: 'workovertime', color: 'hsl(224,75%,53%)'};
   const off_A = {key: 'off_A', color: 'hsl(35,100%,50%)'};
   const off_noA = {key: 'off_noA', color: 'red'};
-  function convertString(date) {
-    let tmp = date;
-    tmp = tmp.split('/');
-    tmp.reverse();
-    tmp = tmp.join('-');
-    return tmp;
-  }
   const [date_list, setDate_List] = useState({});
 
   const note = [

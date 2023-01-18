@@ -24,4 +24,5 @@ const auth = initializeAuth(app, {
 const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
 });
-export {auth, db};
+const storage = getStorage(app);
+export {auth, db, storage};

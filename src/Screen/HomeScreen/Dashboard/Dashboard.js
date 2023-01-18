@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   useWindowDimensions,
+  LogBox,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -33,6 +34,9 @@ import {setRoomList} from '../../../Redux/slices/dataRoom';
 const Dashboard = ({navigation}) => {
   const dispath = useDispatch();
   const {width, height} = useWindowDimensions();
+  LogBox.ignoreLogs([
+    'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
+  ]);
   useEffect(() => {
     async function GetData() {
       const q = query(collection(db, 'Bill_List'), orderBy('Date', 'desc'));
@@ -164,6 +168,7 @@ const Dashboard = ({navigation}) => {
 
   const [showTemplate, setShowTemplate] = useState(false);
   const [searchBooking, setSearchBooking] = useState('');
+  const [checkGuest, setCheckGuest] = useState(true);
   const SumPeople =
     groupByGest.Foreign.Adults +
     groupByGest.Foreign.Children +
@@ -188,6 +193,7 @@ const Dashboard = ({navigation}) => {
       item.CheckIn === 1 &&
       item.Phone_Number.indexOf(search) > -1
     ) {
+      setCheckGuest(false);
       return (
         <TouchableOpacity
           onPress={() => {
@@ -401,30 +407,53 @@ const Dashboard = ({navigation}) => {
               </View>
             </View>
           </View>
-          {/*Victory Pie */}
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <VictoryChart theme={VictoryTheme.material} domainPadding={{x: 35}}>
-              <VictoryBar
-                barRatio={0.8}
-                style={{
-                  data: {fill: 'hsl(145,67%,47%)'},
-                }}
-                cornerRadius={10}
-                data={[
-                  {x: 'New', y: reservation.New},
-                  {x: 'Due in', y: reservation.Duein},
-                  {x: 'Due out', y: reservation.Dueout},
-                  {x: 'Check in', y: reservation.CheckedIn},
-                  {x: 'Check out', y: reservation.CheckedOut},
-                ]}
+          {/*Victory bar */}
+          {reservation.New === 0 &&
+          reservation.Duein === 0 &&
+          reservation.Dueout === 0 &&
+          reservation.CheckedOut === 0 &&
+          reservation.CheckedIn === 0 ? (
+            <View
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 10,
+              }}>
+              <MaterialCommunityIcons
+                name="database-off-outline"
+                size={50}
+                color="hsl(0,0%,73%)"
               />
-            </VictoryChart>
-          </View>
+            </View>
+          ) : (
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <VictoryChart
+                theme={VictoryTheme.material}
+                domainPadding={{x: 35}}>
+                <VictoryBar
+                  barRatio={0.8}
+                  style={{
+                    data: {fill: 'hsl(145,67%,47%)'},
+                  }}
+                  cornerRadius={10}
+                  data={[
+                    {x: 'New', y: reservation.New},
+                    {x: 'Due in', y: reservation.Duein},
+                    {x: 'Due out', y: reservation.Dueout},
+                    {x: 'Check in', y: reservation.CheckedIn},
+                    {x: 'Check out', y: reservation.CheckedOut},
+                  ]}
+                />
+              </VictoryChart>
+            </View>
+          )}
+
           {/*Check-in guest*/}
 
           <View
@@ -581,116 +610,38 @@ const Dashboard = ({navigation}) => {
               </Text>
             </View>
           </View>
-          {/* <ScrollView
-            style={{
-              flex: 1,
-              paddingHorizontal: 10,
-            }}>
-            {bills.map((item, index) => {
-              if (
-                new Date(moment(item.Date_Check_In, 'YYYY-MM-DD')) <=
-                  new Date() &&
-                new Date(moment(item.Date_Check_Out, 'YYYY-MM-DD')) >=
-                  new Date() &&
-                item.CheckIn === 1 &&
-                item.Phone_Number.indexOf(search) > -1
-              ) {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setBill_Id(item.Bill_Id);
-                      setCheckOut(true);
-                      setShowTemplate(!showTemplate);
-                    }}
-                    key={index}
-                    style={{
-                      flex: 1,
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                      marginTop: 10,
-                    }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        paddingVertical: 10,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor:
-                          index % 2 === 0 ? 'hsl(0,0%,90%)' : null,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
-                      }}>
-                      <MaterialCommunityIcons
-                        name="tag-arrow-right"
-                        size={15}
-                        style={{color: 'hsl(0,0%,50%)'}}
-                      />
-                      <Text style={{color: 'hsl(0,0%,50%)'}}>
-                        {item.Date_Check_In}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                        paddingVertical: 10,
-                        backgroundColor:
-                          index % 2 !== 0 ? 'hsl(0,0%,90%)' : null,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
-                      }}>
-                      <MaterialCommunityIcons
-                        name="tag-arrow-left"
-                        size={15}
-                        style={{color: 'hsl(0,0%,50%)'}}
-                      />
 
-                      <Text style={{color: 'hsl(0,0%,50%)'}}>
-                        {item.Date_Check_Out}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        paddingVertical: 10,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor:
-                          index % 2 === 0 ? 'hsl(0,0%,90%)' : null,
-                        borderRadius: 5,
-                        paddingHorizontal: 5,
-                      }}>
-                      <Ionicons
-                        name="key-outline"
-                        size={15}
-                        style={{color: 'hsl(0,0%,50%)'}}
-                      />
-                      <Text numberOfLines={1} style={{color: 'hsl(0,0%,50%)'}}>
-                        {item.List_Room_Id[0]}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }
-            })}
-          </ScrollView> */}
-          <ScrollView
-            horizontal
-            style={{
-              marginVertical: 10,
-              width: width,
-            }}>
-            <FlatList
-              data={bills}
-              renderItem={renderGuests}
-              keyExtractor={item => item.Bill_Id}
-              initialNumToRender={4}
-              removeClippedSubviews={true}
-              nestedScrollEnabled={true}
-            />
-          </ScrollView>
+          {checkGuest ? (
+            <View
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 10,
+              }}>
+              <MaterialCommunityIcons
+                name="database-off-outline"
+                size={50}
+                color="hsl(0,0%,73%)"
+              />
+            </View>
+          ) : (
+            <ScrollView
+              horizontal
+              style={{
+                marginVertical: 10,
+                width: width,
+              }}>
+              <FlatList
+                data={bills}
+                renderItem={renderGuests}
+                keyExtractor={item => item.Bill_Id}
+                initialNumToRender={4}
+                removeClippedSubviews={true}
+                nestedScrollEnabled={true}
+              />
+            </ScrollView>
+          )}
 
           {/*Number of Guest */}
           <View

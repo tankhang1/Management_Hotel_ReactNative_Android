@@ -1,7 +1,6 @@
 import {View, Text, TextInput, Pressable, ScrollView} from 'react-native';
 import React from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useState} from 'react';
 
 const DropDownKind = ({width, open, setOpen, dataKind, value, setValue}) => {
   return (
