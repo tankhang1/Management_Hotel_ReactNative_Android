@@ -8,14 +8,8 @@ const English_Level = createSlice({
       state.push(newSkill);
     },
     deleteSkill: (state, action) => {
-      let flag = -1;
-      for (let i = 0; i < state.length; i++) {
-        if (state[i].x === action.payload.name) {
-          flag = i;
-          break;
-        }
-      }
-      state.splice(flag, 1);
+      let index = state.map(value => value.x).indexOf(action.payload);
+      state.splice(index, 1);
     },
     updateSkill: (state, action) => {
       state.map((item, index) => {

@@ -43,12 +43,7 @@ const DropDownSkill = () => {
         }}>
         <TouchableOpacity
           onPress={() => {
-            dispatch(
-              deleteSkill({
-                name: item.name,
-                level: '',
-              }),
-            );
+            dispatch(deleteSkill(item.x));
           }}
           style={{
             position: 'absolute',
@@ -74,7 +69,12 @@ const DropDownSkill = () => {
     );
   };
   return (
-    <View
+    <TouchableOpacity
+      onPress={() => setOpenDropDown(!openDropDown)}
+      disabled={openDropDown}
+      onFocus={() => {
+        console.log('OK');
+      }}
       style={{
         width: '100%',
         borderRadius: 10,
@@ -118,7 +118,7 @@ const DropDownSkill = () => {
             );
           })
         : null}
-    </View>
+    </TouchableOpacity>
   );
 };
 

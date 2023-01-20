@@ -21,7 +21,6 @@ const fetchData = createAsyncThunk('datas/fetch', async () => {
   customers.forEach(doc => {
     tmp.customers.push(doc.data());
   });
-  console.log(tmp.currentEmployee);
   return tmp;
 });
 

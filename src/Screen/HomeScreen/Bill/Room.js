@@ -20,6 +20,7 @@ import {addInfor} from '../../../Redux/InforBooking';
 import Lottie from 'lottie-react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import AlertWarning from '../../Component/AlertWarning';
 
 const Room = ({navigation}) => {
   LogBox.ignoreLogs([
@@ -48,15 +49,9 @@ const Room = ({navigation}) => {
       name === '' ||
       phone === '' ||
       passport === ''
-    )
-      Alert.alert('Please complete the form!!!!!');
-    else {
-      setDateCheckIn('');
-      setDateCheckOut('');
-      setName('');
-      setPhone('');
-      setPassport('');
-
+    ) {
+      setVisible(!visible);
+    } else {
       dispatch(
         addInfor({
           name: name,
@@ -66,6 +61,11 @@ const Room = ({navigation}) => {
           passport: passport,
         }),
       );
+      setDateCheckIn('');
+      setDateCheckOut('');
+      setName('');
+      setPhone('');
+      setPassport('');
       navigation.navigate('Booking');
     }
   };
@@ -112,6 +112,7 @@ const Room = ({navigation}) => {
         break;
     }
   };
+  const [visible, setVisible] = useState(false);
   return (
     <KeyboardAwareScrollView style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollView
@@ -121,6 +122,12 @@ const Room = ({navigation}) => {
           paddingHorizontal: 10,
         }}
         showsVerticalScrollIndicator={false}>
+        <AlertWarning
+          visible={visible}
+          setVisible={setVisible}
+          header="Warning"
+          body={'Input all of information above before adding'}
+        />
         <View
           style={{
             justifyContent: 'space-between',

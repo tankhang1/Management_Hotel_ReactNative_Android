@@ -10,6 +10,7 @@ import {
   Modal,
   ToastAndroid,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -20,6 +21,7 @@ import {addDoc, collection, doc, setDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {useDispatch, useSelector} from 'react-redux';
 import {addCustomer} from '../../../Redux/slices/dataSlice';
+import AlertWarning from '../../Component/AlertWarning';
 const AddCustomers = () => {
   const Data = [
     {
@@ -68,6 +70,16 @@ const AddCustomers = () => {
     else if (number < 100) return `C0000${number + 1}`;
   };
   const AddNewCustomer = async () => {
+    if (
+      name === '' ||
+      date_of_birth === '' ||
+      phone_number === '' ||
+      gender === '' ||
+      identification === ''
+    ) {
+      setVisible(!visible);
+      return;
+    }
     const Id = createId(dataCustomer.length);
 
     const Data = {
@@ -89,6 +101,7 @@ const AddCustomers = () => {
     setIdentification('');
     ToastAndroid.show('Information customer has been added', 2000);
   };
+  const [visible, setVisible] = useState(false);
 
   return (
     <KeyboardAvoidingView
@@ -97,6 +110,12 @@ const AddCustomers = () => {
         backgroundColor: 'white',
         paddingTop: 10,
       }}>
+      <AlertWarning
+        visible={visible}
+        setVisible={setVisible}
+        header={'Warning'}
+        body={'Input all of information above before adding'}
+      />
       <ScrollView
         style={{
           marginBottom: 20,
@@ -287,7 +306,7 @@ const AddCustomers = () => {
             );
           })}
         </View>
-        <Pressable
+        <TouchableOpacity
           onPress={AddNewCustomer}
           style={{
             width: '80%',
@@ -307,7 +326,7 @@ const AddCustomers = () => {
             }}>
             Add
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

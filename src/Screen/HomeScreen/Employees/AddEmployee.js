@@ -36,6 +36,7 @@ import {Checkbox} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {getDownloadURL, ref, uploadString} from 'firebase/storage';
 import {uuidv4} from '@firebase/util';
+import AlertWarning from '../../Component/AlertWarning';
 
 const AddEmployee = () => {
   const dispatch = useDispatch();
@@ -105,6 +106,23 @@ const AddEmployee = () => {
     else if (number < 100) return `E0000${number + 1}`;
   };
   const AddImage = async () => {
+    if (
+      picture === '' ||
+      name === '' ||
+      identification === '' ||
+      phoneNumber === '' ||
+      dateBirth === '' ||
+      email === '' ||
+      address === '' ||
+      nationality === '' ||
+      position === '' ||
+      salary === '' ||
+      english_level.length === 0
+    ) {
+      setVisible(!visible);
+      return;
+    }
+
     const imageRef = ref(storage, `Employees/${name}`);
     if (typeof global.atob === 'undefined') {
       global.atob = a => Buffer.from(a, 'base64').toString('binary');
@@ -172,7 +190,7 @@ const AddEmployee = () => {
     setSalary('');
     dispatch(resetSkill());
   };
-
+  const [visible, setVisible] = useState(false);
   return (
     <ScrollView
       style={{
@@ -180,6 +198,12 @@ const AddEmployee = () => {
         backgroundColor: 'white',
       }}
       showsVerticalScrollIndicator={false}>
+      <AlertWarning
+        visible={visible}
+        setVisible={setVisible}
+        header="Warning"
+        body={'Input all of information above before adding'}
+      />
       <Modal
         animationType="fade"
         visible={onModalCalendar}
@@ -530,13 +554,29 @@ const AddEmployee = () => {
                 backgroundColor: 'hsl(222,56%,96%)',
                 height: 55,
                 color: 'black',
+                paddingHorizontal: 10,
               }}>
               <Picker
                 selectedValue={gender}
                 onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
                 mode="dropdown">
-                <Picker.Item label="Female" value="Female" />
-                <Picker.Item label="Male" value="Male" />
+                <Picker.Item
+                  label="Female"
+                  value="Female"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(222,56%,96%)',
+                  }}
+                />
+                <Picker.Item
+                  label="Male"
+                  value="Male"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(222,56%,96%)',
+                    borderRadius: 10,
+                  }}
+                />
               </Picker>
             </View>
           </View>

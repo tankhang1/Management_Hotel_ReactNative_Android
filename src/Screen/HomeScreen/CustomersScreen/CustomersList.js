@@ -339,12 +339,13 @@ const CustomersList = () => {
             onPress={() => {
               setVisible(!visible);
             }}>
-            <Ionicons name="list-outline" size={30} />
+            <Ionicons name="list-outline" size={30} color={'black'} />
           </Pressable>
           <Text
             style={{
               fontSize: 24,
               marginLeft: 10,
+              color: 'black',
             }}>
             List Customer
           </Text>
@@ -362,7 +363,7 @@ const CustomersList = () => {
                         width: index === 1 ? 150 : 100,
                       }}
                       key={index}>
-                      {item}
+                      <Text style={{color: 'black'}}>{item}</Text>
                     </DataTable.Title>
                   );
                 })}
@@ -376,37 +377,43 @@ const CustomersList = () => {
                           style={{
                             width: 100,
                           }}>
-                          {item.Customer_Id}
+                          <Text style={{color: 'black'}}>
+                            {item.Customer_Id}
+                          </Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
                             width: 150,
                           }}>
-                          {item.Customer_Name}
+                          <Text style={{color: 'black'}}>
+                            {item.Customer_Name}
+                          </Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
                             width: 100,
                           }}>
-                          {item.Birthday}
+                          <Text style={{color: 'black'}}>{item.Birthday}</Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
                             width: 100,
                           }}>
-                          {item.Gender}
+                          <Text style={{color: 'black'}}>{item.Gender}</Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
                             width: 100,
                           }}>
-                          {item.Identification}
+                          <Text style={{color: 'black'}}>
+                            {item.Identification}
+                          </Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
                             width: 100,
                           }}>
-                          {item.Phone}
+                          <Text style={{color: 'black'}}>{item.Phone}</Text>
                         </DataTable.Cell>
                         <DataTable.Cell
                           style={{
@@ -429,7 +436,11 @@ const CustomersList = () => {
                       data_table.length / numberOfItemsPerPage,
                     )}
                     onPageChange={page => setPage(page)}
-                    label={`${from + 1}-${to} of ${data_table.length}`}
+                    label={() => {
+                      <Text style={{color: 'black'}}>{`${from + 1}-${to} of ${
+                        data_table.length
+                      }`}</Text>;
+                    }}
                     showFastPaginationControls
                     numberOfItemsPerPageList={numberOfItemsPerPageList}
                     numberOfItemsPerPage={numberOfItemsPerPage}
