@@ -10,13 +10,21 @@ import {
   Modal,
   TouchableHighlight,
   FlatList,
+  PermissionsAndroid,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ListComponent from './ListComponent';
 import {useSelector} from 'react-redux';
-
+import {
+  writeFile,
+  readFile,
+  DownloadDirectoryPath,
+  ExternalStorageDirectoryPath,
+} from 'react-native-fs';
+import XLSX from 'xlsx';
 const EmployeesList = () => {
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(false);
@@ -124,6 +132,94 @@ const EmployeesList = () => {
         }}></Animated.View>
     );
   };
+  const converDataEmployee = () => {
+    let ListEmployee = [];
+
+    dataEmployee.forEach(element => {
+      let sum = 0;
+
+      element.List_Skill_Id.forEach(skill => {
+        sum += skill.y;
+      });
+      sum /= 4;
+      tmp = {
+        Address: element.Address,
+        Birthday: element.Birthday,
+        Date_Join: element.Date_Join,
+        Email: element.Email,
+        Employee_Id: element.Employee_Id,
+        Employee_Image: element.Employee_Image,
+        Employee_Name: element.Employee_Name,
+        Gender: element.Gender,
+        Identification: element.Identification,
+        LevelEnglish: sum,
+        Nationality: element.Nationality,
+        Phone: element.Phone,
+        Position: element.Position,
+        Salary: element.Salary,
+      };
+
+      ListEmployee.push(tmp);
+    });
+    return ListEmployee;
+  };
+
+  const exportDataToExecl = async () => {
+    // console.log(tmp);
+    const data = converDataEmployee();
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, 'Employees');
+    const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+
+    // Write generated excel to Storage
+    await writeFile(
+      DownloadDirectoryPath + '/ListEmployee.xlsx',
+      wbout,
+      'ascii',
+    )
+      .then(r => {
+        ToastAndroid.show(
+          'file ListEmployee.xlsx has created in directory',
+          2000,
+        );
+      })
+      .catch(e => {
+        console.log('Error', e);
+      });
+  };
+
+  const handleExport = async () => {
+    try {
+      let isPermitedExternalStorage = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      if (!isPermitedExternalStorage) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage permistion needed',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        console.log(PermissionsAndroid.RESULTS.GRANTED, granted);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          exportDataToExecl();
+          console.log('Permistion granted');
+        } else {
+          console.log('Permission denied');
+        }
+      } else {
+        exportDataToExecl();
+      }
+    } catch (error) {
+      console.log('Error while checking permission');
+      console.log(error);
+      return;
+    }
+  };
   return (
     <View
       style={{
@@ -173,20 +269,16 @@ const EmployeesList = () => {
               alignSelf: 'center',
             }}
           />
-
           <TouchableHighlight
             onPress={() => setSearchName(!searchName)}
-            underlayColor="hsl(145,67%,80%)"
-            style={{
-              width: '100%',
-              paddingVertical: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+            underlayColor="hsl(145,67%,80%)">
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 20,
+                paddingHorizontal: 10,
               }}>
               <Text
                 style={{
@@ -195,32 +287,20 @@ const EmployeesList = () => {
                 }}>
                 Search after name
               </Text>
-              {searchName ? (
-                <Entypo name="check" size={24} color="red" />
-              ) : null}
+
+              {searchName && <Entypo name="check" size={24} color="red" />}
             </View>
           </TouchableHighlight>
-          <View
-            style={{
-              alignSelf: 'center',
-              width: '80%',
-              height: 1,
-              backgroundColor: 'hsl(0,0%,73%)',
-            }}
-          />
           <TouchableHighlight
             onPress={() => setSearchPosition(!searchPosition)}
-            underlayColor="hsl(145,67%,80%)"
-            style={{
-              width: '100%',
-              paddingVertical: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+            underlayColor="hsl(145,67%,80%)">
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 20,
+                paddingHorizontal: 10,
               }}>
               <Text
                 style={{
@@ -229,32 +309,21 @@ const EmployeesList = () => {
                 }}>
                 Search after position
               </Text>
-              {searchPosition ? (
-                <Entypo name="check" size={24} color="red" />
-              ) : null}
+
+              {searchPosition && <Entypo name="check" size={24} color="red" />}
             </View>
           </TouchableHighlight>
-          <View
-            style={{
-              alignSelf: 'center',
-              width: '80%',
-              height: 1,
-              backgroundColor: 'hsl(0,0%,73%)',
-            }}
-          />
+
           <TouchableHighlight
             onPress={() => setSearchId(!searchId)}
-            underlayColor="hsl(145,67%,80%)"
-            style={{
-              width: '100%',
-              paddingVertical: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+            underlayColor="hsl(145,67%,80%)">
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 20,
+                paddingHorizontal: 10,
               }}>
               <Text
                 style={{
@@ -263,7 +332,28 @@ const EmployeesList = () => {
                 }}>
                 Search after id
               </Text>
-              {searchId ? <Entypo name="check" size={24} color="red" /> : null}
+
+              {searchId && <Entypo name="check" size={24} color="red" />}
+            </View>
+          </TouchableHighlight>
+          <TouchableHighlight
+            onPress={handleExport}
+            underlayColor="hsl(145,67%,80%)">
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 20,
+                paddingHorizontal: 10,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'black',
+                }}>
+                Export
+              </Text>
             </View>
           </TouchableHighlight>
         </View>

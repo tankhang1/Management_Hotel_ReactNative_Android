@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 const Collect_ID_Customer_Profile = createSlice({
   name: 'Collect_ID_Customer_Profile',
-  initialState: 'C000001',
+  initialState: '',
   reducers: {
     addId: (state, action) => {
       state = action.payload;

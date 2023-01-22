@@ -1,4 +1,12 @@
-import {View, Text, Pressable, Modal, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Modal,
+  ScrollView,
+  PermissionsAndroid,
+  ToastAndroid,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
@@ -6,6 +14,13 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Animated, {SlideInLeft} from 'react-native-reanimated';
 import {DataTable, Provider as PaperProvider} from 'react-native-paper';
 import Feather from 'react-native-vector-icons/Feather';
+import {
+  writeFile,
+  readFile,
+  DownloadDirectoryPath,
+  ExternalStorageDirectoryPath,
+} from 'react-native-fs';
+import XLSX from 'xlsx';
 const CustomersList = () => {
   // const dataCustomer = ;
   const [visible, setVisible] = React.useState(false);
@@ -25,7 +40,59 @@ const CustomersList = () => {
   const [data_table, setData] = useState([
     ...useSelector(state => state.data_infor).data.customers,
   ]);
+  const exportDataToExecl = async () => {
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(data_table);
+    XLSX.utils.book_append_sheet(wb, ws, 'Customers');
+    const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
 
+    // Write generated excel to Storage
+    await writeFile(
+      DownloadDirectoryPath + '/ListCustomer.xlsx',
+      wbout,
+      'ascii',
+    )
+      .then(r => {
+        ToastAndroid.show(
+          'file ListCustomer.xlsx has created in directory',
+          2000,
+        );
+      })
+      .catch(e => {
+        console.log('Error', e);
+      });
+  };
+  const handleExport = async () => {
+    try {
+      let isPermitedExternalStorage = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      if (!isPermitedExternalStorage) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage permistion needed',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        console.log(PermissionsAndroid.RESULTS.GRANTED, granted);
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          exportDataToExecl();
+          console.log('Permistion granted');
+        } else {
+          console.log('Permission denied');
+        }
+      } else {
+        exportDataToExecl();
+      }
+    } catch (error) {
+      console.log('Error while checking permission');
+      console.log(error);
+      return;
+    }
+  };
   const SortA_Z = () => {
     setCheckSort(true);
     let tmp = data_table;
@@ -461,6 +528,7 @@ const CustomersList = () => {
           }}>
           {/*Export */}
           <Pressable
+            onPress={handleExport}
             style={{
               width: 100,
               height: 50,

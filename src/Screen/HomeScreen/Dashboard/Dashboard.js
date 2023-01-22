@@ -145,7 +145,7 @@ const Dashboard = ({navigation}) => {
   }, []);
   const bills = useSelector(state => state.list_bill);
   const [search, setSearch] = useState('');
-  const [bill_Id, setBill_Id] = useState('OEGRPP8RrgAQDsmdb6L9');
+  const [bill_Id, setBill_Id] = useState('');
   const [checkOut, setCheckOut] = useState(false);
 
   const [reservation, setReservation] = useState({
@@ -284,14 +284,16 @@ const Dashboard = ({navigation}) => {
             paddingTop: 10,
           }}>
           {/*Header */}
-          <Template_Bill
-            visible={showTemplate}
-            setVisible={setShowTemplate}
-            Bill_Id={bill_Id}
-            CheckOut={checkOut}
-            reservation={reservation}
-            setReservation={setReservation}
-          />
+          {bill_Id !== '' && (
+            <Template_Bill
+              visible={showTemplate}
+              setVisible={setShowTemplate}
+              Bill_Id={bill_Id}
+              CheckOut={checkOut}
+              reservation={reservation}
+              setReservation={setReservation}
+            />
+          )}
           <View
             style={{
               flexDirection: 'row',

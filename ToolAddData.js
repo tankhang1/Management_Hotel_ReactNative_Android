@@ -50,7 +50,7 @@ const ToolAddData = () => {
     querySnapshot.forEach(doc => {
       console.log(doc.data());
       // doc.data() is never undefined for query doc snapshots
-      tmp.push(doc.data());
+      tmp.push({no_room: doc.data().no_room, money: doc.data().da});
     });
     setList([...tmp]);
   };
@@ -59,6 +59,12 @@ const ToolAddData = () => {
     List.map((item, index) => {
       sum += Number(item.Money);
     });
+    let sophong = Math.floor(Math.random() * 4) + 1;
+    let maphong = [{}, {}, {}];
+
+    for (let i = 0; i < sophong; i++) {
+      maphong.push(List[Math.floor()].no_room);
+    }
     return sum;
   };
 
@@ -287,13 +293,17 @@ const ToolAddData = () => {
       <TouchableOpacity onPress={AddDataDateWork}>
         <Text>add DateWork</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity onPress={UpdateMonthly}>
+      <TouchableOpacity onPress={UpdateMonthly}>
         <Text>update monthly</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={AddMonth}>
         <Text>add monthly</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={GetDataCaculate}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log(list);
+          c;
+        }}>
         <Text>get</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={Caluated}>
@@ -304,7 +314,7 @@ const ToolAddData = () => {
       </TouchableOpacity>
       <TouchableOpacity onPress={UpdateYear}>
         <Text>update year</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </View>
   );
 };

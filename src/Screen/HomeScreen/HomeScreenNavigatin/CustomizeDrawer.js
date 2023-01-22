@@ -58,7 +58,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                   <Text
                     style={{
                       color: 'black',
-                      fontWeight: '700',
+                      fontWeight: '600',
                     }}>
                     {currentEmployee.Employee_Name}
                   </Text>
@@ -107,7 +107,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               <Text
                 style={{
                   fontSize: 20,
-                  fontWeight: '700',
+                  fontWeight: '600',
                   width: '60%',
                   paddingHorizontal: 10,
                   color: 'black',
@@ -149,7 +149,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                 <Text
                   style={{
                     fontSize: 20,
-                    fontWeight: '700',
+                    fontWeight: '600',
                     width: '60%',
                     paddingHorizontal: 10,
                     color: 'black',
@@ -179,10 +179,8 @@ const CustomizeDrawer = ({props, navigation}) => {
                     width: '100%',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    // marginTop:20,
                     paddingHorizontal: 10,
                   }}>
-                  {/* <FontAwesome name='user-circle' color={"black"} size={24}/> */}
                   <Image
                     source={{
                       uri: 'https://img.icons8.com/external-itim2101-lineal-color-itim2101/64/000000/external-employee-human-resource-itim2101-lineal-color-itim2101.png',
@@ -196,7 +194,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                   <Text
                     style={{
                       fontSize: 20,
-                      fontWeight: '700',
+                      fontWeight: '600',
                       width: '60%',
                       paddingHorizontal: 10,
                       color: 'black',
@@ -223,7 +221,6 @@ const CustomizeDrawer = ({props, navigation}) => {
                     width: '100%',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    // marginTop:20,
                     paddingHorizontal: 10,
                   }}>
                   <Image
@@ -239,7 +236,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                   <Text
                     style={{
                       fontSize: 20,
-                      fontWeight: '700',
+                      fontWeight: '600',
                       width: '60%',
                       paddingHorizontal: 10,
                       color: 'black',
@@ -284,7 +281,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               <Text
                 style={{
                   fontSize: 20,
-                  fontWeight: '700',
+                  fontWeight: '600',
                   width: '60%',
                   paddingHorizontal: 10,
                   color: 'black',
@@ -339,7 +336,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               <Text
                 style={{
                   fontSize: 20,
-                  fontWeight: '700',
+                  fontWeight: '600',
                   width: '60%',
                   paddingHorizontal: 10,
                   color: 'red',
