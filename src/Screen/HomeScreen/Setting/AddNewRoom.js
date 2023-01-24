@@ -14,11 +14,13 @@ import React, {useState, useRef} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import DropDownKind from './DropDownKind';
 import DropDownFacility from './DropDownFacility';
-import {collection, doc, setDoc, Timestamp} from 'firebase/firestore';
+import {collection, doc, getDocs, setDoc, Timestamp} from 'firebase/firestore';
 import {db, storage} from '../../../Firebase/firebase';
 import {uuidv4} from '@firebase/util';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {ref, getDownloadURL, uploadString} from 'firebase/storage';
+import {useEffect} from 'react';
+import ModalAdd from './ModalAdd';
 const AddNewRoom = () => {
   //Animation Kind Room lef
   const [listImage, setListImage] = useState([]);
@@ -45,22 +47,29 @@ const AddNewRoom = () => {
   };
   //DataKindRoom
   const [open, setOpen] = useState(false);
-  const dataKind = [
-    'Single Room',
-    'Twin Room',
-    'Double Room',
-    'Deluxe',
-    'President',
-  ];
+  const [dataKind, setDataKind] = useState([]);
+  const [dataFacility, setDataFacility] = useState([]);
+
+  useEffect(() => {
+    async function getDb() {
+      const kindQuery = getDocs(collection(db, 'KindRoom'));
+      const facilityQuery = getDocs(collection(db, 'Facility'));
+      let kinds = [];
+      (await kindQuery).forEach(doc => {
+        kinds.push(doc.data().Name);
+      });
+      let facilities = [];
+      (await facilityQuery).forEach(doc => {
+        facilities.push(doc.data().Name);
+      });
+      setDataKind([...kinds]);
+      setDataFacility([...facilities]);
+    }
+    getDb();
+  }, []);
+
   //DataFacility
   const [open_facility, setOpen_facility] = useState(false);
-  const dataFacility = [
-    'Service',
-    'Wifi',
-    'Receptionist',
-    'Airconditioning',
-    'Breakfast',
-  ];
   const [value_facility, setValue_facility] = useState('');
   const [dataChip, setDataChip] = useState([]);
   //Value Kind Room
@@ -124,14 +133,10 @@ const AddNewRoom = () => {
       image: url,
       kind: kindRoom,
       money: Number(roomCharge),
-      no_room: 'N_' + Math.floor(Math.random() * 1000) + 1,
+      no_room: 'R_' + Math.floor(Math.random() * 1000) + 96,
       rating: Math.floor(Math.random() * 5) + 1,
-      airconditioning: dataChip.indexOf('Airconditioning') === -1 ? 0 : 1,
-      breakfast: dataChip.indexOf('Breakfast') === -1 ? 0 : 1,
       decription: decribe,
-      receptionist: dataChip.indexOf('Receptionist') === -1 ? 0 : 1,
-      service: dataChip.indexOf('Service') === -1 ? 0 : 1,
-      wifi: dataChip.indexOf('Wifi') === -1 ? 0 : 1,
+      facility: dataChip,
       status: 1,
       dateTo: new Timestamp.fromDate(new Date('1975-12-01')),
       dateFrom: new Timestamp.fromDate(new Date('1975-12-01')),
@@ -145,7 +150,8 @@ const AddNewRoom = () => {
       setDecribe('');
     });
   };
-
+  const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [kindModal, setKindModal] = useState(0);
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
@@ -156,6 +162,11 @@ const AddNewRoom = () => {
         backgroundColor: 'white',
       }}
       extraScrollHeight={20}>
+      <ModalAdd
+        open={openModalAdd}
+        setOpen={setOpenModalAdd}
+        kind={kindModal}
+      />
       <Modal
         visible={onOptionC_L}
         animationType="fade"
@@ -332,6 +343,9 @@ const AddNewRoom = () => {
                 value={kindRoom}
                 setValue={setKindRoom}
                 dataKind={dataKind}
+                openModalAdd={openModalAdd}
+                setOpenModalAdd={setOpenModalAdd}
+                setKind={setKindModal}
               />
             </View>
           </View>
@@ -392,6 +406,9 @@ const AddNewRoom = () => {
             dataKind={dataFacility}
             setChip={setDataChip}
             chip={dataChip}
+            openModalAdd={openModalAdd}
+            setOpenModalAdd={setOpenModalAdd}
+            setKind={setKindModal}
           />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>

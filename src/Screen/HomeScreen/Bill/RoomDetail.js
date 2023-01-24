@@ -12,6 +12,10 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
+import {useState} from 'react';
+import {useEffect} from 'react';
+import {collection, getDocs} from 'firebase/firestore';
+import {db} from '../../../Firebase/firebase';
 const RoomDetail = ({navigation, route}) => {
   const dispatch = useDispatch();
   const Id = useSelector(state => state.id);
@@ -19,24 +23,22 @@ const RoomDetail = ({navigation, route}) => {
   const bookMark1 = useRef(route.params?.bookMark);
 
   let data = Data_Room.filter(item => item.id === Id);
-  const datafacility = [
-    data[0].service === 1
-      ? 'https://img.icons8.com/external-others-cattaleeya-thongsriphong/64/000000/external-Service-travel-color-line-others-cattaleeya-thongsriphong.png'
-      : '',
-    data[0].wifi === 1
-      ? 'https://img.icons8.com/color/96/000000/wifi--v1.png'
-      : '',
-    data[0].receptionist === 1
-      ? 'https://img.icons8.com/external-nawicon-outline-color-nawicon/64/000000/external-receptionist-hotel-nawicon-outline-color-nawicon.png'
-      : '',
-    data[0].airconditioning === 1
-      ? 'https://img.icons8.com/external-photo3ideastudio-flat-photo3ideastudio/64/000000/external-air-conditioning-home-office-photo3ideastudio-flat-photo3ideastudio.png'
-      : '',
-    data[0].breakfast === 1
-      ? 'https://img.icons8.com/officel/80/000000/breakfast.png'
-      : '',
-  ];
 
+  useEffect(() => {
+    async function getDbFacility() {
+      const q = collection(db, 'Facility');
+      const snapShot = await getDocs(q);
+      let tmp = [];
+      snapShot.forEach(doc => {
+        if (data[0].facility.indexOf(doc.data().Name) > -1) {
+          tmp.push(doc.data().Image);
+        }
+      });
+      setDatafacility([...tmp]);
+    }
+    getDbFacility();
+  }, []);
+  const [datafacility, setDatafacility] = useState([]);
   const listlikeroom1 = useSelector(state => state.listlikeroom);
 
   const onLikeRoom = () => {

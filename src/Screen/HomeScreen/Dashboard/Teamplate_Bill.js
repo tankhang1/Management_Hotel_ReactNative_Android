@@ -29,13 +29,12 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const customer = dataCustomers.filter(
     value => value.Customer_Id === bill[0]?.Customer_Id,
   );
-
   const [data_Image, setData_Image] = useState([]);
   useEffect(() => {
     let tmp = [];
-    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
+    for (let i = 0; i < bill[0].List_Room?.length; i++) {
       for (let j = 0; j < dataRooms?.length; j++) {
-        if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
+        if (bill[0].List_Room[i] === dataRooms[j].id) {
           tmp.push(dataRooms[j]);
           break;
         }
@@ -129,9 +128,9 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   };
   const TotalMoneyRoom = () => {
     let sum = 0;
-    for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
-      for (let j = 0; j < (dataRooms || []).length; j++) {
-        if (dataRooms[j].id === bill[0].List_Room_Id[i]) {
+    for (let i = 0; i < bill[0].List_Room?.length; i++) {
+      for (let j = 0; j < (dataRooms || [])?.length; j++) {
+        if (dataRooms[j].id === bill[0].List_Room[i]) {
           sum += dataRooms[j].money;
           break;
         }
@@ -170,14 +169,15 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
 
         Total_Money: TotalMoneyRoom(),
       });
-      ToastAndroid.show('Bill has check out success', 2000);
-      bill[0].List_Room_Id.map(async (item, index) => {
+      bill[0].List_Room.map(async (item, index) => {
         let ref = doc(db, 'DataRoom', item);
         await updateDoc(ref, {
           status: 1,
           dateTo: new Timestamp.fromDate(new Date()),
         });
       });
+      ToastAndroid.show('Bill has check out success', 2000);
+
       setVisible(!visible);
     } else {
       setShowForm(!showForm);
@@ -194,17 +194,18 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
       Children: Number(children),
       Foreign: checkForeign ? 1 : 0,
       Date_Check_In: new Timestamp.fromDate(new Date()),
+      DateIn: new Timestamp.fromDate(new Date()),
     });
-    ToastAndroid.show('Bill has check in success', 2000);
 
-    bill[0].List_Room_Id.map(async (item, index) => {
+    bill[0].List_Room.map(async (item, index) => {
       let ref = doc(db, 'DataRoom', item);
       await updateDoc(ref, {
         status: 0,
         dateFrom: new Timestamp.fromDate(new Date()),
-        DateIn: new Timestamp.fromDate(new Date()),
       });
     });
+    ToastAndroid.show('Bill has check in success', 2000);
+
     setShowForm(!showForm);
     setVisible(!visible);
   };
@@ -551,7 +552,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                       style={{
                         color: 'hsl(0,0%,60%)',
                       }}>
-                      {bill[0]?.Phone_Number}
+                      {bill[0]?.Phone}
                     </Text>
                   </View>
 

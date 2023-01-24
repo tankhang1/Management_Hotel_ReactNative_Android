@@ -10,6 +10,9 @@ const DropDownFacility = ({
   dataKind,
   value,
   setValue,
+  setOpenModalAdd,
+  openModalAdd,
+  setKind,
 }) => {
   return (
     <View
@@ -49,8 +52,29 @@ const DropDownFacility = ({
       </Pressable>
 
       <ScrollView>
-        {open === true
-          ? dataKind.map((item, index) => {
+        {open && (
+          <View>
+            <Pressable
+              onPress={() => {
+                setKind(1);
+                setOpenModalAdd(!openModalAdd);
+                setOpen(!open);
+              }}
+              style={{
+                backgroundColor: 'hsl(208,65%,27%)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 40,
+              }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: 'white',
+                }}>
+                Add New Facility
+              </Text>
+            </Pressable>
+            {dataKind.map((item, index) => {
               return (
                 <Pressable
                   onPress={() => {
@@ -75,8 +99,9 @@ const DropDownFacility = ({
                   </Text>
                 </Pressable>
               );
-            })
-          : null}
+            })}
+          </View>
+        )}
       </ScrollView>
     </View>
   );

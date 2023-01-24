@@ -158,7 +158,7 @@ const AddEmployee = () => {
       Nationality: nationality,
       Phone: phoneNumber,
       Position: position,
-      Salary: salary,
+      Salary: Number(salary),
     };
     await setDoc(doc(collection(db, 'Employee_Information'), Id), Data);
     dispatch(addEmployee(Data));

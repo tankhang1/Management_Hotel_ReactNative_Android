@@ -638,6 +638,8 @@ const Booking = ({navigation}) => {
           style={{
             marginTop: 30,
           }}
+          removeClippedSubviews={true}
+          initialNumToRender={7}
           showsVerticalScrollIndicator={false}
         />
       </View>

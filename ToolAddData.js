@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {
   addDoc,
   doc,
+  getDoc,
   query,
   queryEqual,
   setDoc,
@@ -286,24 +287,72 @@ const ToolAddData = () => {
       );
     });
   };
+  const [dataRoom, setDataRoom] = useState([]);
+  const collectDataRoom = async () => {
+    const q = collection(db, 'DataRoom');
+    const snapShot = getDocs(q);
+    let tmp = [];
+    (await snapShot).forEach(doc => {
+      tmp.push(doc.data());
+    });
+    setDataRoom([...tmp]);
+  };
+  const solveDataRoom = () => {
+    dataRoom.map(async (item, index) => {
+      // let facility = [];
+      // if (item.airconditioning === 1) {
+      //   facility.push('airconditioning');
+      // }
+      // if (item.breakfast === 1) {
+      //   facility.push('breakfast');
+      // }
+      // if (item.receptionist === 1) {
+      //   facility.push('receptionist');
+      // }
+      // if (item.service === 1) {
+      //   facility.push('service');
+      // }
+      // if (item.wifi === 1) {
+      //   facility.push('wifi');
+      // }
+      // const Room = {
+      //   id: item.id,
+      //   image: item.image,
+      //   kind: item.kind,
+      //   money: item.money,
+      //   no_room: item.no_room,
+      //   rating: item.rating,
+      //   decription: item.decription,
+      //   facility: facility,
+      //   status: item.status,
+      //   dateTo: item.dateTo,
+      //   dateFrom: item.dateFrom,
+      // };
+      // console.log(Room);
+      await setDoc(doc(db, 'DataRoom', item.id), item);
+    });
+  };
+  const upDateNo_Room = () => {
+    dataRoom.map(async (item, index) => {
+      await updateDoc(doc(db, 'DataRoom', item.id), {
+        no_room: `R_${index}`,
+      });
+    });
+  };
   const datamonth = 30;
   const month = 12;
   return (
     <View>
-      <TouchableOpacity onPress={AddDataDateWork}>
-        <Text>add DateWork</Text>
+      <TouchableOpacity onPress={collectDataRoom}>
+        <Text>collect Data Room</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={UpdateMonthly}>
-        <Text>update monthly</Text>
+      <TouchableOpacity onPress={() => console.log(dataRoom)}>
+        <Text>console log dataroom</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={AddMonth}>
-        <Text>add monthly</Text>
+      <TouchableOpacity onPress={upDateNo_Room}>
+        <Text>update Room</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          console.log(list);
-          c;
-        }}>
+      <TouchableOpacity onPress={() => {}}>
         <Text>get</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={Caluated}>

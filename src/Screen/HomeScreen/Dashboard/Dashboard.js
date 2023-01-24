@@ -44,11 +44,11 @@ const Dashboard = ({navigation}) => {
         let bill = [];
         let groupGest = {
           Local: {
-            Adults: 0,
+            Adult: 0,
             Children: 0,
           },
           Foreign: {
-            Adults: 0,
+            Adult: 0,
             Children: 0,
           },
         };
@@ -69,10 +69,10 @@ const Dashboard = ({navigation}) => {
             doc.data().CheckIn === 1
           ) {
             if (tmp.Foreign === 1) {
-              groupGest.Foreign.Adults += tmp.Adults;
+              groupGest.Foreign.Adult += tmp.Adult;
               groupGest.Foreign.Children += tmp.Children;
             } else {
-              groupGest.Local.Adults += tmp.Adults;
+              groupGest.Local.Adult += tmp.Adult;
               groupGest.Local.Children += tmp.Children;
             }
           }
@@ -157,25 +157,24 @@ const Dashboard = ({navigation}) => {
   });
   const [groupByGest, setGroupByGest] = useState({
     Local: {
-      Adults: 0,
+      Adult: 0,
       Children: 0,
     },
     Foreign: {
-      Adults: 0,
+      Adult: 0,
       Children: 0,
     },
   });
 
   const [showTemplate, setShowTemplate] = useState(false);
   const [searchBooking, setSearchBooking] = useState('');
-  const [checkGuest, setCheckGuest] = useState(true);
   const SumPeople =
-    groupByGest.Foreign.Adults +
+    groupByGest.Foreign.Adult +
     groupByGest.Foreign.Children +
-    groupByGest.Local.Adults +
+    groupByGest.Local.Adult +
     groupByGest.Local.Children;
-  const SumLocal = groupByGest.Local.Adults + groupByGest.Local.Children;
-  const SumForeign = groupByGest.Foreign.Adults + groupByGest.Foreign.Children;
+  const SumLocal = groupByGest.Local.Adult + groupByGest.Local.Children;
+  const SumForeign = groupByGest.Foreign.Adult + groupByGest.Foreign.Children;
   const collectRoom = useSelector(state => state.list_room).groupRoom;
   const renderGuests = ({item, index}) => {
     let checkin = item.Date_Check_In;
@@ -191,9 +190,8 @@ const Dashboard = ({navigation}) => {
         )}`,
       ) >= new Date() &&
       item.CheckIn === 1 &&
-      item.Phone_Number.indexOf(search) > -1
+      item.Phone.indexOf(search) > -1
     ) {
-      setCheckGuest(false);
       return (
         <TouchableOpacity
           onPress={() => {
@@ -260,7 +258,7 @@ const Dashboard = ({navigation}) => {
               style={{color: 'hsl(0,0%,50%)'}}
             />
             <Text numberOfLines={1} style={{color: 'hsl(0,0%,50%)'}}>
-              {item.List_Room_Id[0]}
+              {item.List_Room[0]}
             </Text>
           </View>
         </TouchableOpacity>
@@ -613,37 +611,20 @@ const Dashboard = ({navigation}) => {
             </View>
           </View>
 
-          {checkGuest ? (
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 10,
-              }}>
-              <MaterialCommunityIcons
-                name="database-off-outline"
-                size={50}
-                color="hsl(0,0%,73%)"
-              />
-            </View>
-          ) : (
-            <ScrollView
-              horizontal
-              style={{
-                marginVertical: 10,
-                width: width,
-              }}>
-              <FlatList
-                data={bills}
-                renderItem={renderGuests}
-                keyExtractor={item => item.Bill_Id}
-                initialNumToRender={4}
-                removeClippedSubviews={true}
-                nestedScrollEnabled={true}
-              />
-            </ScrollView>
-          )}
+          <ScrollView
+            horizontal
+            style={{
+              marginVertical: 10,
+              width: width,
+            }}>
+            <FlatList
+              data={bills}
+              renderItem={renderGuests}
+              keyExtractor={item => item.Bill_Id}
+              removeClippedSubviews={true}
+              nestedScrollEnabled={true}
+            />
+          </ScrollView>
 
           {/*Number of Guest */}
           <View
@@ -745,7 +726,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     fontWeight: '600',
                   }}>
-                  {groupByGest.Foreign.Adults + groupByGest.Local.Adults}
+                  {groupByGest.Foreign.Adult + groupByGest.Local.Adult}
                 </Text>
               </View>
               <View
@@ -799,7 +780,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  {groupByGest.Local.Adults} Adults
+                  {groupByGest.Local.Adult} Adults
                 </Text>
                 <Text
                   style={{
@@ -871,7 +852,7 @@ const Dashboard = ({navigation}) => {
                     color: 'black',
                     marginHorizontal: 10,
                   }}>
-                  {groupByGest.Foreign.Adults} Adults
+                  {groupByGest.Foreign.Adult} Adults
                 </Text>
                 <Text
                   style={{
@@ -1162,7 +1143,7 @@ const Dashboard = ({navigation}) => {
             <ScrollView>
               {bills.map((item, index) => {
                 if (
-                  item.Phone_Number.indexOf(searchBooking) > -1 &&
+                  item.Phone.indexOf(searchBooking) > -1 &&
                   index < (searchBooking === '' ? 4 : bills.length)
                 )
                   return (

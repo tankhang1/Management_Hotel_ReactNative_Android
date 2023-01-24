@@ -429,6 +429,8 @@ const EmployeesList = () => {
             [{nativeEvent: {contentOffset: {x: scrollX}}}],
             {useNativeDriver: false},
           )}
+          initialNumToRender={5}
+          removeClippedSubviews={true}
           data={dataEmployee}
           renderItem={renderItem}
         />

@@ -21,7 +21,6 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 import {doc, updateDoc} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
-import {async} from '@firebase/util';
 
 const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   const dataBills = useSelector(state => state.list_bill);
@@ -36,9 +35,9 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
   useEffect(() => {
     let tmp = [];
     setTimeout(() => {
-      for (let i = 0; i < bill[0].List_Room_Id.length; i++) {
+      for (let i = 0; i < bill[0].List_Room.length; i++) {
         for (let j = 0; j < dataRooms.length; j++) {
-          if (bill[0].List_Room_Id[i] === dataRooms[j].id) {
+          if (bill[0].List_Room[i] === dataRooms[j].id) {
             tmp.push(dataRooms[j]);
             break;
           }
@@ -376,7 +375,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                       color: 'hsl(0,0%,60%)',
                     }}>
                     {' '}
-                    {bill[0].Phone_Number}
+                    {bill[0].Phone}
                   </Text>
                 </View>
 

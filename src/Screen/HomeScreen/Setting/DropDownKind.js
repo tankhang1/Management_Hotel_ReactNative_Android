@@ -2,7 +2,17 @@ import {View, Text, TextInput, Pressable, ScrollView} from 'react-native';
 import React from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 
-const DropDownKind = ({width, open, setOpen, dataKind, value, setValue}) => {
+const DropDownKind = ({
+  width,
+  open,
+  setOpen,
+  dataKind,
+  value,
+  setValue,
+  setOpenModalAdd,
+  openModalAdd,
+  setKind,
+}) => {
   return (
     <View
       style={{
@@ -41,8 +51,29 @@ const DropDownKind = ({width, open, setOpen, dataKind, value, setValue}) => {
         </View>
       </Pressable>
       <ScrollView>
-        {open === true
-          ? dataKind.map((item, index) => {
+        {open && (
+          <View>
+            <Pressable
+              onPress={() => {
+                setKind(0);
+                setOpenModalAdd(!openModalAdd);
+                setOpen(!open);
+              }}
+              style={{
+                backgroundColor: 'hsl(208,65%,27%)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 40,
+              }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: 'white',
+                }}>
+                Add New Kind
+              </Text>
+            </Pressable>
+            {dataKind.map((item, index) => {
               return (
                 <Pressable
                   onPress={() => {
@@ -64,8 +95,9 @@ const DropDownKind = ({width, open, setOpen, dataKind, value, setValue}) => {
                   </Text>
                 </Pressable>
               );
-            })
-          : null}
+            })}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
