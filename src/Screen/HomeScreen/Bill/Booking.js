@@ -204,6 +204,7 @@ const Booking = ({navigation}) => {
           }
         }
       });
+
       setData([...tmp]);
     } else {
       setData([...Rooms]);

@@ -73,7 +73,7 @@ const DropDownKind = ({
                 Add New Kind
               </Text>
             </Pressable>
-            {dataKind.map((item, index) => {
+            {dataKind?.map((item, index) => {
               return (
                 <Pressable
                   onPress={() => {
@@ -91,7 +91,7 @@ const DropDownKind = ({
                       color: 'black',
                       fontSize: 16,
                     }}>
-                    {item}
+                    {item.Name}
                   </Text>
                 </Pressable>
               );

@@ -8,26 +8,25 @@ import {
 } from 'react-native';
 import React from 'react';
 import {useState} from 'react';
-import {addDoc, collection} from 'firebase/firestore';
+import {addDoc, collection, setDoc, doc} from 'firebase/firestore';
 import {cloneElement} from 'react';
 import {db} from '../../../Firebase/firebase';
 
 const ModalAdd = ({open, setOpen, kind}) => {
-  const [typeRoom, setTypeRoom] = useState('');
   const [typeFacility, setTypeFacility] = useState('');
   const [image, setImage] = useState('');
+  const [kindRooms, setkindRooms] = useState('');
+
   const actionAdd = async () => {
     if (kind === 0) {
-      await addDoc(collection(db, 'KindRoom'), {Name: typeRoom});
+      const Data = new Object({Name: kindRooms});
+      await addDoc(collection(db, 'KindRoom'), Data);
     } else {
       await addDoc(collection(db, 'Facility'), {
         Name: typeFacility,
         Image: image,
       });
     }
-    ToastAndroid.show(
-      `Add ${kind === 0 ? 'kind room' : 'kind facility'} success`,
-    );
     setOpen(!open);
   };
   return (
@@ -63,8 +62,8 @@ const ModalAdd = ({open, setOpen, kind}) => {
                 What kind of room you want to add ?
               </Text>
               <TextInput
-                value={typeRoom}
-                onChangeText={setTypeRoom}
+                value={kindRooms}
+                onChangeText={setkindRooms}
                 style={{
                   fontSize: 16,
                   color: 'black',

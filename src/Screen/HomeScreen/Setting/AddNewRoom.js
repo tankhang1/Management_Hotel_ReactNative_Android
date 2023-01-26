@@ -14,12 +14,20 @@ import React, {useState, useRef} from 'react';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import DropDownKind from './DropDownKind';
 import DropDownFacility from './DropDownFacility';
-import {collection, doc, getDocs, setDoc, Timestamp} from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  setDoc,
+  Timestamp,
+} from 'firebase/firestore';
 import {db, storage} from '../../../Firebase/firebase';
 import {uuidv4} from '@firebase/util';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {ref, getDownloadURL, uploadString} from 'firebase/storage';
 import {useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import ModalAdd from './ModalAdd';
 const AddNewRoom = () => {
   //Animation Kind Room lef
@@ -45,34 +53,38 @@ const AddNewRoom = () => {
         });
     });
   };
-  //DataKindRoom
+  // DataKindRoom
   const [open, setOpen] = useState(false);
   const [dataKind, setDataKind] = useState([]);
   const [dataFacility, setDataFacility] = useState([]);
-
+  const navigation = useNavigation();
   useEffect(() => {
     async function getDb() {
-      const kindQuery = getDocs(collection(db, 'KindRoom'));
-      const facilityQuery = getDocs(collection(db, 'Facility'));
-      let kinds = [];
-      (await kindQuery).forEach(doc => {
-        kinds.push(doc.data().Name);
+      onSnapshot(collection(db, 'KindRoom'), snapshot => {
+        let kinds = [];
+        snapshot.forEach(doc => {
+          kinds.push({...doc.data()});
+          console.log(doc.data());
+        });
+        setDataKind([...kinds]);
       });
-      let facilities = [];
-      (await facilityQuery).forEach(doc => {
-        facilities.push(doc.data().Name);
+
+      onSnapshot(collection(db, 'Facility'), snapshot => {
+        let facilities = [];
+        snapshot.forEach(doc => {
+          facilities.push(doc.data());
+        });
+        setDataFacility([...facilities]);
       });
-      setDataKind([...kinds]);
-      setDataFacility([...facilities]);
     }
     getDb();
   }, []);
-
+  console.log(dataKind);
   //DataFacility
   const [open_facility, setOpen_facility] = useState(false);
   const [value_facility, setValue_facility] = useState('');
   const [dataChip, setDataChip] = useState([]);
-  //Value Kind Room
+  // Value Kind Room
   const [kindRoom, setKindRoom] = useState('Single Room');
   const [roomCharge, setRoomCharge] = useState('');
   const [decribe, setDecribe] = useState('');
@@ -119,7 +131,7 @@ const AddNewRoom = () => {
     setOnOptionC_L(!onOptionC_L);
   };
 
-  //DeleteChip
+  //DeleteChip;
   const DeleteChip = item => {
     let tmp = dataChip.filter(value => {
       return value !== item;
@@ -150,7 +162,9 @@ const AddNewRoom = () => {
       setDecribe('');
     });
   };
+
   const [openModalAdd, setOpenModalAdd] = useState(false);
+  const [openModalAddKindRoom, setOpenModalAddKindRoom] = useState(false);
   const [kindModal, setKindModal] = useState(0);
   return (
     <KeyboardAwareScrollView
@@ -167,6 +181,7 @@ const AddNewRoom = () => {
         setOpen={setOpenModalAdd}
         kind={kindModal}
       />
+
       <Modal
         visible={onOptionC_L}
         animationType="fade"
@@ -312,7 +327,7 @@ const AddNewRoom = () => {
             />
           )}
         </Pressable>
-        {/*Kind room and room charge */}
+
         <View
           style={{
             flexDirection: 'row',
@@ -320,7 +335,6 @@ const AddNewRoom = () => {
             justifyContent: 'space-between',
             marginBottom: 20,
           }}>
-          {/*Kind Room */}
           <View
             style={{
               width: '45%',
@@ -350,7 +364,6 @@ const AddNewRoom = () => {
             </View>
           </View>
 
-          {/*Money Rent*/}
           <View
             style={{
               width: '45%',
@@ -384,7 +397,6 @@ const AddNewRoom = () => {
           </View>
         </View>
 
-        {/*choose facility*/}
         <Text
           style={{
             color: 'black',
@@ -428,13 +440,13 @@ const AddNewRoom = () => {
                   style={{
                     color: 'black',
                   }}>
-                  {item}
+                  {item.Name}
                 </Text>
               </Pressable>
             );
           })}
         </ScrollView>
-        {/*Decribe */}
+
         <View>
           <Text
             style={{
