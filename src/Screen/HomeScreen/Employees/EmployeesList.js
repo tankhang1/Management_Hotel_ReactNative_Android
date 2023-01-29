@@ -38,7 +38,7 @@ const EmployeesList = () => {
   let number = 0;
   useEffect(() => {
     setTotal(number);
-  });
+  }, [number]);
   const dataEmployee = useSelector(state => state.data_infor).data.employees;
 
   const renderItem = ({item, index}) => {

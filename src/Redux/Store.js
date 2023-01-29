@@ -10,6 +10,7 @@ import {dataReducer} from './slices/dataSlice';
 import {dataBills} from './slices/dataBills';
 import {dataRooms} from './slices/dataRoom';
 import {devToolsEnhancer} from 'redux-devtools-extension';
+import FacilitiesCheck from './FacilitiesCheck';
 const Store = configureStore({
   reducer: {
     booking: InforBooking,
@@ -22,6 +23,7 @@ const Store = configureStore({
     list_bill: dataBills,
     data_infor: dataReducer,
     list_room: dataRooms,
+    facility_check: FacilitiesCheck,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

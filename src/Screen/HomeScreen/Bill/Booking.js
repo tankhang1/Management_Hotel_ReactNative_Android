@@ -21,9 +21,38 @@ import {useState} from 'react';
 import {Checkbox} from 'react-native-paper';
 import moment from 'moment';
 import {setLike} from '../../../Redux/ListLikeRoom';
+import {useEffect} from 'react';
+import {collection, onSnapshot} from 'firebase/firestore';
+import {db} from '../../../Firebase/firebase';
+import {useCallback} from 'react';
+import {addCheck, deleteCheck} from '../../../Redux/FacilitiesCheck';
 const Booking = ({navigation}) => {
   const Rooms = useSelector(state => state.list_room).rooms;
   const [Data, setData] = useState(Rooms);
+
+  //Facilities
+  useEffect(() => {
+    async function getDb() {
+      onSnapshot(collection(db, 'KindRoom'), snapshot => {
+        let kinds = [];
+        snapshot.forEach(doc => {
+          kinds.push(doc.data().Name);
+        });
+        setKindRoom([...kinds]);
+      });
+
+      onSnapshot(collection(db, 'Facility'), snapshot => {
+        let facilities = [];
+        snapshot.forEach(doc => {
+          facilities.push(doc.data().Name);
+        });
+        setFacilities([...facilities]);
+      });
+    }
+    getDb();
+  }, []);
+  const [KindRoom, setKindRoom] = useState([]);
+  const [Facilities, setFacilities] = useState([]);
   //panresponder
   const pan = useRef(new Animated.ValueXY()).current;
 
@@ -157,22 +186,12 @@ const Booking = ({navigation}) => {
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const SortResult = [
-    'Single Room',
-    'Twin Room',
-    'Double Room',
-    'Deluxe',
-    'President',
-  ];
-
   //Range
 
   const [value, setValue] = useState(0);
   //Rating
   const Rating = [1, 2, 3, 4, 5];
 
-  //Facilities
-  const Facilities = ['Wifi', 'Swimming Pool', 'Parking', 'Restaurant'];
   let CheckFacilities = [];
 
   const [sortResult, setSortResult] = useState(null);
@@ -184,32 +203,60 @@ const Booking = ({navigation}) => {
     let tmp = [];
     if (sortResult !== null || starPerNight !== null || value !== 0) {
       Rooms.map(item => {
-        if (sortResult !== null) {
-          if (item.kind === SortResult[sortResult]) {
-            if (value > 0) {
-              if (item.money < value) {
-                if (starPerNight !== null) {
-                  if (item.rating > starPerNight) tmp.push(item);
-                } else tmp.push(item);
-              }
-            } else tmp.push(item);
-          }
-        } else {
-          if (value > 0) {
-            if (item.money < value) {
-              if (starPerNight !== null) {
-                if (item.rating > starPerNight) tmp.push(item);
-              } else tmp.push(item);
+        // if (sortResult !== null) {
+        //   if (item.kind === KindRoom[sortResult]) {
+        //     if (value > 0) {
+        //       if (item.money < value) {
+        //         if (starPerNight !== null) {
+        //           if (item.rating > starPerNight) tmp.push(item);
+        //         } else tmp.push(item);
+        //       }
+        //     } else tmp.push(item);
+        //   }
+        // } else {
+        //   if (value > 0) {
+        //     if (item.money < value) {
+        //       if (starPerNight !== null) {
+        //         if (item.rating > starPerNight) tmp.push(item);
+        //       } else tmp.push(item);
+        //     }
+        //   }
+        // }
+
+        if (
+          item.status === 1 &&
+          item.kind === KindRoom[sortResult] &&
+          item.money <= value &&
+          item.rating >= starPerNight
+        ) {
+          let c = 0;
+          for (let index = 0; index < checked.length; index++) {
+            const element = checked[index];
+            if (!item.facility.includes(e)) {
+              c = 1;
+              break;
             }
           }
+          if (c === 0) {
+            tmp.push(item);
+          }
         }
+        console.log(tmp);
       });
-
       setData([...tmp]);
     } else {
-      setData([...Rooms]);
+      let tmp = [];
+      Rooms.map((r, i) => {
+        if (item.status === 1) {
+          tmp.push(item);
+        }
+      });
+      setData([...tmp]);
     }
   };
+
+  const checked = useSelector(state => state.facility_check);
+
   return (
     <View
       style={{
@@ -217,317 +264,323 @@ const Booking = ({navigation}) => {
         backgroundColor: 'white',
         paddingHorizontal: 10,
       }}>
-      <Modal
-        visible={showFilter}
-        onRequestClose={() => setShowFilter(!showFilter)}
-        animationType="fade"
-        statusBarTranslucent
-        transparent>
-        <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(187,187,187,0.8)',
-          }}
-          onPress={() => setShowFilter(!showFilter)}
-        />
-        <View
-          style={{
-            width: '100%',
-            position: 'absolute',
-            bottom: 0,
-            paddingBottom: 30,
-            backgroundColor: 'white',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          }}>
-          <View
+      {Facilities.length > 0 ? (
+        <Modal
+          visible={showFilter}
+          onRequestClose={() => setShowFilter(!showFilter)}
+          animationType="fade"
+          statusBarTranslucent
+          transparent>
+          <Pressable
             style={{
-              alignSelf: 'center',
-              width: 80,
-              height: 5,
-              backgroundColor: 'black',
-              marginTop: 10,
-              borderRadius: 30,
+              flex: 1,
+              backgroundColor: 'rgba(187,187,187,0.8)',
             }}
+            onPress={() => setShowFilter(!showFilter)}
           />
-
-          {/*Sort Result */}
           <View
             style={{
-              paddingLeft: 15,
-              paddingTop: 20,
+              width: '100%',
+              position: 'absolute',
+              bottom: 0,
+              paddingBottom: 30,
+              backgroundColor: 'white',
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
             }}>
-            <Text
+            <View
               style={{
-                fontSize: 18,
-                color: 'black',
-                fontWeight: '600',
-              }}>
-              Sort Result
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{
-                marginVertical: 5,
-              }}>
-              {/*Highest Popularity */}
-              {SortResult.map((item, index) => {
-                return (
-                  <Pressable
-                    onPress={() => setSortResult(index)}
-                    key={index}
-                    style={{
-                      borderWidth: 2,
-                      paddingVertical: 10,
-                      paddingHorizontal: 20,
-                      borderColor: 'hsl(145,67%,47%)',
-                      borderRadius: 30,
-                      marginHorizontal: 10,
-                      backgroundColor:
-                        sortResult === index ? 'hsl(145,67%,47%)' : 'white',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color:
-                          sortResult === index ? 'white' : 'hsl(145,67%,47%)',
-                      }}>
-                      {item}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-          {/*Price Range Per Night */}
-          <View
-            style={{
-              paddingHorizontal: 15,
-              paddingTop: 20,
-            }}>
-            <Text
-              style={{
-                fontSize: 18,
-                color: 'black',
-                fontWeight: '600',
-                paddingBottom: 35,
-              }}>
-              Price Range Per Night
-            </Text>
-            <Slider
-              value={value}
-              onValueChange={setValue}
-              thumbStyle={{
-                height: 25,
-                width: 25,
+                alignSelf: 'center',
+                width: 80,
+                height: 5,
+                backgroundColor: 'black',
+                marginTop: 10,
                 borderRadius: 30,
-                backgroundColor: 'white',
-                elevation: 5,
-                borderWidth: 4,
-                borderColor: 'hsl(145,67%,40%)',
               }}
-              renderAboveThumbComponent={() => {
-                return (
-                  <View
-                    style={{
-                      width: 45,
-                      height: 30,
-                      borderRadius: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: 'hsl(145,67%,50%)',
-                    }}>
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontWeight: '600',
-                      }}>
-                      ${value}
-                    </Text>
-                  </View>
-                );
-              }}
-              trackStyle={{
-                height: 10,
-                borderRadius: 10,
-              }}
-              minimumTrackTintColor="hsl(145,67%,47%)"
-              maximumTrackTintColor="hsl(0,0%,80%)"
-              animateTransitions={true}
-              maximumValue={3000}
-              minimumValue={0}
-              step={1}
             />
-          </View>
-          {/*Star Rating */}
-          <View
-            style={{
-              paddingLeft: 15,
-              paddingTop: 20,
-            }}>
-            <Text
+
+            {/*Sort Result */}
+            <View
               style={{
-                fontSize: 18,
-                color: 'black',
-                fontWeight: '600',
-                paddingBottom: 10,
+                paddingLeft: 15,
+                paddingTop: 20,
               }}>
-              Star Rating
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {Rating.map((item, index) => {
-                return (
-                  <Pressable
-                    onPress={() => setStarPerNight(item)}
-                    key={index}
-                    style={{
-                      paddingVertical: 10,
-                      paddingHorizontal: 30,
-                      borderWidth: 2,
-                      borderColor: 'hsl(145,67%,47%)',
-                      borderRadius: 30,
-                      marginHorizontal: 10,
-                      backgroundColor:
-                        starPerNight === item ? 'hsl(145,67%,47%)' : 'white',
-                    }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'black',
+                  fontWeight: '600',
+                }}>
+                Sort Result
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{
+                  marginVertical: 5,
+                }}>
+                {/*Highest Popularity */}
+                {KindRoom.length > 0 &&
+                  KindRoom.map((item, index) => {
+                    return (
+                      <Pressable
+                        onPress={() => setSortResult(index)}
+                        key={index}
+                        style={{
+                          borderWidth: 2,
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          borderColor: 'hsl(145,67%,47%)',
+                          borderRadius: 30,
+                          marginHorizontal: 10,
+                          backgroundColor:
+                            sortResult === index ? 'hsl(145,67%,47%)' : 'white',
+                        }}>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color:
+                              sortResult === index
+                                ? 'white'
+                                : 'hsl(145,67%,47%)',
+                          }}>
+                          {item}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+              </ScrollView>
+            </View>
+            {/*Price Range Per Night */}
+            <View
+              style={{
+                paddingHorizontal: 15,
+                paddingTop: 20,
+              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'black',
+                  fontWeight: '600',
+                  paddingBottom: 35,
+                }}>
+                Price Range Per Night
+              </Text>
+              <Slider
+                value={value}
+                onValueChange={setValue}
+                thumbStyle={{
+                  height: 25,
+                  width: 25,
+                  borderRadius: 30,
+                  backgroundColor: 'white',
+                  elevation: 5,
+                  borderWidth: 4,
+                  borderColor: 'hsl(145,67%,40%)',
+                }}
+                renderAboveThumbComponent={() => {
+                  return (
                     <View
                       style={{
-                        flexDirection: 'row',
+                        width: 45,
+                        height: 30,
+                        borderRadius: 10,
+                        justifyContent: 'center',
                         alignItems: 'center',
+                        backgroundColor: 'hsl(145,67%,50%)',
                       }}>
-                      <AntDesign
-                        name="star"
-                        size={20}
-                        color={
-                          starPerNight === item ? 'white' : 'hsl(145,67%,47%)'
-                        }
-                      />
                       <Text
                         style={{
-                          fontSize: 20,
+                          color: 'white',
                           fontWeight: '600',
-                          paddingLeft: 10,
-                          color:
-                            starPerNight === item
-                              ? 'white'
-                              : 'hsl(145,67%,47%)',
                         }}>
-                        {item}
+                        ${value}
                       </Text>
                     </View>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-          {/*Facility */}
-          <View
-            style={{
-              paddingLeft: 15,
-              paddingTop: 20,
-            }}>
-            <Text
+                  );
+                }}
+                trackStyle={{
+                  height: 10,
+                  borderRadius: 10,
+                }}
+                minimumTrackTintColor="hsl(145,67%,47%)"
+                maximumTrackTintColor="hsl(0,0%,80%)"
+                animateTransitions={true}
+                maximumValue={3000}
+                minimumValue={0}
+                step={1}
+              />
+            </View>
+            {/*Star Rating */}
+            <View
               style={{
-                fontSize: 18,
-                color: 'black',
-                fontWeight: '600',
-                paddingBottom: 10,
+                paddingLeft: 15,
+                paddingTop: 20,
               }}>
-              Facilities
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {Facilities.map((item, index) => {
-                const [checked, setChecked] = useState(false);
-                if (checked === true) {
-                  CheckFacilities.push(item);
-                } else {
-                  if (CheckFacilities.indexOf(item) > -1)
-                    CheckFacilities.splice(CheckFacilities.indexOf(item), 1);
-                }
-                return (
-                  <Pressable
-                    key={index}
-                    onPress={() => setChecked(!checked)}
-                    style={{
-                      marginHorizontal: 8,
-                    }}>
-                    <View
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'black',
+                  fontWeight: '600',
+                  paddingBottom: 10,
+                }}>
+                Star Rating
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {Rating.map((item, index) => {
+                  return (
+                    <Pressable
+                      onPress={() => setStarPerNight(item)}
+                      key={index}
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
+                        paddingVertical: 10,
+                        paddingHorizontal: 30,
+                        borderWidth: 2,
+                        borderColor: 'hsl(145,67%,47%)',
+                        borderRadius: 30,
+                        marginHorizontal: 10,
+                        backgroundColor:
+                          starPerNight === item ? 'hsl(145,67%,47%)' : 'white',
                       }}>
-                      <Checkbox
-                        status={checked ? 'checked' : 'unchecked'}
-                        uncheckedColor={'black'}
-                        color="hsl(145,67%,47%)"
-                      />
-                      <Text
+                      <View
                         style={{
-                          color: 'black',
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }}>
-                        {item}
-                      </Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 20,
-            }}>
-            <Pressable
-              onPress={() => {
-                setSortResult(null), setStarPerNight(null), setValue(0);
-              }}
+                        <AntDesign
+                          name="star"
+                          size={20}
+                          color={
+                            starPerNight === item ? 'white' : 'hsl(145,67%,47%)'
+                          }
+                        />
+                        <Text
+                          style={{
+                            fontSize: 20,
+                            fontWeight: '600',
+                            paddingLeft: 10,
+                            color:
+                              starPerNight === item
+                                ? 'white'
+                                : 'hsl(145,67%,47%)',
+                          }}>
+                          {item}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+            {/*Facility */}
+            <View
               style={{
-                width: '40%',
-                height: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 10,
-                alignSelf: 'center',
-                marginTop: 20,
-                backgroundColor: 'hsl(145,67%,60%)',
+                paddingLeft: 15,
+                paddingTop: 20,
               }}>
               <Text
                 style={{
-                  color: 'white',
+                  fontSize: 18,
+                  color: 'black',
                   fontWeight: '600',
-                  fontSize: 20,
+                  paddingBottom: 10,
                 }}>
-                Reset
+                Facilities
               </Text>
-            </Pressable>
-            <Pressable
-              onPress={ApplyFilter}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {Facilities.map((item, index) => {
+                  return (
+                    <Pressable
+                      key={index}
+                      onPress={() => {
+                        if (checked.includes(item)) {
+                          dispatch(deleteCheck(item));
+                        } else {
+                          dispatch(addCheck(item));
+                        }
+                      }}
+                      style={{
+                        marginHorizontal: 8,
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Checkbox
+                          status={
+                            checked.includes(item) ? 'checked' : 'unchecked'
+                          }
+                          uncheckedColor={'black'}
+                          color="hsl(145,67%,47%)"
+                        />
+                        <Text
+                          style={{
+                            color: 'black',
+                          }}>
+                          {item}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+            <View
               style={{
-                width: '40%',
-                height: 50,
-                justifyContent: 'center',
+                flexDirection: 'row',
                 alignItems: 'center',
-                borderRadius: 10,
-                alignSelf: 'center',
-                marginTop: 20,
-                backgroundColor: 'hsl(145,67%,60%)',
+                justifyContent: 'space-between',
+                paddingHorizontal: 20,
               }}>
-              <Text
+              <Pressable
+                onPress={() => {
+                  setSortResult(null), setStarPerNight(null), setValue(0);
+                }}
                 style={{
-                  color: 'white',
-                  fontWeight: '600',
-                  fontSize: 20,
+                  width: '40%',
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  alignSelf: 'center',
+                  marginTop: 20,
+                  backgroundColor: 'hsl(145,67%,60%)',
                 }}>
-                Apply Filter
-              </Text>
-            </Pressable>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: 20,
+                  }}>
+                  Reset
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={ApplyFilter}
+                style={{
+                  width: '40%',
+                  height: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  alignSelf: 'center',
+                  marginTop: 20,
+                  backgroundColor: 'hsl(145,67%,60%)',
+                }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '600',
+                    fontSize: 20,
+                  }}>
+                  Apply Filter
+                </Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      ) : null}
       <View
         style={{
           paddingHorizontal: 20,
@@ -642,6 +695,7 @@ const Booking = ({navigation}) => {
           removeClippedSubviews={true}
           initialNumToRender={7}
           showsVerticalScrollIndicator={false}
+          extraData={Data}
         />
       </View>
       <Animated.View

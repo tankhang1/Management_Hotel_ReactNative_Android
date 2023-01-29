@@ -5,6 +5,7 @@ import {
   PanGestureHandler,
 } from 'react-native-gesture-handler';
 import Animated, {
+  interpolate,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -12,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Feather from 'react-native-vector-icons/Feather';
+import {useState} from 'react';
 const ItemComponent = ({
   item,
   onMinus,
@@ -23,6 +25,7 @@ const ItemComponent = ({
 }) => {
   const translationX = useSharedValue(0);
   const hide = useSharedValue(0);
+  const [onShowPress, setOnShowPress] = useState(false);
   const PanHandler = useAnimatedGestureHandler({
     onActive: (e, ctx) => {
       translationX.value = e.translationX;
@@ -30,10 +33,10 @@ const ItemComponent = ({
     onEnd: (e, ctx) => {
       if (e.translationX < 0) {
         translationX.value = withTiming(-100);
-        hide.value = 40;
+        hide.value = withTiming(1);
       } else {
         translationX.value = withTiming(0);
-        hide.value = 0;
+        hide.value = withTiming(0);
       }
     },
   });
@@ -44,7 +47,8 @@ const ItemComponent = ({
   });
   const hideAnimated = useAnimatedStyle(() => {
     return {
-      zIndex: hide.value,
+      opacity: hide.value,
+      transform: [{translateX: interpolate(hide.value, [0, 1], [50, 0])}],
     };
   });
   const TouchAnimated = Animated.createAnimatedComponent(TouchableOpacity);
@@ -84,7 +88,7 @@ const ItemComponent = ({
                 color: 'hsl(0,0%,60%)',
                 fontSize: 16,
               }}>
-              {item.key} x {item.quantity}
+              {item.key} x{item.quantity}
             </Text>
             <View
               style={{
@@ -124,10 +128,11 @@ const ItemComponent = ({
           </Animated.View>
         </PanGestureHandler>
       </GestureHandlerRootView>
+
       <TouchAnimated
         onPress={() => {
           translationX.value = withTiming(0);
-          hide.value = 20;
+          hide.value = withTiming(0);
           navigation.navigate('SearchRoom', {item});
         }}
         style={[
@@ -140,6 +145,7 @@ const ItemComponent = ({
             alignItems: 'center',
             backgroundColor: 'hsl(133,75%,57%)',
             borderRadius: 10,
+            zIndex: 999,
           },
           hideAnimated,
         ]}>

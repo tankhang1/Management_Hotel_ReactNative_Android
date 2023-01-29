@@ -159,7 +159,7 @@ const Login = ({navigation}) => {
           <TextInput
             value={password}
             onChangeText={setPassword}
-            placeholder="Enter your username"
+            placeholder="Enter your password"
             style={{
               width: '75%',
               color: 'black',

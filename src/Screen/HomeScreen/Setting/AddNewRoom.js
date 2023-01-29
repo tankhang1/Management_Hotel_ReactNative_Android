@@ -79,7 +79,6 @@ const AddNewRoom = () => {
     }
     getDb();
   }, []);
-  console.log(dataKind);
   //DataFacility
   const [open_facility, setOpen_facility] = useState(false);
   const [value_facility, setValue_facility] = useState('');
