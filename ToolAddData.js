@@ -339,12 +339,71 @@ const ToolAddData = () => {
       });
     });
   };
+
+  const [bills, setBills] = useState([]);
+
+  const collectBills = async () => {
+    console.log('OK');
+    const q = collection(db, 'Bill_List');
+    const snapShot = await getDocs(q);
+    let tmp = [];
+    snapShot.forEach(doc => {
+      tmp.push(doc.data());
+    });
+    setBills([...tmp]);
+  };
+
+  const [dailyURL, setDailyURL] = useState([]);
+  const collectDaily = async () => {
+    const q = collection(
+      db,
+      `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/785ecb5c-a086-4208-b93f-222d929cb84d/Revenue_Daily`,
+    );
+    const snapShot = await getDocs(q);
+    let tmp = [];
+    snapShot.forEach(doc => {
+      tmp.push(doc.id);
+    });
+    setDailyURL([...tmp]);
+  };
+  console.log(dailyURL);
   const datamonth = 30;
   const month = 12;
+
+  const updateDaily = async () => {
+    dailyURL.map(async id => {
+      let bill = [];
+      for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
+        bill.push(bills[Math.floor(Math.random() * bills.length - 1)].Bill_Id);
+      }
+
+      await updateDoc(
+        doc(
+          db,
+          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/785ecb5c-a086-4208-b93f-222d929cb84d/Revenue_Daily/${id}`,
+        ),
+        {
+          List_Bill: bill,
+        },
+      );
+    });
+  };
+
+  const [idRevenueMonth, setIdRevenueMonth] = useState([]);
+  const collectMonthly = async () => {
+    const q = collection(db, '/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly');
+    const snapShot = await getDocs(q);
+    let tmp = [];
+    snapShot.forEach(doc => {
+      tmp.push(doc.id);
+    });
+    setIdRevenueMonth([...tmp]);
+  };
+  console.log(idRevenueMonth);
   return (
     <View>
-      <TouchableOpacity onPress={collectDataRoom}>
-        <Text>collect Data Room</Text>
+      <TouchableOpacity onPress={collectMonthly}>
+        <Text>collect month</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => console.log(dataRoom)}>
         <Text>console log dataroom</Text>
@@ -352,17 +411,17 @@ const ToolAddData = () => {
       <TouchableOpacity onPress={upDateNo_Room}>
         <Text>update Room</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => {}}>
-        <Text>get</Text>
+      <TouchableOpacity onPress={collectBills}>
+        <Text>collect bill</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={Caluated}>
-        <Text>caculate</Text>
+      <TouchableOpacity onPress={() => console.log(bills)}>
+        <Text>console log bill</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={getMonth}>
-        <Text>get Month</Text>
+      <TouchableOpacity onPress={collectDaily}>
+        <Text>daily URL</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={UpdateYear}>
-        <Text>update year</Text>
+      <TouchableOpacity onPress={updateDaily}>
+        <Text>update daily</Text>
       </TouchableOpacity>
     </View>
   );
