@@ -340,20 +340,23 @@ const ChangeProfile = () => {
               }}>
               Employee code:
             </Text>
-            <TextInput
-              value={Employee_code}
-              onChangeText={setEmployee_code}
+            <View
               style={{
-                borderRadius: 100,
-                paddingHorizontal: 20,
-                fontWeight: '600',
                 backgroundColor: 'hsl(222,56%,96%)',
                 height: 55,
-                color: 'black',
-              }}
-              placeholder="Employee Code"
-              placeholderTextColor="hsl(0,0%,60%)"
-            />
+                paddingHorizontal: 20,
+                borderRadius: 100,
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  fontWeight: '600',
+
+                  color: 'black',
+                }}>
+                {Employee_code}
+              </Text>
+            </View>
           </View>
           <View
             style={{

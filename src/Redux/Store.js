@@ -29,6 +29,27 @@ const Store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false,
     }),
+  preloadedState: {
+    booking: null,
+    id: null,
+    bill: [],
+    listlikeroom: [],
+    collect_Id_Customer: '',
+    collect_Id_Employee: '',
+    english_level: [],
+    list_bill: [],
+    data_infor: {
+      data: {
+        employees: [],
+        customers: [],
+        currentEmployee: null,
+      },
+      isLoading: false,
+      error: null,
+    },
+    list_room: {},
+    facility_check: [],
+  },
   devTools: [devToolsEnhancer({realtime: true})],
 });
 export default Store;

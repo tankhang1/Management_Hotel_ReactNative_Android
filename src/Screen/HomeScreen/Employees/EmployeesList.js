@@ -18,14 +18,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ListComponent from './ListComponent';
 import {useSelector} from 'react-redux';
-import {
-  writeFile,
-  readFile,
-  DownloadDirectoryPath,
-  ExternalStorageDirectoryPath,
-} from 'react-native-fs';
+import {writeFile, DownloadDirectoryPath} from 'react-native-fs';
 import XLSX from 'xlsx';
-const EmployeesList = () => {
+const EmployeesList = ({navigation}) => {
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(false);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -126,7 +121,7 @@ const EmployeesList = () => {
           height: 10,
           borderRadius: 10,
           backgroundColor: 'black',
-          marginHorizontal: 5,
+          marginHorizontal: 2,
           marginTop: 20,
           opacity,
         }}></Animated.View>
@@ -369,35 +364,57 @@ const EmployeesList = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: 'hsl(0,0%,93%)',
+            //backgroundColor: 'hsl(0,0%,93%)',
             width: '95%',
             borderRadius: 10,
             paddingHorizontal: 10,
           }}>
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search Employees"
+          <Pressable
+            onPress={() => navigation.openDrawer()}
             style={{
-              width: '92%',
-              color: 'black',
-            }}
-            placeholderTextColor="hsl(0,0%,60%)"
-          />
-          <Pressable onPress={() => setSearch('')}>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 25,
-                height: 25,
-
-                backgroundColor: 'hsl(0,0%,80%)',
-                borderRadius: 30,
-              }}>
-              <Feather name="x" size={15} />
-            </View>
+              width: 35,
+              height: 35,
+              borderRadius: 100,
+              backgroundColor: 'hsl(0,0%,95%)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Entypo name="menu" size={20} color="black" />
           </Pressable>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: 'hsl(0,0%,93%)',
+              marginHorizontal: 10,
+              borderRadius: 100,
+              paddingLeft: 10,
+            }}>
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search Employees"
+              style={{
+                width: '85%',
+                color: 'black',
+              }}
+              placeholderTextColor="hsl(0,0%,60%)"
+            />
+            <Pressable onPress={() => setSearch('')}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 25,
+                  height: 25,
+
+                  backgroundColor: 'hsl(0,0%,80%)',
+                  borderRadius: 30,
+                }}>
+                <Feather name="x" size={15} />
+              </View>
+            </Pressable>
+          </View>
         </View>
         <Pressable onPress={() => setVisible(!visible)}>
           <Entypo name="dots-three-vertical" size={24} color={'black'} />
@@ -429,10 +446,10 @@ const EmployeesList = () => {
             [{nativeEvent: {contentOffset: {x: scrollX}}}],
             {useNativeDriver: false},
           )}
-          initialNumToRender={5}
           removeClippedSubviews={true}
           data={dataEmployee}
           renderItem={renderItem}
+          extraData={dataEmployee}
         />
       </View>
 
@@ -444,6 +461,7 @@ const EmployeesList = () => {
           data={[...new Array(total)]}
           renderItem={renderDot}
           horizontal
+          removeClippedSubviews={true}
         />
       </View>
     </View>

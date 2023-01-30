@@ -14,6 +14,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {addLike, deleteLike} from '../../../Redux/ListLikeRoom';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {setId} from '../../../Redux/ManageId';
 const Search = ({navigation, route}) => {
   const {width} = useWindowDimensions();
@@ -288,28 +289,49 @@ const Search = ({navigation, route}) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingHorizontal: 10,
-          width: width * 0.9,
-          borderWidth: 1,
-          borderColor: 'rgb(186,186,186)',
-          alignSelf: 'center',
+
+          marginHorizontal: 10,
+
           borderRadius: 10,
           marginVertical: 10,
         }}>
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search"
-          selectionColor={'black'}
-          multiline={false}
-          numberOfLines={1}
+        <Pressable
+          onPress={() => navigation.goBack()}
           style={{
-            fontSize: 16,
-            color: 'black',
-            width: '90%',
-          }}
-        />
-        <Ionicons name="ios-search-outline" size={24} color="black" />
+            width: 35,
+            height: 35,
+            borderRadius: 10,
+            backgroundColor: 'hsl(0,0%,80%)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 10,
+          }}>
+          <Entypo name="chevron-left" size={20} color="black" />
+        </Pressable>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderRadius: 100,
+            borderColor: 'hsl(0,0%,80%)',
+          }}>
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search"
+            selectionColor={'black'}
+            multiline={false}
+            numberOfLines={1}
+            style={{
+              fontSize: 16,
+              color: 'black',
+              width: '80%',
+              paddingHorizontal: 20,
+            }}
+          />
+          <Ionicons name="ios-search-outline" size={24} color="black" />
+        </View>
       </View>
       <View
         style={{

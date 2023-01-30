@@ -454,7 +454,7 @@ const AddNewRoom = () => {
               fontWeight: '600',
               marginBottom: 10,
             }}>
-            Decribe
+            Description
           </Text>
           <TextInput
             value={decribe}

@@ -11,6 +11,7 @@ import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, {SlideInLeft} from 'react-native-reanimated';
 import {DataTable, Provider as PaperProvider} from 'react-native-paper';
 import Feather from 'react-native-vector-icons/Feather';
@@ -21,7 +22,7 @@ import {
   ExternalStorageDirectoryPath,
 } from 'react-native-fs';
 import XLSX from 'xlsx';
-const CustomersList = () => {
+const CustomersList = ({navigation}) => {
   // const dataCustomer = ;
   const [visible, setVisible] = React.useState(false);
 
@@ -166,6 +167,7 @@ const CustomersList = () => {
         style={{
           backgroundColor: 'white',
           flex: 1,
+          paddingTop: 10,
         }}
         showsVerticalScrollIndicator={false}>
         {/*Modal */}
@@ -400,14 +402,22 @@ const CustomersList = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginLeft: 10,
+            justifyContent: 'space-between',
+            paddingHorizontal: 10,
           }}>
           <Pressable
-            onPress={() => {
-              setVisible(!visible);
+            onPress={() => navigation.openDrawer()}
+            style={{
+              width: 35,
+              height: 35,
+              borderRadius: 100,
+              backgroundColor: 'hsl(0,0%,95%)',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
-            <Ionicons name="list-outline" size={30} color={'black'} />
+            <Entypo name="menu" size={20} color="black" />
           </Pressable>
+
           <Text
             style={{
               fontSize: 24,
@@ -416,6 +426,17 @@ const CustomersList = () => {
             }}>
             List Customer
           </Text>
+
+          <Pressable
+            onPress={() => {
+              setVisible(!visible);
+            }}>
+            <MaterialCommunityIcons
+              name="filter-variant"
+              size={30}
+              color={'black'}
+            />
+          </Pressable>
         </View>
 
         {/*Table*/}
@@ -512,7 +533,7 @@ const CustomersList = () => {
                     numberOfItemsPerPageList={numberOfItemsPerPageList}
                     numberOfItemsPerPage={numberOfItemsPerPage}
                     onItemsPerPageChange={onItemsPerPageChange}
-                    selectPageDropdownLabel={'Rows per page'}
+                    selectPageDropdownLabel={() => <Text>Rows per page</Text>}
                   />
                 </ScrollView>
               </View>

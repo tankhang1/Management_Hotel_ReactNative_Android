@@ -13,9 +13,12 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {getAuth, signOut} from 'firebase/auth';
 import {useSelector} from 'react-redux';
 import {CommonActions, NavigationAction} from '@react-navigation/native';
+import {useState} from 'react';
 const CustomizeDrawer = ({props, navigation}) => {
   const currentEmployee = useSelector(state => state.data_infor).data
     .currentEmployee;
+
+  const [currentState, setCurrentState] = useState('DashBoard');
   return (
     <View
       style={{
@@ -26,8 +29,12 @@ const CustomizeDrawer = ({props, navigation}) => {
           <Pressable
             style={{
               width: '100%',
+              backgroundColor:
+                currentState === 'Setting' ? 'hsl(198,86%,90%)' : 'white',
             }}
-            onPress={() => navigation.navigate('Setting')}>
+            onPress={() => {
+              navigation.navigate('Setting'), setCurrentState('Setting');
+            }}>
             <View
               style={{
                 width: '90%',
@@ -77,6 +84,7 @@ const CustomizeDrawer = ({props, navigation}) => {
           <TouchableHighlight
             onPress={() => {
               navigation.navigate('Home');
+              setCurrentState('DashBoard');
             }}
             underlayColor={'hsl(241,65%,90%)'}
             style={{
@@ -85,6 +93,8 @@ const CustomizeDrawer = ({props, navigation}) => {
               justifyContent: 'center',
               alignItems: 'center',
               marginTop: 10,
+              backgroundColor:
+                currentState === 'DashBoard' ? 'hsl(198,86%,90%)' : 'white',
             }}>
             <View
               style={{
@@ -119,7 +129,10 @@ const CustomizeDrawer = ({props, navigation}) => {
           {/* Customers */}
           {currentEmployee.Level === 0 ? (
             <TouchableHighlight
-              onPress={() => navigation.navigate('Customer')}
+              onPress={() => {
+                navigation.navigate('Customer');
+                setCurrentState('Customers');
+              }}
               underlayColor={'hsl(241,65%,90%)'}
               style={{
                 width: '120%',
@@ -127,6 +140,8 @@ const CustomizeDrawer = ({props, navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: 10,
+                backgroundColor:
+                  currentState === 'Customers' ? 'hsl(198,86%,90%)' : 'white',
               }}>
               <View
                 style={{
@@ -165,6 +180,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               <TouchableHighlight
                 onPress={() => {
                   navigation.navigate('Employee');
+                  setCurrentState('Employees');
                 }}
                 underlayColor={'hsl(241,65%,90%)'}
                 style={{
@@ -173,6 +189,8 @@ const CustomizeDrawer = ({props, navigation}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginTop: 10,
+                  backgroundColor:
+                    currentState === 'Employees' ? 'hsl(198,86%,90%)' : 'white',
                 }}>
                 <View
                   style={{
@@ -207,6 +225,7 @@ const CustomizeDrawer = ({props, navigation}) => {
               <TouchableHighlight
                 onPress={() => {
                   navigation.navigate('Report');
+                  setCurrentState('Report');
                 }}
                 underlayColor={'hsl(241,65%,90%)'}
                 style={{
@@ -215,6 +234,8 @@ const CustomizeDrawer = ({props, navigation}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginTop: 10,
+                  backgroundColor:
+                    currentState === 'Report' ? 'hsl(198,86%,90%)' : 'white',
                 }}>
                 <View
                   style={{
@@ -252,6 +273,7 @@ const CustomizeDrawer = ({props, navigation}) => {
           <TouchableHighlight
             onPress={() => {
               navigation.navigate('BillNavigation');
+              setCurrentState('Room');
             }}
             underlayColor={'hsl(241,65%,90%)'}
             style={{
@@ -260,6 +282,8 @@ const CustomizeDrawer = ({props, navigation}) => {
               justifyContent: 'center',
               alignItems: 'center',
               marginTop: 10,
+              backgroundColor:
+                currentState === 'Room' ? 'hsl(198,86%,90%)' : 'white',
             }}>
             <View
               style={{
@@ -341,7 +365,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                   paddingHorizontal: 10,
                   color: 'red',
                 }}>
-                Exit
+                Logout
               </Text>
             </View>
           </TouchableHighlight>

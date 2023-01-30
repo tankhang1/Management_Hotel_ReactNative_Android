@@ -77,19 +77,28 @@ const Setting = ({navigation}) => {
   });
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
   const OnTouchNavigation = index => {
-    if (index === 0) {
-      setIsBool(false);
-    } else if (index === 1) {
-      setIsBool(true);
-    } else {
-      const auth = getAuth();
-      signOut(auth)
-        .then(() => {
-          navigation.navigate('AuthScreen');
-        })
-        .catch(error => {
-          Alert.alert(error);
-        });
+    switch (index) {
+      case 0:
+        setIsBool(false);
+        break;
+      case 1:
+        setIsBool(true);
+        break;
+      case 2:
+        navigation.openDrawer();
+        break;
+      case 3:
+        const auth = getAuth();
+        signOut(auth)
+          .then(() => {
+            navigation.navigate('AuthScreen');
+          })
+          .catch(error => {
+            Alert.alert(error);
+          });
+        break;
+      default:
+        break;
     }
   };
   return (

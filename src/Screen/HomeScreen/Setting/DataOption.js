@@ -1,5 +1,6 @@
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
 const DataOption = [
   {
     title: 'Change Profile',
@@ -15,10 +16,17 @@ const DataOption = [
     transY: 2,
   },
   {
+    title: 'Menu',
+    Icon_type: Entypo,
+    icon_name: 'menu',
+    transY: 3,
+  },
+
+  {
     title: 'Exit',
     Icon_type: MaterialIcons,
     icon_name: 'exit-to-app',
-    transY: 3,
+    transY: 4,
   },
 ];
 export default DataOption;
