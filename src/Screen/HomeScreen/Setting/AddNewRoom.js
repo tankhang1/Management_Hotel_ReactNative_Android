@@ -165,6 +165,7 @@ const AddNewRoom = () => {
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [openModalAddKindRoom, setOpenModalAddKindRoom] = useState(false);
   const [kindModal, setKindModal] = useState(0);
+  console.log(dataChip);
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
@@ -439,7 +440,7 @@ const AddNewRoom = () => {
                   style={{
                     color: 'black',
                   }}>
-                  {item.Name}
+                  {item}
                 </Text>
               </Pressable>
             );

@@ -18,14 +18,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  setDoc,
-  doc,
-  collection,
-  updateDoc,
-  Timestamp,
-  addDoc,
-} from 'firebase/firestore';
+import {setDoc, doc, collection} from 'firebase/firestore';
 import {db, storage} from '../../../Firebase/firebase';
 import DropDownSkill from './DropDownSkill';
 import {addEmployee} from '../../../Redux/slices/dataSlice';
@@ -190,6 +183,21 @@ const AddEmployee = () => {
     setSalary('');
     dispatch(resetSkill());
   };
+
+  const Position = [
+    'General Manager',
+    'Deputy General Manager',
+    'Rooms Division Manager',
+    'Front Office Manager',
+    'Chief Accountant',
+    'Receptionist',
+    'Reservation Agent',
+    'Cashier',
+    'Concierge',
+    'Bell man',
+    'Door man',
+    'Housekeeper',
+  ];
   const [visible, setVisible] = useState(false);
   return (
     <ScrollView
@@ -686,7 +694,7 @@ const AddEmployee = () => {
               }}>
               Position:
             </Text>
-            <TextInput
+            {/* <TextInput
               value={position}
               onChangeText={setPosition}
               style={{
@@ -699,7 +707,33 @@ const AddEmployee = () => {
               }}
               placeholder="Position"
               placeholderTextColor="hsl(0,0%,60%)"
-            />
+            /> */}
+            <View
+              style={{
+                borderRadius: 10,
+                fontWeight: '600',
+                backgroundColor: 'hsl(222,56%,96%)',
+                height: 55,
+                color: 'black',
+                paddingHorizontal: 10,
+              }}>
+              <Picker
+                selectedValue={position}
+                onValueChange={(itemValue, itemIndex) => setPosition(itemValue)}
+                mode="dropdown">
+                {Position.map((item, index) => (
+                  <Picker.Item
+                    label={item}
+                    value={item}
+                    style={{
+                      color: 'black',
+                      backgroundColor: 'hsl(222,56%,96%)',
+                      borderRadius: 10,
+                    }}
+                  />
+                ))}
+              </Picker>
+            </View>
           </View>
           {/*Salary */}
           <View
@@ -761,7 +795,7 @@ const AddEmployee = () => {
                 marginBottom: 5,
                 color: 'black',
               }}>
-              Level of account:
+              level of account:
             </Text>
             <View
               style={{

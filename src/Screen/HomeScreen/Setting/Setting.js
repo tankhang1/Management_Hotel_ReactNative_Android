@@ -1,9 +1,16 @@
-import {View, Animated, TouchableOpacity, Easing, Alert} from 'react-native';
+import {
+  View,
+  Animated,
+  TouchableOpacity,
+  Easing,
+  Alert,
+  ToastAndroid,
+} from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 import AddNewRoom from './AddNewRoom';
 import ChangeProfile from './ChangeProfile';
-import {getAuth, signOut} from 'firebase/auth';
+import {getAuth, sendPasswordResetEmail, signOut} from 'firebase/auth';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import DataOption from './DataOption';
@@ -77,6 +84,8 @@ const Setting = ({navigation}) => {
   });
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
   const OnTouchNavigation = index => {
+    const auth = getAuth();
+    console.log(auth.currentUser);
     switch (index) {
       case 0:
         setIsBool(false);
@@ -87,8 +96,24 @@ const Setting = ({navigation}) => {
       case 2:
         navigation.openDrawer();
         break;
+
       case 3:
-        const auth = getAuth();
+        sendPasswordResetEmail(auth, auth.currentUser.email)
+          .then(() => {
+            // Password reset email sent!
+            // ..
+            ToastAndroid.show(
+              'Password have been changed successfull',
+              ToastAndroid.LONG,
+            );
+          })
+          .catch(error => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // ..
+          });
+        break;
+      case 4:
         signOut(auth)
           .then(() => {
             navigation.navigate('AuthScreen');

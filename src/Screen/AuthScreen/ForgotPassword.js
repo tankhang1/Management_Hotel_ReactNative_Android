@@ -99,7 +99,7 @@ const ForgotPassword = ({navigation}) => {
             style={{
               alignSelf: 'center',
             }}>
-            I have a account?{' '}
+            I have an account.{' '}
             <Text
               style={{
                 color: 'blue',

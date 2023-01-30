@@ -28,14 +28,14 @@ const EmployeesList = ({navigation}) => {
   const [searchPosition, setSearchPosition] = useState(false);
   const [searchId, setSearchId] = useState(false);
   let animatedScroll = Animated.divide(scrollX, 300);
-  const [total, setTotal] = useState(0);
+
+  const dataEmployee = useSelector(state => state.data_infor).data.employees;
+  const [total, setTotal] = useState(dataEmployee.length);
 
   let number = 0;
   useEffect(() => {
     setTotal(number);
   }, [number]);
-  const dataEmployee = useSelector(state => state.data_infor).data.employees;
-
   const renderItem = ({item, index}) => {
     const animatedRotate = new Animated.Value(0);
     let back = false;

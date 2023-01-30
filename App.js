@@ -3,9 +3,6 @@ import React from 'react';
 import AllScreenNavigation from './src/AllScreenNavigation/Navigation';
 import {Provider} from 'react-redux';
 import Store from './src/Redux/Store';
-import Search from './src/Screen/HomeScreen/Bill/Search';
-import ToolAddData from './ToolAddData';
-import AlertWarning from './src/Screen/Component/AlertWarning';
 
 const App = () => {
   return (

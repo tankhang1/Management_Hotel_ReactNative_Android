@@ -1,6 +1,7 @@
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const DataOption = [
   {
     title: 'Change Profile',
@@ -21,7 +22,12 @@ const DataOption = [
     icon_name: 'menu',
     transY: 3,
   },
-
+  {
+    title: 'Reset password',
+    Icon_type: MaterialCommunityIcons,
+    icon_name: 'lock-reset',
+    transY: 3,
+  },
   {
     title: 'Exit',
     Icon_type: MaterialIcons,

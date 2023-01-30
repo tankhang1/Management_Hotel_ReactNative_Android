@@ -8,6 +8,7 @@ import {
   Pressable,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import React, {cloneElement, useEffect, useRef, useState} from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -25,6 +26,7 @@ import {
 import {query, collection, orderBy, limit, getDocs} from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import moment from 'moment';
+import {DataTable} from 'react-native-paper';
 const Report = ({navigation}) => {
   LogBox.ignoreLogs([
     'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
@@ -34,6 +36,7 @@ const Report = ({navigation}) => {
     async function GetDB() {
       setMapIncome([]);
       setMapOutcome([]);
+      setBillId([]);
       let income = 0;
       let outcome = 0;
       if (kindFilter === 0) {
@@ -49,18 +52,21 @@ const Report = ({navigation}) => {
         );
         let monthIncome = [];
         let monthOutcome = [];
-
+        let bills = [];
         getDbDate.forEach(monthItem => {
           let dataIncome = {
             x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
             y: monthItem.data().Money,
           };
-
+          bills.push({
+            id: monthItem.data().List_Bill,
+            date: moment(monthItem.data().Date.toDate()).format('DD/MM/YYYY'),
+          });
           income += monthItem.data().Money;
           monthIncome.push(dataIncome);
         });
         setMapIncome([...monthIncome]);
-
+        setBillId([...bills]);
         setSumIncome(income);
         setSumOutcome(outcome);
       }
@@ -129,6 +135,7 @@ const Report = ({navigation}) => {
     setKindFilter(index);
     setMapIncome([]);
     setMapOutcome([]);
+    setBillId([]);
     let income = 0;
     let outcome = 0;
     if (index === 0) {
@@ -144,18 +151,21 @@ const Report = ({navigation}) => {
       );
       let monthIncome = [];
       let monthOutcome = [];
-
+      let bills = [];
       getDbDate.forEach(monthItem => {
         let dataIncome = {
           x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
           y: monthItem.data().Money,
         };
-
+        bills.push({
+          id: monthItem.data().List_Bill,
+          date: moment(monthItem.data().Date.toDate()).format('DD/MM/YYYY'),
+        });
         income += monthItem.data().Money;
         monthIncome.push(dataIncome);
       });
       setMapIncome([...monthIncome]);
-
+      setBillId([...bills]);
       setSumIncome(income);
       setSumOutcome(outcome);
     }
@@ -223,6 +233,7 @@ const Report = ({navigation}) => {
   const [sumOutcome, setSumOutcome] = useState(0);
   const [mapIncome, setMapIncome] = useState([]);
   const [mapOutcome, setMapOutcome] = useState([]);
+  const [billId, setBillId] = useState([]);
 
   const [multiTouchFilter, setMultiTouchFilter] = useState([
     'Week',
@@ -267,6 +278,9 @@ const Report = ({navigation}) => {
       ? (avg / money.length).toFixed(2) * 100
       : -(Math.abs(avg) / money.length).toFixed(2) * 100;
   };
+
+  console.log(billId);
+
   return (
     <ScrollView
       style={{
@@ -553,7 +567,7 @@ const Report = ({navigation}) => {
         </View>
       </View>
       {/*Review */}
-      <View
+      {/* <View
         style={{
           backgroundColor: 'white',
           marginVertical: 10,
@@ -613,7 +627,58 @@ const Report = ({navigation}) => {
             color={Avg(mapOutcome) > 0 ? 'green' : 'red'}
           />
         </Text>
-      </View>
+      </View> */}
+      {kindFilter === 0 && (
+        <DataTable
+          style={{
+            backgroundColor: 'white',
+            marginVertical: 10,
+            borderRadius: 10,
+          }}>
+          <DataTable.Header>
+            <DataTable.Title style={{flex: 2}}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                }}>
+                Bill ID
+              </Text>
+            </DataTable.Title>
+            <DataTable.Title style={{flex: 1}}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 18,
+                }}>
+                Date
+              </Text>
+            </DataTable.Title>
+          </DataTable.Header>
+          <ScrollView>
+            {billId.map((b, i) =>
+              b.id.map((id, index) => (
+                <TouchableOpacity key={index}>
+                  <DataTable.Row>
+                    <DataTable.Cell
+                      style={{
+                        flex: 2,
+                      }}>
+                      {id}
+                    </DataTable.Cell>
+                    <DataTable.Cell
+                      style={{
+                        flex: 1,
+                      }}>
+                      {b.date}
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                </TouchableOpacity>
+              )),
+            )}
+          </ScrollView>
+        </DataTable>
+      )}
     </ScrollView>
   );
 };

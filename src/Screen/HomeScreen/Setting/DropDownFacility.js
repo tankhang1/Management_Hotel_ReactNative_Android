@@ -78,10 +78,10 @@ const DropDownFacility = ({
               return (
                 <Pressable
                   onPress={() => {
-                    setValue(item),
+                    setValue(item.Name),
                       setOpen(!open),
-                      chip.indexOf(item) === -1
-                        ? setChip([...chip, item])
+                      chip.indexOf(item.Name) === -1
+                        ? setChip([...chip, item.Name])
                         : null;
                   }}
                   key={index}

@@ -122,7 +122,7 @@ const CustomizeDrawer = ({props, navigation}) => {
                   paddingHorizontal: 10,
                   color: 'black',
                 }}>
-                DashBoard
+                Dashboard
               </Text>
             </View>
           </TouchableHighlight>

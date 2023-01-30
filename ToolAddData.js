@@ -357,7 +357,7 @@ const ToolAddData = () => {
   const collectDaily = async () => {
     const q = collection(
       db,
-      `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/785ecb5c-a086-4208-b93f-222d929cb84d/Revenue_Daily`,
+      `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/f9b4d7f6-6580-48ef-829e-b187674fdd20/Revenue_Daily`,
     );
     const snapShot = await getDocs(q);
     let tmp = [];
@@ -380,7 +380,7 @@ const ToolAddData = () => {
       await updateDoc(
         doc(
           db,
-          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/785ecb5c-a086-4208-b93f-222d929cb84d/Revenue_Daily/${id}`,
+          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/f9b4d7f6-6580-48ef-829e-b187674fdd20/Revenue_Daily/${id}`,
         ),
         {
           List_Bill: bill,

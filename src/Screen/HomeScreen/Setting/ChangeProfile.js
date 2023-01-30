@@ -18,6 +18,8 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useSelector} from 'react-redux';
+import {Picker} from '@react-native-picker/picker';
+
 import {
   collection,
   query,
@@ -473,7 +475,7 @@ const ChangeProfile = () => {
               }}>
               Gender:
             </Text>
-            <TextInput
+            {/* <TextInput
               value={gender}
               onChangeText={setGender}
               style={{
@@ -486,7 +488,35 @@ const ChangeProfile = () => {
               }}
               placeholder="Gender"
               placeholderTextColor="hsl(0,0%,60%)"
-            />
+            /> */}
+            <View
+              style={{
+                backgroundColor: 'hsl(222,56%,96%)',
+                borderRadius: 20,
+                paddingHorizontal: 10,
+              }}>
+              <Picker
+                selectedValue={gender}
+                onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+                mode="dropdown">
+                <Picker.Item
+                  label="Female"
+                  value="Female"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(222,56%,96%)',
+                  }}
+                />
+                <Picker.Item
+                  label="Male"
+                  value="Male"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(222,56%,96%)',
+                  }}
+                />
+              </Picker>
+            </View>
           </View>
           <View
             style={{
