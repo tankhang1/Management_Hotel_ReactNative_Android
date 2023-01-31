@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TextInput,
-  Animated,
   Easing,
   Pressable,
   ScrollView,
@@ -12,10 +11,12 @@ import {
   FlatList,
   PermissionsAndroid,
   ToastAndroid,
+  Animated,
 } from 'react-native';
 import React, {useState, useRef, useEffect} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ListComponent from './ListComponent';
 import {useSelector} from 'react-redux';
 import {writeFile, DownloadDirectoryPath} from 'react-native-fs';
@@ -23,19 +24,41 @@ import XLSX from 'xlsx';
 const EmployeesList = ({navigation}) => {
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(false);
+  const {width: SCREEN_WIDTH} = Dimensions.get('screen');
+
   const scrollX = useRef(new Animated.Value(0)).current;
+  const positionIndex = Animated.divide(scrollX, SCREEN_WIDTH);
   const [searchName, setSearchName] = useState(true);
   const [searchPosition, setSearchPosition] = useState(false);
   const [searchId, setSearchId] = useState(false);
-  let animatedScroll = Animated.divide(scrollX, 300);
-
   const dataEmployee = useSelector(state => state.data_infor).data.employees;
-  const [total, setTotal] = useState(dataEmployee.length);
 
+  const [total, setTotal] = useState(dataEmployee.length);
   let number = 0;
+  const [dataSearch, setDataSearch] = useState(dataEmployee);
   useEffect(() => {
-    setTotal(number);
-  }, [number]);
+    function searchDB() {
+      let tmp = [];
+      dataEmployee.map((item, index) => {
+        if (
+          (item.Employee_Name.toLowerCase().indexOf(search.toLowerCase()) >
+            -1 &&
+            searchName === true) ||
+          (item.Position.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
+            searchPosition === true) ||
+          (item.Employee_Id.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
+            searchId === true)
+        ) {
+          tmp.push(item);
+        }
+      });
+
+      setDataSearch([...tmp]);
+    }
+    searchDB();
+  }, [search]);
+  console.log(dataSearch);
+
   const renderItem = ({item, index}) => {
     const animatedRotate = new Animated.Value(0);
     let back = false;
@@ -56,59 +79,60 @@ const EmployeesList = ({navigation}) => {
         useNativeDriver: true,
       }).start();
     };
-    let scaleX = animatedScroll.interpolate({
-      inputRange: [index - 1, index, index + 1],
-      outputRange: [0.8, 1, 0.8],
-      extrapolate: 'clamp',
-    });
-    if (
-      (item.Employee_Name.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-        searchName === true) ||
-      (item.Position.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-        searchPosition === true) ||
-      (item.Employee_Id.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-        searchId === true)
-    ) {
-      number++;
-      return (
-        <Animated.View
-          style={{
-            transform: [{scale: scaleX}],
-            paddingLeft: index === 0 ? 10 : 0,
-          }}
-          key={index}>
-          <Pressable onPress={handlingFlashlist}>
-            <Animated.View
-              style={{
-                backfaceVisibility: 'hidden',
-                transform: [{rotateY: rotateFont}],
-              }}>
-              <ListComponent title="font" item={item} />
-            </Animated.View>
-          </Pressable>
 
-          {/*back */}
-          <Pressable
-            onPress={handlingFlashlist}
+    // if (
+    //   (item.Employee_Name.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
+    //     searchName === true) ||
+    //   (item.Position.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
+    //     searchPosition === true) ||
+    //   (item.Employee_Id.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
+    //     searchId === true)
+    // ) {
+    //   number++;
+    return (
+      <Animated.View
+        style={{
+          width: SCREEN_WIDTH,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        key={index}>
+        <Pressable
+          onPress={handlingFlashlist}
+          style={{
+            position: 'absolute',
+            top: 0,
+          }}>
+          <Animated.View
             style={{
-              position: 'absolute',
-              top: 0,
+              backfaceVisibility: 'hidden',
+              transform: [{rotateY: rotateFont}],
             }}>
-            <Animated.View
-              style={{
-                backfaceVisibility: 'hidden',
-                transform: [{rotateY: rotateBack}],
-              }}>
-              <ListComponent title="back" item={item} />
-            </Animated.View>
-          </Pressable>
-        </Animated.View>
-      );
-    }
+            <ListComponent title="font" item={item} />
+          </Animated.View>
+        </Pressable>
+
+        {/*back */}
+        <Pressable
+          onPress={handlingFlashlist}
+          style={{
+            position: 'absolute',
+            top: 0,
+          }}>
+          <Animated.View
+            style={{
+              backfaceVisibility: 'hidden',
+              transform: [{rotateY: rotateBack}],
+            }}>
+            <ListComponent title="back" item={item} />
+          </Animated.View>
+        </Pressable>
+      </Animated.View>
+    );
   };
 
   const renderDot = ({item, index}) => {
-    let opacity = animatedScroll.interpolate({
+    let opacity = positionIndex.interpolate({
       inputRange: [index - 1, index, index + 1],
       outputRange: [0.2, 1, 0.2],
       extrapolate: 'clamp',
@@ -429,27 +453,50 @@ const EmployeesList = ({navigation}) => {
           paddingTop: 10,
           color: 'hsl(0,0%,60%)',
         }}>
-        Total {total} employees
+        Total {dataSearch.length} employees
       </Text>
 
       {/*Carousel Employees*/}
       <View
         style={{
-          height: 430,
+          height: 460,
         }}>
         <FlatList
           horizontal
-          snapToAlignment={'center'}
           showsHorizontalScrollIndicator={false}
-          snapToInterval={305}
+          //snapToInterval={WIDTH_EMPLOYEE}
           onScroll={Animated.event(
             [{nativeEvent: {contentOffset: {x: scrollX}}}],
             {useNativeDriver: false},
           )}
+          ListEmptyComponent={() => (
+            <View
+              style={{
+                width: SCREEN_WIDTH,
+                backgroundColor: 'white',
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
+              <MaterialCommunityIcons
+                name="database-off-outline"
+                size={50}
+                color="hsl(0,0%,73%)"
+              />
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: 'hsl(0,0%,73%)',
+                }}>
+                Don't have information
+              </Text>
+            </View>
+          )}
           removeClippedSubviews={true}
-          data={dataEmployee}
+          data={dataSearch}
           renderItem={renderItem}
-          extraData={dataEmployee}
+          extraData={total}
+          pagingEnabled={true}
         />
       </View>
 
@@ -458,7 +505,7 @@ const EmployeesList = ({navigation}) => {
           alignSelf: 'center',
         }}>
         <FlatList
-          data={[...new Array(total)]}
+          data={[...new Array(dataSearch.length)]}
           renderItem={renderDot}
           horizontal
           removeClippedSubviews={true}

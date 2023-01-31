@@ -37,7 +37,7 @@ const SearchCustomer = ({navigation}) => {
         <TextInput
           value={search}
           onChangeText={setSearch}
-          placeholder="Search"
+          placeholder="Search customer (name or phone)"
           style={{
             width: '90%',
             color: 'black',
@@ -49,7 +49,9 @@ const SearchCustomer = ({navigation}) => {
       <ScrollView>
         {DataCustomer.map((item, index) => {
           if (
-            item.Customer_Name.toLowerCase().indexOf(search.toLowerCase()) > -1
+            item.Customer_Name.toLowerCase().indexOf(search.toLowerCase()) >
+              -1 ||
+            item.Phone.toLowerCase().indexOf(search.toLowerCase()) > -1
           )
             return (
               <Pressable

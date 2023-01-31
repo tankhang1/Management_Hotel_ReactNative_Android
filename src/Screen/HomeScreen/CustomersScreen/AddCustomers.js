@@ -22,6 +22,8 @@ import {db} from '../../../Firebase/firebase';
 import {useDispatch, useSelector} from 'react-redux';
 import {addCustomer} from '../../../Redux/slices/dataSlice';
 import AlertWarning from '../../Component/AlertWarning';
+import {Picker} from '@react-native-picker/picker';
+
 const AddCustomers = () => {
   const Data = [
     {
@@ -44,16 +46,10 @@ const AddCustomers = () => {
     },
     {
       id: 4,
-      title: 'Birth',
+      title: 'Birthday',
       value: date_of_birth,
       setValue: setDate_of_birth,
       icon: 1,
-    },
-    {
-      id: 5,
-      title: 'Gender',
-      value: gender,
-      setValue: setGender,
     },
   ];
 
@@ -264,23 +260,10 @@ const AddCustomers = () => {
                       }}
                       placeholderTextColor="hsl(0,0%,60%)"
                     />
-                  ) : item.title === 'Birth' ? (
+                  ) : item.title === 'Birthday' ? (
                     <TextInput
                       value={date_of_birth}
                       onChangeText={setDate_of_birth}
-                      placeholder={item.title}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                      style={{
-                        width: '90%',
-                        color: 'black',
-                      }}
-                      placeholderTextColor="hsl(0,0%,60%)"
-                    />
-                  ) : item.title == 'Gender' ? (
-                    <TextInput
-                      value={gender}
-                      onChangeText={setGender}
                       placeholder={item.title}
                       onFocus={onFocus}
                       onBlur={onBlur}
@@ -305,6 +288,58 @@ const AddCustomers = () => {
               </View>
             );
           })}
+          <View
+            style={{
+              marginBottom: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text
+              style={{
+                fontSize: 16,
+
+                marginBottom: 5,
+                color: 'black',
+              }}>
+              Gender:
+            </Text>
+            <View
+              style={{
+                borderRadius: 10,
+                fontWeight: '600',
+                backgroundColor: 'hsl(0,0%,95%)',
+                color: 'black',
+                paddingHorizontal: 10,
+                width: '48%',
+                marginRight: 10,
+                borderWidth: 1,
+              }}>
+              <Picker
+                selectedValue={gender}
+                onValueChange={(itemValue, itemIndex) => setGender(itemValue)}
+                mode="dropdown">
+                <Picker.Item
+                  label="Female"
+                  value="Female"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(0,0%,95%)',
+                    fontSize: 16,
+                  }}
+                />
+                <Picker.Item
+                  label="Male"
+                  value="Male"
+                  style={{
+                    color: 'black',
+                    backgroundColor: 'hsl(0,0%,95%)',
+                    borderRadius: 10,
+                  }}
+                />
+              </Picker>
+            </View>
+          </View>
         </View>
         <TouchableOpacity
           onPress={AddNewCustomer}

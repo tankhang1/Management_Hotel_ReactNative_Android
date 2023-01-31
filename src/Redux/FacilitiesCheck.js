@@ -11,8 +11,11 @@ const FacilitiesCheck = createSlice({
       state = state.filter(value => value !== action.payload);
       return state;
     },
+    resetCheck: (state, action) => {
+      return [];
+    },
   },
 });
 
-export const {addCheck, deleteCheck} = FacilitiesCheck.actions;
+export const {addCheck, deleteCheck, resetCheck} = FacilitiesCheck.actions;
 export default FacilitiesCheck.reducer;

@@ -325,7 +325,7 @@ const ListComponent = props => {
                 color: 'white',
                 fontWeight: '600',
               }}>
-              View History
+              View Profile
             </Text>
           </Pressable>
         </View>

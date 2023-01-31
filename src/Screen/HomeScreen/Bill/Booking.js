@@ -25,7 +25,11 @@ import {useEffect} from 'react';
 import {collection, onSnapshot} from 'firebase/firestore';
 import {db} from '../../../Firebase/firebase';
 import {useCallback} from 'react';
-import {addCheck, deleteCheck} from '../../../Redux/FacilitiesCheck';
+import {
+  addCheck,
+  deleteCheck,
+  resetCheck,
+} from '../../../Redux/FacilitiesCheck';
 const Booking = ({navigation}) => {
   const Rooms = useSelector(state => state.list_room).rooms;
   const [Data, setData] = useState(Rooms);
@@ -188,41 +192,21 @@ const Booking = ({navigation}) => {
 
   //Range
 
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(3000);
   //Rating
   const Rating = [1, 2, 3, 4, 5];
 
   let CheckFacilities = [];
 
   const [sortResult, setSortResult] = useState(null);
-  const [starPerNight, setStarPerNight] = useState(null);
+  const [starPerNight, setStarPerNight] = useState(1);
 
   const ApplyFilter = () => {
     setShowFilter(!showFilter);
 
     let tmp = [];
-    if (sortResult !== null || starPerNight !== null || value !== 0) {
+    if (sortResult !== null) {
       Rooms.map(item => {
-        // if (sortResult !== null) {
-        //   if (item.kind === KindRoom[sortResult]) {
-        //     if (value > 0) {
-        //       if (item.money < value) {
-        //         if (starPerNight !== null) {
-        //           if (item.rating > starPerNight) tmp.push(item);
-        //         } else tmp.push(item);
-        //       }
-        //     } else tmp.push(item);
-        //   }
-        // } else {
-        //   if (value > 0) {
-        //     if (item.money < value) {
-        //       if (starPerNight !== null) {
-        //         if (item.rating > starPerNight) tmp.push(item);
-        //       } else tmp.push(item);
-        //     }
-        //   }
-        // }
-
         if (
           item.status === 1 &&
           item.kind === KindRoom[sortResult] &&
@@ -230,9 +214,10 @@ const Booking = ({navigation}) => {
           item.rating >= starPerNight
         ) {
           let c = 0;
+
           for (let index = 0; index < checked.length; index++) {
             const element = checked[index];
-            if (!item.facility.includes(e)) {
+            if (!item.facility.includes(element)) {
               c = 1;
               break;
             }
@@ -535,7 +520,10 @@ const Booking = ({navigation}) => {
               }}>
               <Pressable
                 onPress={() => {
-                  setSortResult(null), setStarPerNight(null), setValue(0);
+                  setSortResult(null),
+                    setStarPerNight(1),
+                    setValue(3000),
+                    dispatch(resetCheck());
                 }}
                 style={{
                   width: '40%',
