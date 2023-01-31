@@ -460,7 +460,7 @@ const AddNewRoom = () => {
           <TextInput
             value={decribe}
             onChangeText={setDecribe}
-            placeholder="Decribe about your room"
+            placeholder="Describe about your room"
             style={{
               width: '100%',
               borderWidth: 1,

@@ -129,6 +129,7 @@ const AddCustomers = () => {
                 setDate_of_birth(moment(date).format('DD/MM/YYYY').toString()),
                   setVisibleCalendar(!visibleCalendar);
               }}
+              maxDate={new Date()}
             />
           </View>
         </Modal>

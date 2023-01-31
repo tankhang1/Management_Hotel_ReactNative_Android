@@ -204,7 +204,7 @@ const Room = ({navigation}) => {
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Input your name"
+            placeholder="Name"
             style={{
               width: '100%',
               backgroundColor: 'transparent',
@@ -245,7 +245,7 @@ const Room = ({navigation}) => {
           <TextInput
             value={phone}
             onChangeText={setPhone}
-            placeholder="Input your phone"
+            placeholder="Phone"
             style={{
               width: '100%',
               backgroundColor: 'transparent',

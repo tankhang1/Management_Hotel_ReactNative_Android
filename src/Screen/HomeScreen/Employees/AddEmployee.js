@@ -240,6 +240,7 @@ const AddEmployee = () => {
               selectedDayColor="#7300e6"
               selectedDayTextColor="#FFFFFF"
               onDateChange={date => onDateChange(date)}
+              maxDate={new Date()}
             />
           </View>
         </Pressable>
