@@ -13,6 +13,7 @@ import {
 import React, {cloneElement, useEffect, useRef, useState} from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Lottie from 'lottie-react-native';
 import {
   VictoryAxis,
@@ -279,8 +280,6 @@ const Report = ({navigation}) => {
       : -(Math.abs(avg) / money.length).toFixed(2) * 100;
   };
 
-  console.log(billId);
-
   return (
     <ScrollView
       style={{
@@ -296,6 +295,7 @@ const Report = ({navigation}) => {
           elevation: 5,
           backgroundColor: 'white',
           paddingVertical: 10,
+          paddingHorizontal: 10,
         }}>
         <Pressable onPress={() => navigation.openDrawer()}>
           <Lottie
@@ -318,13 +318,11 @@ const Report = ({navigation}) => {
           }}>
           CKHM Hotel Organisation
         </Text>
-        <Image
-          source={require('./asset/thunder.png')}
-          style={{
-            width: 40,
-            height: 40,
-            resizeMode: 'contain',
-          }}
+
+        <MaterialCommunityIcons
+          name="microsoft-excel"
+          size={30}
+          color="green"
         />
       </View>
       {/*Body */}

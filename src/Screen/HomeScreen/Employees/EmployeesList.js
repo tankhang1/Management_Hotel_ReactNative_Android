@@ -459,7 +459,7 @@ const EmployeesList = ({navigation}) => {
       {/*Carousel Employees*/}
       <View
         style={{
-          height: 460,
+          height: 430,
         }}>
         <FlatList
           horizontal
