@@ -534,10 +534,9 @@ const AddEmployee = () => {
                 placeholder="Birthday"
                 placeholderTextColor="hsl(0,0%,60%)"
               />
-              <TouchableOpacity
-                onPress={() => setOnModalCalendar(!onModalCalendar)}>
+              <Pressable onPress={() => setOnModalCalendar(!onModalCalendar)}>
                 <AntDesign name="calendar" size={24} color="black" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 

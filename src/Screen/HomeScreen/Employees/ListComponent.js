@@ -1,12 +1,14 @@
 import {View, Text, Image, Pressable} from 'react-native';
-import React from 'react';
+import React, {memo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {addId} from '../../../Redux/Collect_ID_Employee';
+import {useMemo} from 'react';
 
 const ListComponent = props => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
   const {title, item} = props;
   if (title === 'font')
     return (
@@ -67,7 +69,7 @@ const ListComponent = props => {
         </Text>
       </View>
     );
-  else
+  else if (title === 'back')
     return (
       <View
         style={{
@@ -312,6 +314,7 @@ const ListComponent = props => {
               dispatch(addId(item.Employee_Id));
               navigation.navigate('EmployeeProfile');
             }}
+            //disabled={back}
             style={{
               paddingHorizontal: 20,
               backgroundColor: 'hsl(35,97%,55%)',
@@ -333,4 +336,4 @@ const ListComponent = props => {
     );
 };
 
-export default ListComponent;
+export default memo(ListComponent);

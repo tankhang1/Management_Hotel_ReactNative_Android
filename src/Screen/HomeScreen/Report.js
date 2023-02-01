@@ -24,128 +24,45 @@ import {
   VictoryPie,
   VictoryTheme,
 } from 'victory-native';
-import {query, collection, orderBy, limit, getDocs} from 'firebase/firestore';
+import CalendarPicker from 'react-native-calendar-picker';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {
+  query,
+  collection,
+  orderBy,
+  limit,
+  getDocs,
+  where,
+} from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import moment from 'moment';
-import {DataTable} from 'react-native-paper';
+import {DataTable, Modal} from 'react-native-paper';
+import {useCallback} from 'react';
+import ModalOptionReport from './ModalOptionReport';
+import {FirebaseError, map} from '@firebase/util';
 const Report = ({navigation}) => {
   LogBox.ignoreLogs([
     'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
   ]);
 
   useEffect(() => {
-    async function GetDB() {
-      setMapIncome([]);
-      setMapOutcome([]);
-      setBillId([]);
+    const getDb = async () => {
+      let mapIncome = [];
+      let mapOutcome = [];
+      let mapSumIncome = [];
+      let mapSumOutcome = [];
+      {
+        /* Week */
+      }
       let income = 0;
       let outcome = 0;
-      if (kindFilter === 0) {
-        const getDbDate = await getDocs(
-          query(
-            collection(
-              db,
-              `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/12a7e0fb-f8e1-4488-b174-9fce340d9eb5/Revenue_Daily`,
-            ),
-            orderBy('Date', 'desc'),
-            limit(7),
-          ),
-        );
-        let monthIncome = [];
-        let monthOutcome = [];
-        let bills = [];
-        getDbDate.forEach(monthItem => {
-          let dataIncome = {
-            x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
-            y: monthItem.data().Money,
-          };
-          bills.push({
-            id: monthItem.data().List_Bill,
-            date: moment(monthItem.data().Date.toDate()).format('DD/MM/YYYY'),
-          });
-          income += monthItem.data().Money;
-          monthIncome.push(dataIncome);
-        });
-        setMapIncome([...monthIncome]);
-        setBillId([...bills]);
-        setSumIncome(income);
-        setSumOutcome(outcome);
-      }
-      if (kindFilter === 1) {
-        const getDbMonth = await getDocs(
-          query(
-            collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
-            orderBy('Date', 'asc'),
-          ),
-        );
-        let monthIncome = [];
-        let monthOutcome = [];
-
-        getDbMonth.forEach(monthItem => {
-          let dataIncome = {
-            x: moment(monthItem.data().Date.toDate()).format('MM'),
-            y: monthItem.data().Income,
-          };
-          let dataOutcome = {
-            x: moment(monthItem.data().Date.toDate()).format('MM'),
-            y: monthItem.data().Outcome,
-          };
-          income += monthItem.data().Income;
-          outcome += monthItem.data().Outcome;
-          monthIncome.push(dataIncome);
-          monthOutcome.push(dataOutcome);
-        });
-        setMapIncome([...monthIncome]);
-        setMapOutcome([...monthOutcome]);
-
-        setSumIncome(income);
-        setSumOutcome(outcome);
-      }
-      if (kindFilter === 2) {
-        const getDbMonth = await getDocs(
-          query(collection(db, 'Revenue'), orderBy('Date', 'asc')),
-        );
-        let monthIncome = [];
-        let monthOutcome = [];
-
-        getDbMonth.forEach(monthItem => {
-          let dataIncome = {
-            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
-            y: monthItem.data().Income,
-          };
-          let dataOutcome = {
-            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
-            y: monthItem.data().Outcome,
-          };
-          income += monthItem.data().Income;
-          outcome += monthItem.data().Outcome;
-          monthIncome.push(dataIncome);
-          monthOutcome.push(dataOutcome);
-        });
-        setMapIncome([...monthIncome]);
-        setMapOutcome([...monthOutcome]);
-
-        setSumIncome(income);
-        setSumOutcome(outcome);
-      }
-    }
-    GetDB();
-  }, []);
-
-  const getMonth = async index => {
-    setKindFilter(index);
-    setMapIncome([]);
-    setMapOutcome([]);
-    setBillId([]);
-    let income = 0;
-    let outcome = 0;
-    if (index === 0) {
       const getDbDate = await getDocs(
         query(
           collection(
             db,
             `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/12a7e0fb-f8e1-4488-b174-9fce340d9eb5/Revenue_Daily`,
           ),
+
           orderBy('Date', 'desc'),
           limit(7),
         ),
@@ -153,6 +70,7 @@ const Report = ({navigation}) => {
       let monthIncome = [];
       let monthOutcome = [];
       let bills = [];
+
       getDbDate.forEach(monthItem => {
         let dataIncome = {
           x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
@@ -165,21 +83,28 @@ const Report = ({navigation}) => {
         income += monthItem.data().Money;
         monthIncome.push(dataIncome);
       });
-      setMapIncome([...monthIncome]);
+      mapIncome.push({key: 'Week', data: monthIncome.reverse()});
+      mapOutcome.push({key: 'Week', data: monthOutcome.reverse()});
       setBillId([...bills]);
-      setSumIncome(income);
-      setSumOutcome(outcome);
-    }
-    if (index === 1) {
+      setFirstDay(bills[bills.length - 1].date);
+      setSecondDay(bills[0].date);
+      mapSumIncome.push({key: 'Week', data: income});
+      mapSumOutcome.push({key: 'Week', data: outcome});
+
+      {
+        /*Month */
+      }
+
       const getDbMonth = await getDocs(
         query(
           collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
           orderBy('Date', 'asc'),
         ),
       );
-      let monthIncome = [];
-      let monthOutcome = [];
-
+      monthIncome = [];
+      monthOutcome = [];
+      income = 0;
+      outcome = 0;
       getDbMonth.forEach(monthItem => {
         let dataIncome = {
           x: moment(monthItem.data().Date.toDate()).format('MM'),
@@ -194,21 +119,23 @@ const Report = ({navigation}) => {
         monthIncome.push(dataIncome);
         monthOutcome.push(dataOutcome);
       });
-      setMapIncome([...monthIncome]);
-      setMapOutcome([...monthOutcome]);
+      mapIncome.push({key: 'Month', data: monthIncome});
+      mapOutcome.push({key: 'Month', data: monthOutcome});
+      mapSumIncome.push({key: 'Month', data: income});
+      mapSumOutcome.push({key: 'Month', data: outcome});
 
-      setSumIncome(income);
-      setSumOutcome(outcome);
-    }
+      {
+        /*Year */
+      }
 
-    if (index === 2) {
-      const getDbMonth = await getDocs(
+      const getDbYear = await getDocs(
         query(collection(db, 'Revenue'), orderBy('Date', 'asc')),
       );
-      let monthIncome = [];
-      let monthOutcome = [];
-
-      getDbMonth.forEach(monthItem => {
+      monthIncome = [];
+      monthOutcome = [];
+      income = 0;
+      outcome = 0;
+      getDbYear.forEach(monthItem => {
         let dataIncome = {
           x: moment(monthItem.data().Date.toDate()).format('YYYY'),
           y: monthItem.data().Income,
@@ -222,30 +149,46 @@ const Report = ({navigation}) => {
         monthIncome.push(dataIncome);
         monthOutcome.push(dataOutcome);
       });
-      setMapIncome([...monthIncome]);
-      setMapOutcome([...monthOutcome]);
+      mapIncome.push({key: 'Year', data: monthIncome});
+      mapOutcome.push({key: 'Year', data: monthOutcome});
+      mapSumIncome.push({key: 'Year', data: income});
+      mapSumOutcome.push({key: 'Year', data: outcome});
 
-      setSumIncome(income);
-      setSumOutcome(outcome);
-    }
-  };
-
-  const [sumIncome, setSumIncome] = useState(0);
-  const [sumOutcome, setSumOutcome] = useState(0);
+      return {
+        mapIncome,
+        mapOutcome,
+        mapSumIncome,
+        mapSumOutcome,
+      };
+    };
+    getDb().then(({mapIncome, mapOutcome, mapSumIncome, mapSumOutcome}) => {
+      setMapIncome([...mapIncome]);
+      setMapOutcome([...mapOutcome]);
+      setSumIncome([...mapSumIncome]);
+      setSumOutcome([...mapSumOutcome]);
+    });
+  }, [navigation]);
+  const [sumIncome, setSumIncome] = useState([]);
+  const [sumOutcome, setSumOutcome] = useState([]);
   const [mapIncome, setMapIncome] = useState([]);
   const [mapOutcome, setMapOutcome] = useState([]);
   const [billId, setBillId] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [firstDay, setFirstDay] = useState('');
+  const [secondDay, setSecondDay] = useState('');
 
   const [multiTouchFilter, setMultiTouchFilter] = useState([
     'Week',
     'Month',
     'Year',
   ]);
+  console.log(billId);
+
   const [kindFilter, setKindFilter] = useState(0);
   const renderFilter = ({item, index}) => {
     return (
       <Pressable
-        onPress={() => getMonth(index)}
+        onPress={() => setKindFilter(index)}
         key={index}
         style={{
           width: 100,
@@ -268,24 +211,88 @@ const Report = ({navigation}) => {
       </Pressable>
     );
   };
-  const Avg = money => {
-    let avg = 0;
-    for (let i = 0; i < money.length - 1; i++)
-      for (let j = i + 1; j < money.length; j++) {
-        avg += (money[j].y - money[i].y) / money[i].y;
-      }
+  const changeModal = useCallback(() => {
+    setOpenModal(!openModal);
+  }, [openModal]);
 
-    return avg > 0
-      ? (avg / money.length).toFixed(2) * 100
-      : -(Math.abs(avg) / money.length).toFixed(2) * 100;
-  };
+  const changeDate = useCallback(async () => {
+    changeModal();
+    let income = 0;
+    let outcome = 0;
+    let tmpMapIncome = [...mapIncome];
+    let tmpMapOutcome = [...mapOutcome];
+    let tmpMapSumIncome = [...sumIncome];
+    let tmpMapSumOutcome = [...sumOutcome];
+    let tmpFirstDay = new Date(
+      `${firstDay.slice(6, 10)}-${firstDay.slice(3, 5)}-${firstDay.slice(
+        0,
+        2,
+      )}`,
+    );
+    let tmpSecondDay = new Date(
+      `${secondDay.slice(6, 10)}-${secondDay.slice(3, 5)}-${secondDay.slice(
+        0,
+        2,
+      )}`,
+    );
+    const getDbDate = await getDocs(
+      query(
+        collection(
+          db,
+          `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/12a7e0fb-f8e1-4488-b174-9fce340d9eb5/Revenue_Daily`,
+        ),
+        where('Date', '>=', tmpFirstDay),
+        where('Date', '<=', tmpSecondDay),
+        orderBy('Date', 'desc'),
+        limit(7),
+      ),
+    );
+    let monthIncome = [];
+    let monthOutcome = [];
+    let bills = [];
 
+    getDbDate.forEach(monthItem => {
+      let dataIncome = {
+        x: moment(monthItem.data().Date.toDate()).format('DD/MM'),
+        y: monthItem.data().Money,
+      };
+      bills.push({
+        id: monthItem.data().List_Bill,
+        date: moment(monthItem.data().Date.toDate()).format('DD/MM/YYYY'),
+      });
+      income += monthItem.data().Money;
+      monthIncome.push(dataIncome);
+    });
+    tmpMapIncome[0].data = monthIncome.reverse();
+    tmpMapOutcome[0].data = monthOutcome.reverse();
+    tmpMapSumIncome[0].data = income;
+    tmpMapSumOutcome[0].data = outcome;
+    setMapIncome([...tmpMapIncome]);
+    setMapOutcome([...tmpMapOutcome]);
+    setSumIncome([...tmpMapSumIncome]);
+    setSumOutcome([...tmpMapSumOutcome]);
+    setBillId([...bills]);
+    setFirstDay(bills[bills.length - 1].date);
+    setSecondDay(bills[0].date);
+  }, [firstDay, secondDay]);
+
+  const [exportExcel, setExportExcel] = useState(false);
   return (
     <ScrollView
       style={{
         backgroundColor: 'hsl(213,21%,90%)',
         flex: 1,
       }}>
+      <ModalOptionReport
+        openModal={openModal}
+        changeModal={changeModal}
+        setFirstDay={setFirstDay}
+        setSecondDay={setSecondDay}
+        changeDate={changeDate}
+        exportExcel={exportExcel}
+        setExportExcel={setExportExcel}
+      />
+
       {/*Header */}
       <View
         style={{
@@ -297,18 +304,17 @@ const Report = ({navigation}) => {
           paddingVertical: 10,
           paddingHorizontal: 10,
         }}>
-        <Pressable onPress={() => navigation.openDrawer()}>
-          <Lottie
-            source={{
-              uri: 'https://assets7.lottiefiles.com/packages/lf20_xufsq6mg.json',
-            }}
-            style={{
-              width: 50,
-              height: 50,
-            }}
-            loop
-            autoPlay
-          />
+        <Pressable
+          onPress={() => navigation.openDrawer()}
+          style={{
+            width: 35,
+            height: 35,
+            borderRadius: 100,
+            backgroundColor: 'hsl(0,0%,95%)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Entypo name="menu" size={20} color="black" />
         </Pressable>
         <Text
           style={{
@@ -319,11 +325,16 @@ const Report = ({navigation}) => {
           CKHM Hotel Organisation
         </Text>
 
-        <MaterialCommunityIcons
-          name="microsoft-excel"
-          size={30}
-          color="green"
-        />
+        <Pressable
+          onPress={() => {
+            changeModal(), setExportExcel(true);
+          }}>
+          <MaterialCommunityIcons
+            name="microsoft-excel"
+            size={30}
+            color="green"
+          />
+        </Pressable>
       </View>
       {/*Body */}
       {/*Profit and Loss */}
@@ -339,19 +350,34 @@ const Report = ({navigation}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginLeft: 20,
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
           }}>
-          <Entypo name="bar-graph" size={20} color={'hsl(0,0%,73%)'} />
-          <Text
+          <View
             style={{
-              fontSize: 20,
-              color: 'hsl(203,37%,32%)',
-              fontWeight: '700',
-              paddingLeft: 10,
-              letterSpacing: 0.8,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}>
-            Profit and Loss
-          </Text>
+            <Entypo name="bar-graph" size={20} color={'hsl(0,0%,73%)'} />
+            <Text
+              style={{
+                fontSize: 20,
+                color: 'hsl(203,37%,32%)',
+                fontWeight: '700',
+                paddingLeft: 10,
+                letterSpacing: 0.8,
+              }}>
+              Profit and Loss
+            </Text>
+          </View>
+          {kindFilter === 0 && (
+            <Pressable
+              onPress={() => {
+                changeModal(), setExportExcel(false);
+              }}>
+              <AntDesign name="calendar" size={24} color="black" />
+            </Pressable>
+          )}
         </View>
 
         <View
@@ -363,6 +389,8 @@ const Report = ({navigation}) => {
             data={multiTouchFilter}
             renderItem={renderFilter}
             horizontal
+            removeClippedSubviews
+            extraData={multiTouchFilter}
           />
         </View>
 
@@ -379,7 +407,7 @@ const Report = ({navigation}) => {
               letterSpacing: 1,
               textAlign: 'center',
             }}>
-            $ {sumIncome - sumOutcome}
+            $ {sumIncome[kindFilter]?.data - sumOutcome[kindFilter]?.data}
           </Text>
           <Text
             style={{
@@ -389,74 +417,74 @@ const Report = ({navigation}) => {
             }}>
             Net Profit
           </Text>
+
+          {kindFilter === 0 && (
+            <Text
+              style={{
+                position: 'absolute',
+                left: '-35%',
+                fontSize: 10,
+                color: 'black',
+              }}>
+              {firstDay} -{secondDay}
+            </Text>
+          )}
         </View>
-        {mapIncome.length === 0 && mapOutcome.length === 0 ? (
-          <ActivityIndicator color={'blue'} size={30} />
-        ) : kindFilter === 2 ? (
-          <View
-            style={{
-              flex: 1,
-            }}>
-            {mapIncome.length === 1 ? (
-              <VictoryPie
-                colorScale={['hsl(171,62%,48%)', 'hsl(215,62%,60%)']}
-                data={[
-                  {x: 'Income', y: sumIncome},
-                  {x: 'Expenses', y: sumOutcome},
-                ]}
+        {kindFilter === 2 && mapIncome[kindFilter]?.data?.length === 1 && (
+          <VictoryPie
+            colorScale={['hsl(171,62%,48%)', 'hsl(215,62%,60%)']}
+            data={[
+              {x: 'Income', y: sumIncome[kindFilter]?.data},
+              {x: 'Expenses', y: sumOutcome[kindFilter]?.data},
+            ]}
+          />
+        )}
+        {kindFilter === 2 && mapIncome[kindFilter]?.data?.length > 1 && (
+          <VictoryChart theme={VictoryTheme.material}>
+            <VictoryGroup>
+              <VictoryLine
+                style={{
+                  data: {stroke: '#c43a31'},
+                  parent: {border: '1px solid hsl(171,62%,48%)'},
+                }}
+                data={mapIncome[kindFilter].data}
               />
-            ) : (
-              <VictoryChart theme={VictoryTheme.material}>
-                <VictoryGroup>
-                  <VictoryLine
-                    style={{
-                      data: {stroke: '#c43a31'},
-                      parent: {border: '1px solid hsl(171,62%,48%)'},
-                    }}
-                    data={mapIncome}
-                  />
-                  <VictoryLine
-                    style={{
-                      data: {stroke: '#c43a31'},
-                      parent: {border: '1px solid hsl(215,62%,60%)'},
-                    }}
-                    data={mapOutcome}
-                  />
-                </VictoryGroup>
-              </VictoryChart>
-            )}
-          </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-            }}>
-            {mapIncome.length !== 0 ? (
-              <VictoryChart theme={VictoryTheme.material}>
-                <VictoryAxis
-                  style={{
-                    axis: {stroke: 'none'},
-                  }}
-                />
-                <VictoryAxis
-                  style={{
-                    axis: {stroke: 'none'},
-                  }}
-                  dependentAxis
-                />
-                <VictoryBar
-                  data={mapIncome}
-                  style={{
-                    data: {
-                      fill: 'hsl(171,62%,48%)',
-                      width: 10,
-                    },
-                  }}
-                  cornerRadius={{top: 5, bottom: 5}}
-                />
-              </VictoryChart>
-            ) : null}
-            {mapOutcome.length !== 0 ? (
+              <VictoryLine
+                style={{
+                  data: {stroke: '#c43a31'},
+                  parent: {border: '1px solid hsl(215,62%,60%)'},
+                }}
+                data={mapOutcome[kindFilter].data}
+              />
+            </VictoryGroup>
+          </VictoryChart>
+        )}
+        {kindFilter < 2 && (
+          <View>
+            <VictoryChart theme={VictoryTheme.material}>
+              <VictoryAxis
+                style={{
+                  axis: {stroke: 'none'},
+                }}
+              />
+              <VictoryAxis
+                style={{
+                  axis: {stroke: 'none'},
+                }}
+                dependentAxis
+              />
+              <VictoryBar
+                data={mapIncome[kindFilter]?.data}
+                style={{
+                  data: {
+                    fill: 'hsl(171,62%,48%)',
+                    width: 10,
+                  },
+                }}
+                cornerRadius={{top: 5, bottom: 5}}
+              />
+            </VictoryChart>
+            {kindFilter === 1 && (
               <VictoryChart theme={VictoryTheme.material}>
                 <VictoryAxis
                   style={{
@@ -470,7 +498,7 @@ const Report = ({navigation}) => {
                   dependentAxis
                 />
                 <VictoryBar
-                  data={mapOutcome}
+                  data={mapOutcome[kindFilter]?.data}
                   style={{
                     data: {
                       fill: 'hsl(215,62%,60%)',
@@ -480,10 +508,9 @@ const Report = ({navigation}) => {
                   cornerRadius={{top: 5, bottom: 5}}
                 />
               </VictoryChart>
-            ) : null}
+            )}
           </View>
         )}
-        {/*Legend */}
         <View
           style={{
             flexDirection: 'row',
@@ -523,7 +550,7 @@ const Report = ({navigation}) => {
                 lineHeight: 30,
                 fontWeight: '600',
               }}>
-              $ {sumIncome}
+              $ {sumIncome[kindFilter]?.data}
             </Text>
           </View>
           <View>
@@ -559,73 +586,12 @@ const Report = ({navigation}) => {
                 lineHeight: 30,
                 fontWeight: '600',
               }}>
-              $ {sumOutcome}
+              $ {sumOutcome[kindFilter]?.data}
             </Text>
           </View>
         </View>
       </View>
-      {/*Review */}
-      {/* <View
-        style={{
-          backgroundColor: 'white',
-          marginVertical: 10,
-          paddingVertical: 10,
-          paddingHorizontal: 10,
-        }}>
-        <Text
-          style={{
-            color: 'black',
-            fontSize: 16,
-          }}>
-          Average revenue:{' '}
-          <Text>
-            ${(sumIncome / 12).toFixed(2)} per{' '}
-            {multiTouchFilter[kindFilter].toLocaleLowerCase()} {'  '}
-          </Text>
-          <Text
-            style={{
-              color: 'red',
-            }}>
-            ({Avg(mapIncome)}%)
-          </Text>
-          <Ionicons
-            name={
-              Avg(mapIncome) > 0
-                ? 'trending-up-outline'
-                : 'trending-down-outline'
-            }
-            size={24}
-            color={Avg(mapIncome) > 0 ? 'green' : 'red'}
-          />
-        </Text>
-        <Text
-          style={{
-            color: 'black',
-            fontSize: 16,
-          }}>
-          Average expense:{' '}
-          <Text>
-            ${(sumOutcome / 12).toFixed(2)} per{' '}
-            {multiTouchFilter[kindFilter].toLocaleLowerCase()}
-            {'  '}
-          </Text>
-          <Text
-            style={{
-              color: Avg(mapOutcome) > 0 ? 'green' : 'red',
-            }}>
-            ({Avg(mapOutcome)}%)
-          </Text>
-          <Ionicons
-            name={
-              Avg(mapOutcome) > 0
-                ? 'trending-up-outline'
-                : 'trending-down-outline'
-            }
-            size={24}
-            color={Avg(mapOutcome) > 0 ? 'green' : 'red'}
-          />
-        </Text>
-      </View> */}
+
       {kindFilter === 0 && (
         <DataTable
           style={{

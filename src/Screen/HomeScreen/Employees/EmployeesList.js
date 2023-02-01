@@ -13,7 +13,7 @@ import {
   ToastAndroid,
   Animated,
 } from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, memo} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,6 +21,7 @@ import ListComponent from './ListComponent';
 import {useSelector} from 'react-redux';
 import {writeFile, DownloadDirectoryPath} from 'react-native-fs';
 import XLSX from 'xlsx';
+import {useCallback} from 'react';
 const EmployeesList = ({navigation}) => {
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(false);
@@ -33,8 +34,6 @@ const EmployeesList = ({navigation}) => {
   const [searchId, setSearchId] = useState(false);
   const dataEmployee = useSelector(state => state.data_infor).data.employees;
 
-  const [total, setTotal] = useState(dataEmployee.length);
-  let number = 0;
   const [dataSearch, setDataSearch] = useState(dataEmployee);
   useEffect(() => {
     function searchDB() {
@@ -52,15 +51,15 @@ const EmployeesList = ({navigation}) => {
           tmp.push(item);
         }
       });
-
       setDataSearch([...tmp]);
     }
+
     searchDB();
   }, [search]);
-  console.log(dataSearch);
-
-  const renderItem = ({item, index}) => {
+  //const [back, setBack] = useState(false);
+  const renderItem = useCallback(({item, index}) => {
     const animatedRotate = new Animated.Value(0);
+
     let back = false;
     let rotateFont = animatedRotate.interpolate({
       inputRange: [0, 1],
@@ -70,25 +69,25 @@ const EmployeesList = ({navigation}) => {
       inputRange: [0, 1],
       outputRange: ['180deg', '360deg'],
     });
-    const handlingFlashlist = () => {
+    const handlingFlashlist = ({title}) => {
       back = !back;
-      Animated.timing(animatedRotate, {
-        toValue: back ? 1 : 0,
-        duration: 1000,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }).start();
+      if (back === true) {
+        console.log('Ok');
+        Animated.timing(animatedRotate, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.ease,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        Animated.timing(animatedRotate, {
+          toValue: 0,
+          duration: 1000,
+          easing: Easing.ease,
+          useNativeDriver: true,
+        }).start();
+      }
     };
-
-    // if (
-    //   (item.Employee_Name.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-    //     searchName === true) ||
-    //   (item.Position.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-    //     searchPosition === true) ||
-    //   (item.Employee_Id.toLowerCase().indexOf(search.toLowerCase()) > -1 &&
-    //     searchId === true)
-    // ) {
-    //   number++;
     return (
       <Animated.View
         style={{
@@ -98,7 +97,7 @@ const EmployeesList = ({navigation}) => {
         }}
         key={index}>
         <Pressable
-          onPress={handlingFlashlist}
+          onPress={() => handlingFlashlist({title: 'font'})}
           style={{
             position: 'absolute',
             top: 0,
@@ -114,7 +113,7 @@ const EmployeesList = ({navigation}) => {
 
         {/*back */}
         <Pressable
-          onPress={handlingFlashlist}
+          onPress={() => handlingFlashlist({title: 'back'})}
           style={{
             position: 'absolute',
             top: 0,
@@ -129,9 +128,9 @@ const EmployeesList = ({navigation}) => {
         </Pressable>
       </Animated.View>
     );
-  };
+  }, []);
 
-  const renderDot = ({item, index}) => {
+  const renderDot = useCallback(({item, index}) => {
     let opacity = positionIndex.interpolate({
       inputRange: [index - 1, index, index + 1],
       outputRange: [0.2, 1, 0.2],
@@ -150,11 +149,11 @@ const EmployeesList = ({navigation}) => {
           opacity,
         }}></Animated.View>
     );
-  };
+  }, []);
   const converDataEmployee = () => {
     let ListEmployee = [];
 
-    dataEmployee.forEach(element => {
+    dataSearch.forEach(element => {
       let sum = 0;
 
       element.List_Skill_Id.forEach(skill => {
@@ -464,7 +463,6 @@ const EmployeesList = ({navigation}) => {
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          //snapToInterval={WIDTH_EMPLOYEE}
           onScroll={Animated.event(
             [{nativeEvent: {contentOffset: {x: scrollX}}}],
             {useNativeDriver: false},
@@ -495,7 +493,7 @@ const EmployeesList = ({navigation}) => {
           removeClippedSubviews={true}
           data={dataSearch}
           renderItem={renderItem}
-          extraData={total}
+          extraData={dataSearch}
           pagingEnabled={true}
         />
       </View>
@@ -515,4 +513,4 @@ const EmployeesList = ({navigation}) => {
   );
 };
 
-export default EmployeesList;
+export default memo(EmployeesList);

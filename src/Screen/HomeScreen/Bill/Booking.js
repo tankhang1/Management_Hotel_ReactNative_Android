@@ -231,7 +231,7 @@ const Booking = ({navigation}) => {
       setData([...tmp]);
     } else {
       let tmp = [];
-      Rooms.map((r, i) => {
+      Rooms.map((item, i) => {
         if (item.status === 1) {
           tmp.push(item);
         }

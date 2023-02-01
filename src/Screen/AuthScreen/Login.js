@@ -177,7 +177,7 @@ const Login = ({navigation}) => {
             />
           </Pressable>
         </View>
-        <TouchableOpacity
+        <Pressable
           onPress={() => navigation.navigate('ForgotPassword')}
           style={{
             paddingVertical: 10,
@@ -191,8 +191,8 @@ const Login = ({navigation}) => {
             }}>
             Forgot password?
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onSignIn}>
+        </Pressable>
+        <Pressable onPress={onSignIn}>
           <View
             style={{
               width: '80%',
@@ -212,7 +212,7 @@ const Login = ({navigation}) => {
               SIGN IN
             </Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </KeyboardAvoidingView>
     </ScrollView>
   );
