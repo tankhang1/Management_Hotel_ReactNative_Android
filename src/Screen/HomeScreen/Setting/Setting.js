@@ -98,20 +98,32 @@ const Setting = ({navigation}) => {
         break;
 
       case 3:
-        sendPasswordResetEmail(auth, auth.currentUser.email)
-          .then(() => {
-            // Password reset email sent!
-            // ..
-            ToastAndroid.show(
-              'Password have been changed successfull',
-              ToastAndroid.LONG,
-            );
-          })
-          .catch(error => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
-          });
+        Alert.alert('Warning', 'Do you really want to change your password?', [
+          {
+            text: 'Ask me later',
+            onPress: () => console.log('Ask me later pressed'),
+          },
+          {
+            text: 'Change',
+            onPress: () => {
+              sendPasswordResetEmail(auth, auth.currentUser.email)
+                .then(() => {
+                  // Password reset email sent!
+                  // ..
+                  ToastAndroid.show(
+                    'Password have been changed successfull',
+                    ToastAndroid.LONG,
+                  );
+                })
+                .catch(error => {
+                  const errorCode = error.code;
+                  const errorMessage = error.message;
+                  // ..
+                });
+            },
+          },
+        ]);
+
         break;
       case 4:
         signOut(auth)

@@ -11,7 +11,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import moment from 'moment';
 import {useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
-import {collection, getDocs, query, where} from 'firebase/firestore';
+import {collection, getDoc, getDocs, query, where} from 'firebase/firestore';
 import {db} from '../../Firebase/firebase';
 import {writeFile, DownloadDirectoryPath} from 'react-native-fs';
 import XLSX from 'xlsx';
@@ -27,63 +27,81 @@ const ModalOptionReport = ({
   exportExcel,
 }) => {
   const [fromDate, setFromDate] = useState(1);
-  const [month, setMonth] = useState(1);
-  const [year, setYear] = useState(2022);
+  const [fromMonth, setFromMonth] = useState(1);
+  const [fromYear, setFromYear] = useState(2022);
+  const [toMonth, setToMonth] = useState(1);
+  const [toYear, setToYear] = useState(2022);
   const [toDate, setToDate] = useState(1);
   const [dataExport, setDataExport] = useState([]);
   const exportData = async () => {
-    // async function getDb() {
-
-    // return getDb().finally(() => console.log(dataExport));
-    let tmpFirstDay = new Date(`${year}-${month}-${fromDate}`);
-    let tmpSecondDay = new Date(`${year}-${month}-${toDate}`);
+    let tmpFirstDay = new Date(`${fromYear}-${fromMonth}-${fromDate}`);
+    let tmpSecondDay = new Date(`${toYear}-${toMonth}-${toDate}`);
     let data = [];
-    const getDbMonth = await getDocs(
-      collection(db, `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly`),
-    );
-    getDbMonth.forEach(async doc => {
-      if (Number(moment(doc.data().Date.toDate()).format('MM')) === month) {
-        const getDbDate = await getDocs(
-          query(
-            collection(
-              db,
-              `/Revenue/bKypk6E9kcOQZqzu9CZq/Revenue_Monthly/${doc.id}/Revenue_Daily`,
-            ),
-            where('Date', '>=', tmpFirstDay),
-            where('Date', '<=', tmpSecondDay),
-          ),
+    const getDbYear = await getDocs(collection(db, 'Revenue'));
+    getDbYear.forEach(async dbyear => {
+      if (
+        Number(moment(dbyear.data().Date.toDate()).format('YYYY')) >=
+          fromYear &&
+        Number(moment(dbyear.data().Date.toDate()).format('YYYY')) <= toYear
+      ) {
+        const getDbMonth = await getDocs(
+          collection(db, `/Revenue/${dbyear.id}/Revenue_Monthly`),
         );
-        getDbDate.forEach(date => {
-          data.push({
-            Date: moment(date.data().Date.toDate()).format('DD/MM/YYYY'),
-            Money: date.data().Money,
-          });
-          setDataExport([...data]);
-          // console.log(dataExport);
+        getDbMonth.forEach(async doc => {
+          if (
+            Number(moment(doc.data().Date.toDate()).format('MM')) >=
+              fromMonth &&
+            Number(moment(doc.data().Date.toDate()).format('MM')) <= toMonth
+          ) {
+            console.log('oke');
+            const getDbDate = await getDocs(
+              collection(
+                db,
+                `/Revenue/${dbyear.id}/Revenue_Monthly/${doc.id}/Revenue_Daily`,
+              ),
+            );
+            getDbDate.forEach(date => {
+              if (
+                new Date(date.data().Date.toDate()) >= tmpFirstDay &&
+                new Date(date.data().Date.toDate()) <= tmpSecondDay
+              ) {
+                data.push({
+                  Date: moment(date.data().Date.toDate()).format('DD/MM/YYYY'),
+                  Money: date.data().Money,
+                });
+                setDataExport([...data]);
+              }
+            });
+          }
         });
       }
     });
   };
 
   const exportDataToExecl = async () => {
-    // console.log(tmp);
     exportData().finally(async () => {
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.json_to_sheet(dataExport);
-      XLSX.utils.book_append_sheet(wb, ws, 'DataBill');
-      const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
-      // Write generated excel to Storage
-      await writeFile(DownloadDirectoryPath + '/DataBill.xlsx', wbout, 'ascii')
-        .then(r => {
-          ToastAndroid.show(
-            'file DataBill.xlsx has created in directory',
-            2000,
-          );
-          changeModal();
-        })
-        .catch(e => {
-          console.log('Error', e);
-        });
+      if (dataExport.length > 0) {
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.json_to_sheet(dataExport);
+        XLSX.utils.book_append_sheet(wb, ws, 'DataBill');
+        const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
+        // Write generated excel to Storage
+        await writeFile(
+          DownloadDirectoryPath + '/DataBill.xlsx',
+          wbout,
+          'ascii',
+        )
+          .then(r => {
+            ToastAndroid.show(
+              'file DataBill.xlsx has created in directory',
+              2000,
+            );
+            changeModal();
+          })
+          .catch(e => {
+            console.log('Error', e);
+          });
+      }
     });
   };
 
@@ -200,12 +218,12 @@ const ModalOptionReport = ({
                     }}
                     selectedValue={fromDate}
                     onValueChange={(itemValue, itemIndex) => {
-                      console.log(itemValue);
                       setFromDate(itemValue);
                     }}
                     mode="dropdown">
                     {DATE.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${i + 1}`}
                         value={i + 1}
                         style={{
@@ -219,13 +237,14 @@ const ModalOptionReport = ({
                     style={{
                       flex: 1,
                     }}
-                    selectedValue={month}
+                    selectedValue={fromMonth}
                     onValueChange={(itemValue, itemIndex) =>
-                      setMonth(itemValue)
+                      setFromMonth(itemValue)
                     }
                     mode="dropdown">
                     {MONTH.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${i + 1}`}
                         value={i + 1}
                         style={{
@@ -239,11 +258,14 @@ const ModalOptionReport = ({
                     style={{
                       flex: 1,
                     }}
-                    selectedValue={year}
-                    onValueChange={(itemValue, itemIndex) => setYear(itemValue)}
+                    selectedValue={fromYear}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setFromYear(itemValue)
+                    }
                     mode="dropdown">
                     {YEAR.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${2022 + i}`}
                         value={2022 + i}
                         style={{
@@ -285,6 +307,7 @@ const ModalOptionReport = ({
                     mode="dropdown">
                     {DATE.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${i + 1}`}
                         value={i + 1}
                         style={{
@@ -298,13 +321,14 @@ const ModalOptionReport = ({
                     style={{
                       flex: 1,
                     }}
-                    selectedValue={month}
+                    selectedValue={toMonth}
                     onValueChange={(itemValue, itemIndex) =>
-                      setMonth(itemValue)
+                      setToMonth(itemValue)
                     }
                     mode="dropdown">
                     {MONTH.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${i + 1}`}
                         value={i + 1}
                         style={{
@@ -318,11 +342,14 @@ const ModalOptionReport = ({
                     style={{
                       flex: 1,
                     }}
-                    selectedValue={year}
-                    onValueChange={(itemValue, itemIndex) => setYear(itemValue)}
+                    selectedValue={toYear}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setToYear(itemValue)
+                    }
                     mode="dropdown">
                     {YEAR.map((_, i) => (
                       <Picker.Item
+                        key={i}
                         label={`${2022 + i}`}
                         value={2022 + i}
                         style={{

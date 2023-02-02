@@ -40,6 +40,9 @@ import {DataTable, Modal} from 'react-native-paper';
 import {useCallback} from 'react';
 import ModalOptionReport from './ModalOptionReport';
 import {FirebaseError, map} from '@firebase/util';
+import {Picker} from '@react-native-picker/picker';
+import DropdownYear from './DropdownYear';
+
 const Report = ({navigation}) => {
   LogBox.ignoreLogs([
     'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
@@ -176,15 +179,16 @@ const Report = ({navigation}) => {
   const [openModal, setOpenModal] = useState(false);
   const [firstDay, setFirstDay] = useState('');
   const [secondDay, setSecondDay] = useState('');
+  const [year, setYear] = useState(2022);
 
   const [multiTouchFilter, setMultiTouchFilter] = useState([
     'Week',
     'Month',
     'Year',
   ]);
-  console.log(billId);
 
   const [kindFilter, setKindFilter] = useState(0);
+  const MAPYEAR = [2022, 2023, 2024];
   const renderFilter = ({item, index}) => {
     return (
       <Pressable
@@ -275,6 +279,95 @@ const Report = ({navigation}) => {
     setFirstDay(bills[bills.length - 1].date);
     setSecondDay(bills[0].date);
   }, [firstDay, secondDay]);
+
+  const changeYear = useCallback(
+    async itemValue => {
+      let income = 0;
+      let outcome = 0;
+      let tmpMapIncome = [...mapIncome];
+      let tmpMapOutcome = [...mapOutcome];
+      let tmpMapSumIncome = [...sumIncome];
+      let tmpMapSumOutcome = [...sumOutcome];
+
+      {
+        /*Year */
+      }
+      let idYear = '';
+      const getDbYear = await getDocs(
+        query(collection(db, 'Revenue'), orderBy('Date', 'asc')),
+      );
+      let monthIncome = [];
+      let monthOutcome = [];
+      income = 0;
+      outcome = 0;
+      getDbYear.forEach(monthItem => {
+        const yearItem = moment(monthItem.data().Date.toDate()).format('YYYY');
+        console.log(yearItem, itemValue);
+        if (Number(yearItem) === itemValue) {
+          idYear = monthItem.id;
+
+          let dataIncome = {
+            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+            y: monthItem.data().Income,
+          };
+          let dataOutcome = {
+            x: moment(monthItem.data().Date.toDate()).format('YYYY'),
+            y: monthItem.data().Outcome,
+          };
+          income += monthItem.data().Income;
+          outcome += monthItem.data().Outcome;
+          monthIncome.push(dataIncome);
+          monthOutcome.push(dataOutcome);
+        }
+      });
+
+      tmpMapIncome[2].data = monthIncome;
+      tmpMapOutcome[2].data = monthOutcome;
+      tmpMapSumIncome[2].data = income;
+      tmpMapSumOutcome[2].data = outcome;
+
+      if (idYear !== '') {
+        const getDbMonth = await getDocs(
+          query(
+            collection(db, `/Revenue/${idYear}/Revenue_Monthly`),
+            orderBy('Date', 'asc'),
+          ),
+        );
+        monthIncome = [];
+        monthOutcome = [];
+        income = 0;
+        outcome = 0;
+        getDbMonth.forEach(monthItem => {
+          let dataIncome = {
+            x: moment(monthItem.data().Date.toDate()).format('MM'),
+            y: monthItem.data().Income,
+          };
+          let dataOutcome = {
+            x: moment(monthItem.data().Date.toDate()).format('MM'),
+            y: monthItem.data().Outcome,
+          };
+          income += monthItem.data().Income;
+          outcome += monthItem.data().Outcome;
+          monthIncome.push(dataIncome);
+          monthOutcome.push(dataOutcome);
+        });
+        tmpMapIncome[1].data = monthIncome;
+        tmpMapOutcome[1].data = monthOutcome;
+        tmpMapSumIncome[1].data = income;
+        tmpMapSumOutcome[1].data = outcome;
+      } else {
+        tmpMapIncome[1].data = [];
+        tmpMapOutcome[1].data = [];
+        tmpMapSumIncome[1].data = 0;
+        tmpMapSumOutcome[1].data = 0;
+      }
+      setMapIncome([...tmpMapIncome]);
+      setMapOutcome([...tmpMapOutcome]);
+      setSumIncome([...tmpMapSumIncome]);
+      setSumOutcome([...tmpMapSumOutcome]);
+    },
+    [year],
+  );
 
   const [exportExcel, setExportExcel] = useState(false);
   return (
@@ -370,6 +463,39 @@ const Report = ({navigation}) => {
               Profit and Loss
             </Text>
           </View>
+          {/*Year */}
+          {kindFilter > 0 && (
+            <View>
+              <Picker
+                style={{
+                  width: 120,
+                  backgroundColor: 'transparent',
+                }}
+                selectedValue={year}
+                onValueChange={(itemValue, itemIndex) => {
+                  console.log(itemValue);
+                  setYear(itemValue);
+                  changeYear(itemValue);
+                }}
+                mode="dropdown">
+                {MAPYEAR.map((item, i) => (
+                  <Picker.Item
+                    key={i}
+                    label={item.toString()}
+                    value={item}
+                    style={{
+                      color: 'black',
+                      backgroundColor: 'transparent',
+
+                      width: 100,
+
+                      borderWidth: 1,
+                    }}
+                  />
+                ))}
+              </Picker>
+            </View>
+          )}
           {kindFilter === 0 && (
             <Pressable
               onPress={() => {
@@ -426,7 +552,7 @@ const Report = ({navigation}) => {
                 fontSize: 10,
                 color: 'black',
               }}>
-              {firstDay} -{secondDay}
+              {firstDay} - {secondDay}
             </Text>
           )}
         </View>

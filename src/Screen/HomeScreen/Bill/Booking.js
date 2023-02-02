@@ -165,13 +165,14 @@ const Booking = ({navigation}) => {
               style={{
                 position: 'absolute',
                 bottom: 0,
+                right: 0,
                 width: 100,
                 height: 50,
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderBottomLeftRadius: 30,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: 20,
                 borderBottomRightRadius: 20,
+
                 backgroundColor: 'hsl(205,100%,38%)',
               }}>
               <Text
@@ -226,7 +227,6 @@ const Booking = ({navigation}) => {
             tmp.push(item);
           }
         }
-        console.log(tmp);
       });
       setData([...tmp]);
     } else {

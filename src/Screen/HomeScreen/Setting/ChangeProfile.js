@@ -354,7 +354,7 @@ const ChangeProfile = () => {
                 style={{
                   fontWeight: '600',
 
-                  color: 'black',
+                  color: 'hsl(0,0%,73%)',
                 }}>
                 {Employee_code}
               </Text>
