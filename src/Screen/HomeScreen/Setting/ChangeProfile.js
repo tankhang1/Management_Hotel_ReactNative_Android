@@ -349,12 +349,13 @@ const ChangeProfile = () => {
                 paddingHorizontal: 20,
                 borderRadius: 100,
                 justifyContent: 'center',
+                opacity: 0.5,
               }}>
               <Text
                 style={{
                   fontWeight: '600',
 
-                  color: 'hsl(0,0%,73%)',
+                  color: 'black',
                 }}>
                 {Employee_code}
               </Text>

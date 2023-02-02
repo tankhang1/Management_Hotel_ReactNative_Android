@@ -110,16 +110,17 @@ const Setting = ({navigation}) => {
                 .then(() => {
                   // Password reset email sent!
                   // ..
-                  ToastAndroid.show(
-                    'Password have been changed successfull',
-                    ToastAndroid.LONG,
-                  );
                 })
                 .catch(error => {
                   const errorCode = error.code;
                   const errorMessage = error.message;
                   // ..
                 });
+
+              ToastAndroid.show(
+                'Please check your email to change password',
+                ToastAndroid.SHORT,
+              );
             },
           },
         ]);

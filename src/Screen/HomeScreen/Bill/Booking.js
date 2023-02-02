@@ -16,6 +16,7 @@ import {setId} from '../../../Redux/ManageId';
 
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Slider} from '@miblanchard/react-native-slider';
 import {useState} from 'react';
 import {Checkbox} from 'react-native-paper';
@@ -684,6 +685,29 @@ const Booking = ({navigation}) => {
           initialNumToRender={7}
           showsVerticalScrollIndicator={false}
           extraData={Data}
+          ListEmptyComponent={() => (
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'white',
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
+              <MaterialCommunityIcons
+                name="database-off-outline"
+                size={50}
+                color="hsl(0,0%,73%)"
+              />
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: 'hsl(0,0%,73%)',
+                }}>
+                Don't have information
+              </Text>
+            </View>
+          )}
         />
       </View>
       <Animated.View
