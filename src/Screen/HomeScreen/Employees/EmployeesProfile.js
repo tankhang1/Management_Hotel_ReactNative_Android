@@ -22,7 +22,6 @@ const EmployeesProfile = () => {
     'Require cycle: node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js -> node_modules\victory-vendorlib-vendord3-interpolatesrcobject.js -> node_modules\victory-vendorlib-vendord3-interpolatesrc\value.js',
   ]);
   const id = useSelector(state => state.collect_Id_Employee);
-  console.log(id);
   const dataEmployee = useSelector(
     state => state.data_infor,
   ).data.employees.filter(value => value.Employee_Id === id);

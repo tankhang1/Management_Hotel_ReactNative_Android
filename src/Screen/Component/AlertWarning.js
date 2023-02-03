@@ -12,7 +12,7 @@ const AlertWarning = ({visible, setVisible, header, body}) => {
       <View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(186,186,186,0.5)',
+          backgroundColor: 'rgba(186,186,186,0.2)',
           justifyContent: 'center',
           alignItems: 'center',
         }}>

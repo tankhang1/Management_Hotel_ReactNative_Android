@@ -6,6 +6,7 @@ import {
   ScrollView,
   PermissionsAndroid,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -60,7 +61,7 @@ const CustomersList = ({navigation}) => {
         );
       })
       .catch(e => {
-        console.log('Error', e);
+        Alert.alert('Error', e);
       });
   };
   const handleExport = async () => {
@@ -78,7 +79,6 @@ const CustomersList = ({navigation}) => {
             buttonPositive: 'OK',
           },
         );
-        console.log(PermissionsAndroid.RESULTS.GRANTED, granted);
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           exportDataToExecl();
           console.log('Permistion granted');

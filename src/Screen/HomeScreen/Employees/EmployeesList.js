@@ -12,6 +12,7 @@ import {
   PermissionsAndroid,
   ToastAndroid,
   Animated,
+  Alert,
 } from 'react-native';
 import React, {useState, useRef, useEffect, memo} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
@@ -72,7 +73,6 @@ const EmployeesList = ({navigation}) => {
     const handlingFlashlist = ({title}) => {
       back = !back;
       if (back === true) {
-        console.log('Ok');
         Animated.timing(animatedRotate, {
           toValue: 1,
           duration: 1000,
@@ -183,7 +183,6 @@ const EmployeesList = ({navigation}) => {
   };
 
   const exportDataToExecl = async () => {
-    // console.log(tmp);
     const data = converDataEmployee();
     let wb = XLSX.utils.book_new();
     let ws = XLSX.utils.json_to_sheet(data);
@@ -203,7 +202,7 @@ const EmployeesList = ({navigation}) => {
         );
       })
       .catch(e => {
-        console.log('Error', e);
+        Alert.alert('Error', e);
       });
   };
 
@@ -222,7 +221,6 @@ const EmployeesList = ({navigation}) => {
             buttonPositive: 'OK',
           },
         );
-        console.log(PermissionsAndroid.RESULTS.GRANTED, granted);
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           exportDataToExecl();
           console.log('Permistion granted');

@@ -1197,7 +1197,14 @@ const Dashboard = ({navigation}) => {
   }
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <ActivityIndicator color="green" size={100} />
+      <ActivityIndicator color="green" size={50} />
+      <Text
+        style={{
+          marginVertical: 10,
+          color: 'black',
+        }}>
+        Loading....
+      </Text>
     </View>
   );
 };

@@ -8,7 +8,7 @@ export default function Loading({navigation}) {
   useEffect(() => {
     Animated.timing(animationProgress.current, {
       toValue: 1,
-      duration: 5000,
+      duration: 3000,
       easing: Easing.linear,
       useNativeDriver: false,
     }).start(({finished}) => {

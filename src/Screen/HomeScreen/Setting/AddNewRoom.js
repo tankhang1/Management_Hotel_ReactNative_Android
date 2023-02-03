@@ -64,7 +64,6 @@ const AddNewRoom = () => {
         let kinds = [];
         snapshot.forEach(doc => {
           kinds.push({...doc.data()});
-          console.log(doc.data());
         });
         setDataKind([...kinds]);
       });
@@ -165,7 +164,6 @@ const AddNewRoom = () => {
   const [openModalAdd, setOpenModalAdd] = useState(false);
   const [openModalAddKindRoom, setOpenModalAddKindRoom] = useState(false);
   const [kindModal, setKindModal] = useState(0);
-  console.log(dataChip);
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}

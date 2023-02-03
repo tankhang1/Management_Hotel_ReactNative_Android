@@ -5,6 +5,7 @@ import {
   Pressable,
   ScrollView,
   Animated,
+  Alert,
 } from 'react-native';
 import React, {useRef} from 'react';
 import Lottie from 'lottie-react-native';
@@ -62,11 +63,18 @@ const Introduce = ({navigation}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <ActivityIndicator color="green" size={100} />
+        <ActivityIndicator color="green" size={50} />
+        <Text
+          style={{
+            marginVertical: 10,
+            color: 'black',
+          }}>
+          Loading....
+        </Text>
       </View>
     );
   } else if (error) {
-    console.log(error);
+    Alert.alert('Error', e);
     return;
   } else
     return (

@@ -5,6 +5,7 @@ import {
   Pressable,
   ToastAndroid,
   PermissionsAndroid,
+  Alert,
 } from 'react-native';
 import React, {memo} from 'react';
 import CalendarPicker from 'react-native-calendar-picker';
@@ -53,7 +54,6 @@ const ModalOptionReport = ({
               fromMonth &&
             Number(moment(doc.data().Date.toDate()).format('MM')) <= toMonth
           ) {
-            console.log('oke');
             const getDbDate = await getDocs(
               collection(
                 db,
@@ -99,7 +99,7 @@ const ModalOptionReport = ({
             changeModal();
           })
           .catch(e => {
-            console.log('Error', e);
+            Alert.alert('Error', e);
           });
       }
     });

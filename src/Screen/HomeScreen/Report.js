@@ -302,7 +302,6 @@ const Report = ({navigation}) => {
       outcome = 0;
       getDbYear.forEach(monthItem => {
         const yearItem = moment(monthItem.data().Date.toDate()).format('YYYY');
-        console.log(yearItem, itemValue);
         if (Number(yearItem) === itemValue) {
           idYear = monthItem.id;
 
@@ -473,7 +472,6 @@ const Report = ({navigation}) => {
                 }}
                 selectedValue={year}
                 onValueChange={(itemValue, itemIndex) => {
-                  console.log(itemValue);
                   setYear(itemValue);
                   changeYear(itemValue);
                 }}

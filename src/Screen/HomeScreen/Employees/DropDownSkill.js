@@ -72,9 +72,6 @@ const DropDownSkill = () => {
     <TouchableOpacity
       onPress={() => setOpenDropDown(!openDropDown)}
       disabled={openDropDown}
-      onFocus={() => {
-        console.log('OK');
-      }}
       style={{
         width: '100%',
         borderRadius: 10,

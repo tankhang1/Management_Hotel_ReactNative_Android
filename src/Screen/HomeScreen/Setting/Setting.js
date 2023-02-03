@@ -85,7 +85,6 @@ const Setting = ({navigation}) => {
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
   const OnTouchNavigation = index => {
     const auth = getAuth();
-    console.log(auth.currentUser);
     switch (index) {
       case 0:
         setIsBool(false);
