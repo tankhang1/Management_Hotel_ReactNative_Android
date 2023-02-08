@@ -182,6 +182,7 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
     } else {
       setShowForm(!showForm);
     }
+    setSurcharge(0);
   };
   const [adult, setAdult] = useState('');
   const [children, setChildren] = useState('');
@@ -739,8 +740,12 @@ const Template_Bill = ({visible, setVisible, Bill_Id, CheckOut}) => {
                   </Text>
                   <TextInput
                     value={surcharge}
-                    onChangeText={setSurcharge}
-                    placeholder="Surcharge"
+                    onChangeText={text => {
+                      if (!isNaN(Number(text))) {
+                        setSurcharge(Number(text));
+                      }
+                    }}
+                    placeholder="0"
                     style={{
                       color: 'hsl(0,0%,60%)',
                       fontSize: 14,

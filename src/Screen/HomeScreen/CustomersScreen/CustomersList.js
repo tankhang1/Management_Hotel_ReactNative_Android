@@ -50,18 +50,19 @@ const CustomersList = ({navigation}) => {
 
     // Write generated excel to Storage
     await writeFile(
-      DownloadDirectoryPath + '/ListCustomer.xlsx',
+      DownloadDirectoryPath +
+        `/ListCustomer${Math.floor(Math.random() * 1000)}.xlsx`,
       wbout,
       'ascii',
     )
       .then(r => {
         ToastAndroid.show(
           'file ListCustomer.xlsx has created in directory',
-          2000,
+          ToastAndroid.SHORT,
         );
       })
       .catch(e => {
-        Alert.alert('Error', e);
+        Alert.alert('Error', e.message);
       });
   };
   const handleExport = async () => {

@@ -87,7 +87,8 @@ const ModalOptionReport = ({
         const wbout = XLSX.write(wb, {type: 'binary', bookType: 'xlsx'});
         // Write generated excel to Storage
         await writeFile(
-          DownloadDirectoryPath + '/DataBill.xlsx',
+          DownloadDirectoryPath +
+            `/DataBill${Math.floor(Math.random() * 100)}.xlsx`,
           wbout,
           'ascii',
         )
@@ -96,13 +97,13 @@ const ModalOptionReport = ({
               'file DataBill.xlsx has created in directory',
               2000,
             );
-            changeModal();
           })
           .catch(e => {
             Alert.alert('Error', e);
           });
       }
     });
+    changeModal();
   };
 
   const handleExport = async () => {
@@ -131,7 +132,7 @@ const ModalOptionReport = ({
       }
     } catch (error) {
       console.log('Error while checking permission');
-      console.log(error);
+      console.log(error.message);
       return;
     }
   };

@@ -191,18 +191,19 @@ const EmployeesList = ({navigation}) => {
 
     // Write generated excel to Storage
     await writeFile(
-      DownloadDirectoryPath + '/ListEmployee.xlsx',
+      DownloadDirectoryPath +
+        `/ListEmployee${Math.floor(Math.random() * 1000)}.xlsx`,
       wbout,
       'ascii',
     )
       .then(r => {
         ToastAndroid.show(
           'file ListEmployee.xlsx has created in directory',
-          2000,
+          ToastAndroid.SHORT,
         );
       })
       .catch(e => {
-        Alert.alert('Error', e);
+        Alert.alert('Error', e.message);
       });
   };
 
