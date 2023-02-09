@@ -77,7 +77,7 @@ const DropDownKind = ({
               return (
                 <Pressable
                   onPress={() => {
-                    setValue(item), setOpen(!open);
+                    setValue(item.Name), setOpen(!open);
                   }}
                   key={index}
                   style={{
