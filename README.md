@@ -9,11 +9,13 @@ The project is used for hotelier. The video below describe some feature of app
 - [@tankhang1](https://github.com/tankhang1)
 
 
-## Demo
+## Download
+https://drive.google.com/drive/folders/1Z3iCbOJ1drNTbb8CnecZUHF-rH7dj441?usp=share_link
+Account: doank3442@gmail.com
+Password: 123456
 
-Insert gif or link to demo
 
-https://youtu.be/R_T4dr0LyDI
+
 
 ## Features
 
